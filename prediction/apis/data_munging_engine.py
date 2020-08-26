@@ -1,5 +1,5 @@
-from endpoints import data_munging_engine as endpoints
-import request_utils
+from prediction.endpoints import data_munging_engine as endpoints
+import prediction.request_utils
 
 def concat_columns2(auth, database, collection, attribute, separator):
     ep = endpoints.CONCAT_COLUMNS2

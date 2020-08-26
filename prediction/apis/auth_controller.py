@@ -1,5 +1,5 @@
-from endpoints import auth_controller as endpoints
-import request_utils
+from prediction.endpoints import auth_controller as endpoints
+import prediction.request_utils
 
 # AUTH_LOGIN See jwt_access
 

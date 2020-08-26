@@ -1,5 +1,5 @@
-from endpoints import algorithm_client_pulse as endpoints
-import request_utils
+from prediction.endpoints import algorithm_client_pulse as endpoints
+import prediction.request_utils
 
 def get_timeline(auth, user, limit):
     ep = endpoints.GET_TIMELINE

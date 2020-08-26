@@ -1,2 +1,2 @@
-from endpoints import settings_controller as endpoints
-import request_utils
+from prediction.endpoints import settings_controller as endpoints
+import prediction.request_utils

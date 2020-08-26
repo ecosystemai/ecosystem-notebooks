@@ -1,5 +1,5 @@
-from endpoints import predictor_engine as endpoints
-import request_utils
+from runtime.endpoints import predictor_engine as endpoints
+import runtime.request_utils
 
 def get_estore_recommendations(auth, campaign_id, channel_name, headers, msisdn, number_of_offers, params, payment_method, sub_campaign_id, user_id):
     ep = endpoints.GET_OFFER_RECOMMENDATIONS

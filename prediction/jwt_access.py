@@ -1,5 +1,5 @@
 import requests
-from endpoints import auth_controller as endpoints
+from prediction.endpoints import auth_controller as endpoints
 from datetime import datetime
 import time
 

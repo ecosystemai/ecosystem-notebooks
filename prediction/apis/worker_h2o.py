@@ -1,5 +1,5 @@
-from endpoints import worker_h2o as endpoints
-import request_utils
+from prediction.endpoints import worker_h2o as endpoints
+import prediction.request_utils
 
 def train_model(auth, modelid, modeltype, params):
     ep = endpoints.BUILD_MODEL

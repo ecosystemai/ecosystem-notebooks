@@ -1,2 +1,2 @@
-from endpoints import user_controller as endpoints
-import request_utils
+from prediction.endpoints import user_controller as endpoints
+import prediction.request_utils

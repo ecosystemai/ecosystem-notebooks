@@ -1,5 +1,5 @@
-from endpoints import ecosystem_generation_engine as endpoints
-import request_utils
+from prediction.endpoints import ecosystem_generation_engine as endpoints
+import prediction.request_utils
 
 def generate_build(auth, json):
     ep = endpoints.GENERATE_BUILD

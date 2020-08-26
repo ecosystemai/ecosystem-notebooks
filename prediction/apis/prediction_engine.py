@@ -1,6 +1,5 @@
-from endpoints import prediction_engine as endpoints
-import request_utils
-import copy
+from prediction.endpoints import prediction_engine as endpoints
+import prediction.request_utils
 
 def delete_analysis(auth, analysis_id):
     ep = endpoints.DELETE_ANALYSIS
