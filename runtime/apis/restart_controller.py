@@ -1,5 +1,5 @@
 from runtime.endpoints import restart_controller as endpoints
-import runtime.request_utils
+from runtime import request_utils
 
 def restart(auth):
     ep = endpoints.RESTART

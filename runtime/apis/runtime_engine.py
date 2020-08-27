@@ -1,5 +1,5 @@
 from runtime.endpoints import runtime_engine as endpoints
-import runtime.request_utils
+from runtime import request_utils
 import requests
 
 def login(auth):

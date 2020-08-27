@@ -1,2 +1,2 @@
 from prediction.endpoints import user_controller as endpoints
-import prediction.request_utils
+from prediction import request_utils

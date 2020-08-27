@@ -1,5 +1,5 @@
 from runtime.endpoints import worker_utilities as endpoints
-import runtime.request_utils
+from runtime import request_utils
 
 def get_cassandra(auth, sql, c_type):
     ep = endpoints.GET_CASSANDRA

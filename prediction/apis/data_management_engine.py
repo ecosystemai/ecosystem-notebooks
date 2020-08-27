@@ -1,5 +1,5 @@
 from prediction.endpoints import data_management_engine as endpoints
-import prediction.request_utils
+from prediction import request_utils
 
 # Data Management Engine
 def get_document_db_aggregate2(auth, database, collection, aggregate, field, limit, projections, skip, sort):

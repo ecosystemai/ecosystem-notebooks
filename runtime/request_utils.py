@@ -58,7 +58,7 @@ def create(auth, endpoint, json=None, params=None, ep_arg=None):
 		print(call_message)
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json)
 	else:
-		raise Exception("Error: Unsupported state: Both json and params parameters passed.")
+		raise Exception("Error: Unsupported state: Both json and params parameters passed to create() function.")
 	if resp.status_code != 200:
 		error_message = endpoint["error_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"], response_code=resp.status_code)
 		print(error_message)

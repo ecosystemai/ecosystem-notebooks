@@ -1,59 +1,5 @@
 from runtime.endpoints import predictor_engine as endpoints
-import runtime.request_utils
-
-def get_estore_recommendations(auth, campaign_id, channel_name, headers, msisdn, number_of_offers, params, payment_method, sub_campaign_id, user_id):
-    ep = endpoints.GET_OFFER_RECOMMENDATIONS
-    param_dict = {
-        "campaign_id": campaign_id, 
-        "channel_name": channel_name,
-        "headers": headers,
-        "msisdn": msisdn,
-        "number_of_offers": number_of_offers,
-        "params": params,
-        "payment_method": payment_method,
-        "sub_campaign_id": sub_campaign_id,
-        "user_id": user_id
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def put_estore_recommendations(auth, document, headers):
-    ep = endpoints.PUT_ESTORE_RECOMMENDATIONS
-    param_dict = {
-        "document": document, 
-        "headers": headers
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def get_estore_recommender_non_gsm(auth, campaign_id, channel_name, headers, msisdn, number_of_offers, params, payment_method, sub_campaign_id, user_id):
-    ep = endpoints.GET_ESTORE_RECOMMENDER_NON_GSM
-    param_dict = {
-        "campaign_id": campaign_id, 
-        "channel_name": channel_name,
-        "headers": headers,
-        "msisdn": msisdn,
-        "number_of_offers": number_of_offers,
-        "params": params,
-        "payment_method": payment_method,
-        "sub_campaign_id": sub_campaign_id,
-        "user_id": user_id
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def put_estore_recommender_non_gsm(auth, document, headers):
-    ep = endpoints.PUT_ESTORE_RECOMMENDER_NON_GSM
-    param_dict = {
-        "document": document, 
-        "headers": headers
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
+from runtime import request_utils
 
 def get_spending_personality(auth, campaign, channel, customer, headers, params, subcampaign, userid):
     ep = endpoints.GET_SPENDING_PERSONALITY
@@ -75,51 +21,6 @@ def put_spending_personality(auth, document, headers):
     param_dict = {
         "document": document, 
         "headers": headers
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def gift_recommendations(auth, document):
-    ep = endpoints.GIFT_RECOMMENDATIONS
-    param_dict = {
-        "document": document
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def gift_recommendations_free(auth, campaign_id, channel_name, headers, msisdn, number_of_offers, params, payment_method, sub_campaign_id, transaction_id, user_id):
-    ep = endpoints.GIFT_RECOMMENDATIONS_FREE
-    param_dict = {
-        "campaign_id": campaign_id,
-        "channel_name": channel_name,
-        "headers": headers,
-        "msisdn": msisdn,
-        "number_of_offers": number_of_offers,
-        "params": params,
-        "payment_method": payment_method,
-        "sub_campaign_id": sub_campaign_id,
-        "transaction_id": transaction_id,
-        "user_id": user_id
-    }
-    resp = request_utils.create(auth, ep, params=param_dict)
-    meta = resp.json()
-    return meta
-
-def gift_recommendations_purchased(auth, campaign_id, channel_name, headers, msisdn, number_of_offers, params, payment_method, sub_campaign_id, transaction_id, user_id):
-    ep = endpoints.GIFT_RECOMMENDATIONS_PURCHASED
-    param_dict = {
-        "campaign_id": campaign_id,
-        "channel_name": channel_name,
-        "headers": headers,
-        "msisdn": msisdn,
-        "number_of_offers": number_of_offers,
-        "params": params,
-        "payment_method": payment_method,
-        "sub_campaign_id": sub_campaign_id,
-        "transaction_id": transaction_id,
-        "user_id": user_id
     }
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()

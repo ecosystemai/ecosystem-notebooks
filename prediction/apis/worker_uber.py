@@ -1,2 +1,2 @@
 from prediction.endpoints import worker_uber as endpoints
-import prediction.request_utils
+from prediction import request_utils

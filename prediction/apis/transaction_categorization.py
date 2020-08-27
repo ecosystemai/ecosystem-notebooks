@@ -1,5 +1,5 @@
 from prediction.endpoints import transaction_categorization as endpoints
-import prediction.request_utils
+from prediction import request_utils
 
 def get_transactions(auth, json):
     ep = endpoints.GET_TRANSACTIONS

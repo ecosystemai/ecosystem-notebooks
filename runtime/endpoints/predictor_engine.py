@@ -1,27 +1,3 @@
-GET_ESTORE_RECOMMENDATIONS = {
-	"type": "get",
-	"endpoint": "/estoreRecommendations",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-PUT_ESTORE_RECOMMENDATIONS = {
-	"type": "put",
-	"endpoint": "/estoreRecommendations",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GET_ESTORE_RECOMMENDER_NON_GSM = {
-	"type": "get",
-	"endpoint": "/estoreRecommenderNonGSM",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-PUT_ESTORE_RECOMMENDER_NON_GSM = {
-	"type": "put",
-	"endpoint": "/estoreRecommenderNonGSM",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
 GET_SPENDING_PERSONALITY = {
 	"type": "get",
 	"endpoint": "/getSpendingPersonality",
@@ -31,24 +7,6 @@ GET_SPENDING_PERSONALITY = {
 PUT_SPENDING_PERSONALITY = {
 	"type": "put",
 	"endpoint": "/getSpendingPersonality",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GIFT_RECOMMENDATIONS = {
-	"type": "put",
-	"endpoint": "/giftRecommendations",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GIFT_RECOMMENDATIONS_FREE = {
-	"type": "get",
-	"endpoint": "/giftRecommendationsFree",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GIFT_RECOMMENDATIONS_PURCHASED = {
-	"type": "get",
-	"endpoint": "/giftRecommendationsPurchased",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }

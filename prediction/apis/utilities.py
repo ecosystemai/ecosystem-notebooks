@@ -1,5 +1,5 @@
 from prediction.endpoints import utilities as endpoints
-import prediction.request_utils
+from prediction import request_utils
 
 def convert_json_to_yaml(auth, json):
     ep = endpoints.CONVERT_JSON_TO_YAML

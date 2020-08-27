@@ -1,5 +1,5 @@
 from prediction.endpoints import data_ingestion_engine as endpoints
-import prediction.request_utils
+from prediction import request_utils
 
 def add_metadocumemnts(auth, meta_documents):
     ep = endpoints.ADD_META_DOCUMENTS

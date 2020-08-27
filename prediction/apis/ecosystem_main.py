@@ -1,2 +1,2 @@
 from prediction.endpoints import ecosystem_main as endpoints
-import prediction.request_utils
+from prediction import request_utils
