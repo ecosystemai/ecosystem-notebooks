@@ -6,9 +6,9 @@ Ecosystem Notebooks is a wrapper for the Ecosystem API servers(Prediction and Ru
 
 ## Requirements
 
-To use any of the notebooks, access to an Ecosystem API server is required.
-Jupyter Notebook.
-[Python3](https://www.python.org/downloads/): Was built using Python 3.6, but should work for most Python3 versions.
+* To use any of the notebooks, access to an Ecosystem API server is required.
+* Jupyter Notebook.
+* [Python3](https://www.python.org/downloads/): Was built using Python 3.6, but should work for most Python3 versions.
 
 ## Getting started
 
