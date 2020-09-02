@@ -4,7 +4,7 @@
 
 Ecosystem Notebooks is a wrapper for the Ecosystem API servers. They can be used for both the Prediction and Runtime servers. 
 
-The notebooks are a great interface to work from in order to test, and explore the server’s capabilities. They allow you to navigate them without encountering the complexities of directly interacting with the APIs.
+The notebooks are a great interface to work from in order to test, and explore the server’s capabilities. They allow you to navigate them easily by removing the complexities of directly interacting with the APIs.
 
 Ecosystem Notebooks are built using the Jupyter Notebook coding environment, and Python 3 kernel for code execution.
 
@@ -27,13 +27,13 @@ Once Jupyter is installed, enter the directory containing the notebooks. At the 
 ```bash
 jupyter notebook
 ```
-This will open up a default web browser to the Jupyter Notebook landing page from which you can open up one of the desired Ecosystem Notebooks.
+This will open up a default web browser to the Jupyter Notebook landing page from which you can open up one of the desired notebooks.
 
 ![Jupyter Landing Page](https://github.com/ecosystemai/ecosystem-notebooks/blob/master/docs/images/jupyter_landing_page.png "Jupyter Landing Page")
 
 ## How does Ecosystem Notebooks work
 
-It is within a chosen notebook that becomes your coding environment from which you can edit and run live code. For easy navigation within any of the notebooks, you can use the table of contents which will be situated on the left.
+From within a chosen notebook, Ecosystem Notebooks can be used. This coding environment, from which you can edit and run live code, provides the interface with which to utilise the API endpoints for Ecosystem Prediction and Runtime servers.For easy navigation within any of the notebooks, you can use the table of contents which will be situated on the left.
 
 In order for the API endpoints to properly function, you will need to login. Depending on which notebooks you have chosen to use, logging in could require a URL endpoint. Or a username, password and URL combination, which will generate an authentication token. This token will activate the API, then you can begin using Ecosystem Notebooks!
 
