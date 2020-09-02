@@ -12,7 +12,7 @@ Ecosystem Notebooks are built using the Jupyter Notebook coding environment, and
 
 * To use any of the notebooks, access to an Ecosystem API server is required
 * [Jupyter Notebook](https://jupyter.org/)
-* [Python3](https://www.python.org/downloads/): The notebooks were built using python 3.6, but most Python 3 versions will work
+* [Python 3](https://www.python.org/downloads/): The notebooks were built using python 3.6, but most Python 3 versions will work
 
 ## Getting started
 
