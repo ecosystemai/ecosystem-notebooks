@@ -37,4 +37,4 @@ Logging on is required before any of the api endpoints will function. Depending 
 
 ![Login](https://github.com/ecosystemai/ecosystem-notebooks/blob/master/docs/images/login.png "Login")
 
-The Ecosystem Noteboos contains all available API endpoints on the Ecosystem Servers. These can be run in place or copied to be executed on an extranal site.
+The Ecosystem Notebooks contain all available API endpoints on the Ecosystem Servers. These can be run in place or copied to be executed on an extranal site.
