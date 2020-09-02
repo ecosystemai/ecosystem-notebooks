@@ -3,6 +3,7 @@
 ## What is Ecosystem Notebooks?
 
 Ecosystem Notebooks is a wrapper for the Ecosystem API servers. They can be used for both the Prediction and Runtime servers. 
+
 The notebooks are a great interface to work from in order to test, and explore the server’s capabilities. They allow you to navigate them without encountering the complexities of directly interacting with the APIs.
 
 Ecosystem Notebooks are built using the Jupyter Notebook coding environment, and Python 3 kernel for code execution.
@@ -10,7 +11,7 @@ Ecosystem Notebooks are built using the Jupyter Notebook coding environment, and
 ## Requirements
 
 * To use any of the notebooks, access to an Ecosystem API server is required
-* Jupyter Notebook
+* [Jupyter Notebook](https://jupyter.org/)
 * [Python3](https://www.python.org/downloads/): The notebooks were built using python 3.6, but most Python 3 versions will work
 
 ## Getting started
