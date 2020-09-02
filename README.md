@@ -2,39 +2,40 @@
 
 ## What is Ecosystem Notebooks?
 
-The Notebooks provide Python access to the Ecosystem API servers(Prediction and Runtime). It allows working, testing and exploring of the API server's capabilities and services, while abstracting away the complexities of directly interacting with the APIs. The notebooks are built using Jupyter Notebook, an interactive computing envirnment, together with the Python3 kernal for code execution.
+Ecosystem Notebooks is a wrapper for the Ecosystem API servers. They can be used for both the Prediction and Runtime servers. 
+The notebooks are a great interface to work from in order to test, and explore the server’s capabilities. They allow you to navigate them without encountering the complexities of directly interacting with the APIs.
+
+Ecosystem Notebooks are built using the Jupyter Notebook coding environment, and Python 3 kernel for code execution.
 
 ## Requirements
 
-* To use any of the notebooks, access to an Ecosystem API server is required.
-* Jupyter Notebook.
-* [Python3](https://www.python.org/downloads/): Was built using Python 3.6, but should work for most Python3 versions.
+* To use any of the notebooks, access to an Ecosystem API server is required
+* Jupyter Notebook
+* [Python3](https://www.python.org/downloads/): The notebooks were built using python 3.6, but most Python 3 versions will work
 
 ## Getting started
 
-To get going with Ecosystem Notebooks, start by installing Jupyter Notebook.
+To begin using Ecosystem Notebooks, you need to first install Jupyter Notebook.
 
-This can be done by running the configure_jupyter.sh shell script, in addition recommended styling options can be added by running the configure_jupyter_styling.sh shell script, but is not required.
+This can be done by running the configure_jupyter.sh shell script. 
+In addition, recommended styling options can be added by running the configure_jupyter_styling.sh shell script. While this is not required, you are welcome to play around with it to personalise the Ecosystem workbench style.
 
-To install the relevant python code add the parent directory(ecosystem-notebooks) to the PYTHONPATH environment variable. 
+To install the relevant python code, add the parent directory (ecosystem-notebooks) to the PYTHONPATH environment variable. 
 
-Once Jupyter is installed run the command:
+Once Jupyter is installed, enter the directory containing the notebooks. At the designated .ipynb extension, run the command:
 ```bash
 jupyter notebook
 ```
-in the directory containing the notebooks designated by the .ipynb extention.
-
-This will open up a default web browser to the Jupyter Notebook landing page from which you can open up the required notebook.
+This will open up a default web browser to the Jupyter Notebook landing page from which you can open up one of the desired Ecosystem Notebooks.
 
 ![Jupyter Landing Page](https://github.com/ecosystemai/ecosystem-notebooks/blob/master/docs/images/jupyter_landing_page.png "Jupyter Landing Page")
 
 ## How does Ecosystem Notebooks work
 
-The opened notebook is a live computing environment, allowing code to be edited and run in place. 
-To navigate the notebook, use the table of contents on the left to easily find any section.
+It is within a chosen notebook that becomes your coding environment from which you can edit and run live code. For easy navigation within any of the notebooks, you can use the table of contents which will be situated on the left.
 
-Logging on is required before any of the api endpoints will function. Depending on the notebook this will either be a username, password and url endpoint combination or just an url endpoint. This will generate an authentication token that all api calls required to function.
+In order for the API endpoints to properly function, you will need to login. Depending on which notebooks you have chosen to use, logging in could require a URL endpoint. Or a username, password and URL combination, which will generate an authentication token. This token will activate the API, then you can begin using Ecosystem Notebooks!
 
 ![Login](https://github.com/ecosystemai/ecosystem-notebooks/blob/master/docs/images/login.png "Login")
 
-The Ecosystem Notebooks contain all available API endpoints on the Ecosystem Servers. These can be run in place or copied to be executed on an extranal site.
+Ecosystem Notebooks contains all the available API endpoints on the Ecosystem Servers. You can either play around in the ecosystem environment, or you can use it in your own chosen infrastructure.
