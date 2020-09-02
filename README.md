@@ -2,7 +2,7 @@
 
 ## What is Ecosystem Notebooks?
 
-Ecosystem Notebooks is a wrapper for the Ecosystem API servers(Prediction and Runtime). It allows working, testing and exploring of the API server's capabilities and services, while abstracting away the complexities of directly interacting with the APIs. The notebooks are built using Jupyter Notebook, an interactive computing envirnment, together with the Python3 kernal for code execution.
+The Notebooks provide Python access to the Ecosystem API servers(Prediction and Runtime). It allows working, testing and exploring of the API server's capabilities and services, while abstracting away the complexities of directly interacting with the APIs. The notebooks are built using Jupyter Notebook, an interactive computing envirnment, together with the Python3 kernal for code execution.
 
 ## Requirements
 
