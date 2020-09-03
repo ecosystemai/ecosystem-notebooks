@@ -37,7 +37,7 @@ def put_spending_personality(auth, document, headers):
     return meta
 
 def model_detail(auth, model):
-    ep = endpoints.GIFT_RECOMMENDATIONS_PURCHASED
+    ep = endpoints.GET_OFFER_RECOMMENDATIONS
     param_dict = {
         "model": model
     }
