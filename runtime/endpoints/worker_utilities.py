@@ -40,6 +40,12 @@ GET_PROPERTIES_PREDICT_PARAM = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+GET_REST = {
+	"type": "get",
+	"endpoint": "/getREST",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
 LIST_TO_MATRIX = {
 	"type": "get",
 	"endpoint": "/listToMatrix",

@@ -54,6 +54,15 @@ def get_properties_predict_param(auth):
     meta = resp.json()
     return meta
 
+def get_rest(auth, path):
+    ep = endpoints.LIST_TO_MATRIX
+    param_dict = {
+        "path": path
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
 def list_to_matrix(auth, params):
     ep = endpoints.LIST_TO_MATRIX
     param_dict = {
