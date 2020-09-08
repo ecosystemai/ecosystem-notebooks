@@ -2,12 +2,15 @@ from runtime.endpoints import runtime_engine as endpoints
 from runtime import request_utils
 import requests
 
+# Get Login
 def login(auth):
     ep = endpoints.LOGIN
     resp = request_utils.create(auth, ep)
     meta = resp.json()
     return meta
 
+# Ping server and provide response
+#   message: The message to return. (string)
 def ping(auth, message):
     ep = endpoints.PING
     param_dict = {
