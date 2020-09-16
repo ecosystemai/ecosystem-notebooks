@@ -138,7 +138,7 @@ def get_uframe(auth, frame_id):
     ep = endpoints.GET_USER_FRAME
     param_dict = {"frame_id": frame_id}
     resp = request_utils.create(auth, ep, params=param_dict)
-    result = resp.json()
+    result = resp
     return result
 
 def get_user_model(auth, model_identity):

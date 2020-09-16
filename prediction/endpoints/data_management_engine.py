@@ -109,7 +109,7 @@ GET_MONGO_DB_COLLECTIONS = {
 }
 GET_MONGO_DB_COLLECTION_STATS = {
 	"type": "get",
-	"endpoint": "/getMongoDBCollectionsStats",
+	"endpoint": "/getMongoDBCollectionStats",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }

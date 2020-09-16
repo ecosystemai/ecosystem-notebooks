@@ -190,7 +190,7 @@ def get_document_db_collections(auth, database):
     result = resp.json()
     return result
 
-def get_document_db_collections_stats(auth, database, collection):
+def get_document_db_collection_stats(auth, database, collection):
     ep = endpoints.GET_MONGO_DB_COLLECTION_STATS
     param_dict = {
         "database": database, 
@@ -248,8 +248,10 @@ def get_data_sort(auth, database, collection, field, limit, projections, skip, s
         meta = meta["data"]
     return meta
 
-def get_document_db_list(auth, server):
+def get_document_db_list(auth, server=None):
     ep = endpoints.GET_MONGO_DB_LIST
+    if server == None:
+    	server = auth.get_server()
     param_dict = {
         "server": server
     }

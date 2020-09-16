@@ -43,13 +43,14 @@ def copy_file(auth, f_from, f_to):
         "to": f_to
     }
     resp = request_utils.create(auth, ep, params=param_dict)
-    result = resp.json()
+    result = resp
     return result
 
 def get_file(auth, file_name, lines):
     ep = endpoints.GET_FILE
     param_dict = {
         "file": file_name,
+        "lines": lines
     }
     resp = request_utils.create(auth, ep, params=param_dict)
     result = resp.json()

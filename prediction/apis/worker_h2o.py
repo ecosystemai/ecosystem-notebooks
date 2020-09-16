@@ -5,7 +5,8 @@ def train_model(auth, modelid, modeltype, params):
     ep = endpoints.BUILD_MODEL
     param_dict = {"model_id": modelid, "model_type": modeltype, "model_parms": params}
     resp = request_utils.create(auth, ep, params=param_dict)
-    result = resp.json()
+    result = resp
+    # result = resp.json()
     return result
 
 def cancel_job(auth, jobid):

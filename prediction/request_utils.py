@@ -25,6 +25,7 @@ class ApiError(IOError):
 def auto_format_params(d):
 	s = ""
 	for key in d:
+		d[key] = str(d[key])
 		s += "{key}={{{key}}}&".format(key=key)
 	return s.format(**d)
 
