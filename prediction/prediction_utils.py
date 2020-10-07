@@ -37,7 +37,8 @@ def _async_thread(auth, j_dc_doc, count, total):
 				pass
 	
 
-def async_upload(data, db_name, col_name):
+def async_upload(auth, dataframe, db_name, col_name):
+	data = list(dataframe.T.to_dict().values())
 	j_dc_doc = {
 		"database": db_name,
 		"collection": col_name,
