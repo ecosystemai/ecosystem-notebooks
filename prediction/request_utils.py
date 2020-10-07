@@ -43,20 +43,18 @@ def get_type(t):
 	else:
 		raise RequestTypeError(t)
 
-def create(auth, endpoint, json=None, params=None, ep_arg=None):
+def create(auth, endpoint, json=None, params=None, ep_arg=None, info=True):
 	url_endpoint = auth.get_server() + endpoint["endpoint"]
 	if ep_arg != None:
 		url_endpoint = url_endpoint + ep_arg
 	resp = None
 	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
 	if json == None and params == None:
-		print(call_message)
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers())
 	elif json == None:
-		print(call_message + "?" + auto_format_params(params))
+		call_message = call_message + "?" + auto_format_params(params)
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), params=params)
 	elif params == None:
-		print(call_message)
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json)
 	else:
 		raise Exception("Error: Unsupported state: Both json and params parameters passed.")
@@ -64,4 +62,6 @@ def create(auth, endpoint, json=None, params=None, ep_arg=None):
 		error_message = endpoint["error_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"], response_code=resp.status_code)
 		print(error_message)
 		raise ApiError(error_message, response=resp)
+	if info:
+		print(call_message)
 	return resp
