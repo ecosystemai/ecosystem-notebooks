@@ -96,7 +96,6 @@ def file_to_frame(auth, file_name, first_row_column_names, separator):
 
 def featurestore_to_frame(auth, userframe):
     ep = endpoints.PROCESS_TO_FRAME_PARSE
-    param_dict = {"databasename": databasename, "tablename": tablename}
     resp = request_utils.create(auth, ep, json=userframe)
     parsed_frame = resp.json()
     return parsed_frame

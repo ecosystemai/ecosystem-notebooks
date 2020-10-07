@@ -37,9 +37,9 @@ def add_document_database(auth, database):
     result = resp.json()
     return result
 
-def add_documents(auth, json):
+def add_documents(auth, json, info=True):
     ep = endpoints.ADD_MONGO_DOCUMENTS
-    resp = request_utils.create(auth, ep, json=json)
+    resp = request_utils.create(auth, ep, json=json, info=info)
     result = resp.json()
     return result
 
