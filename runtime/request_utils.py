@@ -47,7 +47,7 @@ def create_only_auth(auth, endpoint, **kwargs):
 	resp = None
 	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
 	print(call_message)
-	resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), **kwargs)
+	resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), verify=False, **kwargs)
 	if resp.status_code != 200:
 		error_message = endpoint["error_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"], response_code=resp.status_code)
 		print(error_message)
@@ -62,13 +62,13 @@ def create(auth, endpoint, json=None, params=None, ep_arg=None):
 	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
 	if json == None and params == None:
 		print(call_message)
-		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers())
+		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), verify=False)
 	elif json == None:
 		print(call_message + "?" + auto_format_params(params))
-		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), params=params)
+		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), params=params, verify=False)
 	elif params == None:
 		print(call_message)
-		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json)
+		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json, verify=False)
 	else:
 		raise Exception("Error: Unsupported state: Both json and params parameters passed to create() function.")
 	if resp.status_code != 200:
