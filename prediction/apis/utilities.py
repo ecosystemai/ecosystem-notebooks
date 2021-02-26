@@ -55,3 +55,9 @@ def get_file(auth, file_name, lines):
     resp = request_utils.create(auth, ep, params=param_dict)
     result = resp.json()
     return result
+
+def execute_generic(auth, script):
+    ep = endpoints.EXECUTE_GENERIC
+    resp = request_utils.create(auth, ep, data=script)
+    result = resp.json()
+    return result

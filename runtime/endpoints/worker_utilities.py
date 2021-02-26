@@ -82,3 +82,45 @@ UPDATE_PREDICT_PARAM = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+UPLOAD_FILE = {
+	"type": "post",
+	"endpoint": "/upload",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+FILE_DATABASE_IMPORT = {
+	"type": "get",
+	"endpoint": "/fileDatabaseImport",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+UPDATE_PROPERTIES = {
+	"type": "post",
+	"endpoint": "/updateProperties",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+REFRESH = {
+	"type": "get",
+	"endpoint": "/refresh",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+GET_SPEND_PERSONALITY = {
+	"type": "get",
+	"endpoint": "/getSpendingPersonality",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+
+GET_FINANCIAL_WELLNESS = {
+	"type": "get",
+	"endpoint": "/getFinancialWellnessScore",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}

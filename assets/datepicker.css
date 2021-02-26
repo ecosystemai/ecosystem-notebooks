@@ -1,0 +1,20 @@
+.DateRangePickerInput {
+	width: 100%;
+}
+
+.DateRangePicker {
+	width: 100%;
+}
+.DateInput {
+	width: 45%;
+	
+}
+.DateInput_input {
+	text-align: center;
+}
+.DateRangePickerInput_arrow {
+	width: 10%;
+}
+.DateRangePickerInput_arrow_svg {
+	margin: auto;
+}
