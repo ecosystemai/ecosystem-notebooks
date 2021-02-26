@@ -1,29 +1,29 @@
 #circle {
     background: red;
-    width: 15px;
-    height: 15px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border-color: black;
-    border-width: 2px;
+    border-color: grey;
+    border-width: 1px;
     border-style: solid;
 }
 
 #circle2 {
     background: red;
-    width: 15px;
-    height: 15px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border-color: black;
-    border-width: 2px;
+    border-color: grey;
+    border-width: 1px;
     border-style: solid;
 }
 
 #circle3 {
     background: red;
-    width: 15px;
-    height: 15px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    border-color: black;
-    border-width: 2px;
+    border-color: grey;
+    border-width: 1px;
     border-style: solid;
 }

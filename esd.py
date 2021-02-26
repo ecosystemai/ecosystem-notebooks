@@ -23,6 +23,8 @@ tmp_dir = "tmp/"
 if not os.path.exists(tmp_dir):
 	os.mkdir(tmp_dir)
 
+
+
 def json_flatten(jdict, key_prefix):
 	rdict = {}
 	for key in jdict.keys():
@@ -50,71 +52,89 @@ table_data = [
 columns = [
 ]
 
+
+
 app.layout = html.Div([
 		# Login
 		html.Div([
+				html.Button("Login", id="accordion_button", className="accordion"),
 				html.Div([
 						html.Div([
-								html.Label("Prediction Server URL:", style={"padding-right": "5px"}),
-								dcc.Input(
-									id="ps_url",
-									value="http://127.0.0.1:3001/api",
-									# value="",
+								html.Div([
+										html.Label("Prediction Server URL:", style={"padding-right": "5px"}),
+										dcc.Input(
+											id="ps_url",
+											style={"background-color": "white"},
+											value="http://127.0.0.1:3001/api",
+											# value="",
+										),
+									]
 								),
-								html.Label("Prediction Server Username:", style={"padding-left": "15px", "padding-right": "5px"}),
-								dcc.Input(
-									id="ps_username",
-									value="admin@ecosystem.ai",
-									# value="",
-
+								html.Div([
+										html.Label("Prediction Server Username:", style={"padding-right": "5px"}),
+										dcc.Input(
+											id="ps_username",
+											style={"background-color": "white"},
+											value="admin@ecosystem.ai",
+											# value="",
+										),
+									]
 								),
-								html.Label("Prediction Server Password:", style={"padding-left": "15px", "padding-right": "5px"}),
-								dcc.Input(
-									id="ps_password",
-									value="password",
-									# value="",
+								html.Div([
+										html.Label("Prediction Server Password:", style={"padding-right": "5px"}),
+										dcc.Input(
+											id="ps_password",
+											style={"background-color": "white"},
+											value="password",
+											# value="",
+										),
+									]
 								),
-							]
+								html.Div([
+										html.Label("Runtime Server URL:", style={"padding-right": "5px"}),
+										dcc.Input(
+											id="rs_url",
+											style={"background-color": "white"},
+											value="http://127.0.0.1:8091",
+											# value="",
+										),
+									]
+								)
+							],
 						),
 						html.Div([
-								html.Label("Runtime Server URL:", style={"padding-right": "5px"}),
-								dcc.Input(
-									id="rs_url",
-									value="http://127.0.0.1:8091",
-									# value="",
+								html.Div([
+										html.Button("Login",
+													id="login_button", 
+													type="text",
+													style={
+														"width": "100%",
+														"height": "100%"
+													}
+										),
+									],
+									style={"display": "inline-block", "width": "100px", "height": "100%"}
 								),
-							]
-						)
-					]
-				),
-				html.Div([
-						html.Div([
-								html.Button("Login",
-											id="login_button", 
-											type="text",
-											style={
-												"width": "100%",
-												"height": "100%"
-											}
-								),
+								html.Div([
+										html.Div([], id="circle")
+									],
+									style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "4px", "padding-left": "5px"}
+								)
 							],
-							style={"display": "inline-block", "width": "100px", "height": "100%"}
+							style={"width": "100%"}
 						),
-						html.Div([
-								html.Div([], id="circle")
-							],
-							style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "0px", "padding-left": "5px"}
-						)
 					],
-					style={"width": "100%"}
+					id="login_div",
+					className="login_off"
 				),
 			],
-			id="login_div"
+			style={"width": "26%"}
 		),
 		html.Hr(),
 		# Filter/Find
 		html.Div([
 				html.Div([
+						html.H3("Use Case Details:"),
 						html.Label("Use Case"),
 						dcc.Dropdown(
 							id="usecase_dropdown",
@@ -123,6 +143,7 @@ app.layout = html.Div([
 							persistence=True,
 							style={"font-size": "13px"}
 						),
+						html.Br(),
 						html.Label("Find Filter"),
 						html.Br(),
 						dcc.Input(
@@ -138,6 +159,7 @@ app.layout = html.Div([
 									}
 						),
 						html.Br(),
+						html.Br(),
 						html.Label("Customer"),
 						html.Div([
 								dcc.RadioItems(
@@ -148,13 +170,37 @@ app.layout = html.Div([
 								),
 							],
 							style={"overflow-y": "scroll", "height": "180px", "border": "1px solid grey"}
-						)
+						),
+						html.Div([
+							html.Br(),
+							html.Label("Score Value"),
+							html.Br(),
+							dcc.Input(
+								id="score_value_input",
+								value="",
+								style={"width": "70%"}
+							),
+							html.Button("Score",
+										id="score_button", 
+										type="text",
+										style={
+											"width": "26%",
+										}
+							),
+							html.Br(),
+							html.Br(),
+							dcc.Upload(html.Button("Batch Score", style={"width": "35%"}), 
+								id="batch_score_picker"
+							),
+							html.Br()
+						],
+						style={"width": "100%"}
+					),
 					],
-					style={"display": "inline-block", "verticalAlign": "top", "width": "20%", "height": "300px",}
+					style={"display": "inline-block", "verticalAlign": "top", "width": "20%", "height": "470px",}
 				),
 				html.Div([
-						html.Label("Transactions"),
-						html.Br(),
+						html.H3("Transaction Details:"),
 						dash_table.DataTable(
 							id="datatable",
 							columns=columns,
@@ -162,146 +208,123 @@ app.layout = html.Div([
 							style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
 							style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
 							style_cell={"textAlign": "left", "minWidth": "80px", "font-family": "arial", "font-size": "11px"},
-							fixed_rows={'headers': True},
+							fixed_rows={"headers": True},
 							style_table={"overflowY": "auto", "overflowX": "auto", "height": "280px"},
 						)
 					],
-					style={"display": "inline-block", "float": "right", "width": "78%"}
+					style={"display": "inline-block", "width": "58%", "padding-left": "20px"}
+				),
+				html.Div([
+						html.H3("Upload Data:"),
+						html.Label("Customer Data"),
+						html.Br(),
+						html.Div([
+								html.Div([
+									dcc.Input(
+										id="upload_customer_data",
+										value="",
+										style={"width": "100%"}
+									),
+								], style={"display": "inline-block", "width": "85%"}),
+								html.Div([
+									dcc.Upload(html.Button("..."), id="customer_upload_picker",),
+								], style={"display": "inline-block", "padding-left": "8px"})
+							]
+						),
+						html.Br(),
+						html.Button("Upload",
+									id="customer_upload_button", 
+									type="text",
+									style={
+										"width": "25%",
+									}
+						),
+						html.Label("Uploaded File.", id="upload_button_label1", hidden=True),
+						html.Br(),
+						html.Br(),
+						html.Label("Transaction Data"),
+						html.Br(),
+						html.Div([
+								html.Div([
+									dcc.Input(
+										id="upload_transaction_data",
+										value="",
+										style={"width": "100%"}
+									),
+								], style={"display": "inline-block", "width": "85%"}),
+								html.Div([
+									dcc.Upload(html.Button("..."), id="transaction_upload_picker",),
+								], style={"display": "inline-block", "padding-left": "8px"})
+							]
+						),
+						html.Br(),
+						html.Button("Upload",
+									id="transaction_upload_button", 
+									type="text",
+									style={
+										"width": "25%",
+									}
+						),
+						html.Label("Uploaded File.", id="upload_button_label2", hidden=True),
+						html.Br(),
+						html.Br(),
+						html.Label("CTO Data"),
+						html.Br(),
+						html.Div([
+								html.Div([
+									dcc.Input(
+										id="upload_cto_data",
+										value="",
+										style={"width": "100%"}
+									),
+								], style={"display": "inline-block", "width": "85%"}),
+								html.Div([
+									dcc.Upload(html.Button("..."), id="cto_upload_picker",),
+								], style={"display": "inline-block", "padding-left": "8px"})
+							]
+						),
+						html.Br(),
+						html.Button("Upload",
+									id="cto_upload_button", 
+									type="text",
+									style={
+										"width": "25%",
+									}
+						),
+						html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
+						html.Br(),
+						html.Br(),
+						html.Div([
+								html.Div([
+										html.Button("Process Uploads",
+													id="process_uploads_button", 
+													type="text",
+													style={
+														"width": "100%"
+													}
+										),
+									],
+									style={"display": "inline-block", "width": "35%", "height": "100%"}
+								),
+								html.Div([
+										html.Div([], id="circle2")
+									],
+									style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "11px", "padding-left": "5px"}
+								)
+							],
+							style={"width": "100%"}
+						),
+					],
+					id = "upload_div",
+					style= {"display": "inline-block", "float": "right", "width": "20%"}
 				)
 			],
 			# style={"border": "5px solid grey", "width": "100%"}
 		),
-		# Score/Upload
+		html.Hr(),
 		html.Div([
 				html.Div([
-						html.Label("Score Value"),
-						html.Br(),
-						dcc.Input(
-							id="score_value_input",
-							value="",
-							style={"width": "70%"}
-						),
-						html.Button("Score",
-									id="score_button", 
-									type="text",
-									style={
-										"width": "26%",
-									}
-						),
-						html.Br(),
-						html.Br(),
-						dcc.Upload(html.Button("Batch Score", style={"width": "98.5%"}), 
-							id="batch_score_picker"
-						),
-						html.Br(),
-						html.Hr(),
-						html.Div([
-								html.Br(),
-								html.Label("Customer Data"),
-								html.Br(),
-								html.Div([
-										html.Div([
-											dcc.Input(
-												id="upload_customer_data",
-												value="",
-												style={"width": "100%"}
-											),
-										], style={"display": "inline-block", "width": "85%"}),
-										html.Div([
-											dcc.Upload(html.Button("..."), id="customer_upload_picker",),
-										], style={"display": "inline-block", "padding-left": "8px"})
-									]
-								),
-								html.Button("Upload",
-											id="customer_upload_button", 
-											type="text",
-											style={
-												"width": "25%",
-											}
-								),
-								html.Label("Uploaded File.", id="upload_button_label1", hidden=True),
-								html.Br(),
-								html.Br(),
-								html.Label("Transaction Data"),
-								html.Br(),
-								html.Div([
-										html.Div([
-											dcc.Input(
-												id="upload_transaction_data",
-												value="",
-												style={"width": "100%"}
-											),
-										], style={"display": "inline-block", "width": "85%"}),
-										html.Div([
-											dcc.Upload(html.Button("..."), id="transaction_upload_picker",),
-										], style={"display": "inline-block", "padding-left": "8px"})
-									]
-								),
-								html.Button("Upload",
-											id="transaction_upload_button", 
-											type="text",
-											style={
-												"width": "25%",
-											}
-								),
-								html.Label("Uploaded File.", id="upload_button_label2", hidden=True),
-								html.Br(),
-								html.Br(),
-								html.Label("CTO Data"),
-								html.Br(),
-								html.Div([
-										html.Div([
-											dcc.Input(
-												id="upload_cto_data",
-												value="",
-												style={"width": "100%"}
-											),
-										], style={"display": "inline-block", "width": "85%"}),
-										html.Div([
-											dcc.Upload(html.Button("..."), id="cto_upload_picker",),
-										], style={"display": "inline-block", "padding-left": "8px"})
-									]
-								),
-								html.Button("Upload",
-											id="cto_upload_button", 
-											type="text",
-											style={
-												"width": "25%",
-											}
-								),
-								html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
-								html.Br(),
-								html.Br(),
-								html.Div([
-										html.Div([
-												html.Button("Process Uploads",
-															id="process_uploads_button", 
-															type="text",
-															style={
-																"width": "100%"
-															}
-												),
-											],
-											style={"display": "inline-block", "width": "88%", "height": "100%"}
-										),
-										html.Div([
-												html.Div([], id="circle2")
-											],
-											style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "0x", "padding-left": "5px"}
-										)
-									],
-									style={"width": "100%"}
-								),
-							],
-							id = "upload_div",
-							style= {"width": "98%", "height": "380px"}
-						)
-					],
-					style={"display": "inline-block", "verticalAlign": "top", "width": "20%", "height": "300px",}
-				),
-				html.Div([
-						html.Label("Scoring Output"),
-						html.Br(),
+						html.H3("Scoring Output"),
 						dcc.Tabs(id="tabs_scoring", value="scoring", parent_className="custom-tabs",
 							children=[
 								dcc.Tab(label="Scoring Raw", value="scoring"),
@@ -310,39 +333,44 @@ app.layout = html.Div([
 							],
 						),
 						html.Div([
-								dash_table.DataTable(
-									id="scoring_datatable",
-									columns=[],
-									data=[],
-									style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
-									style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
-									style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
-									fixed_rows={'headers': True},
-									style_table={"overflowY": "auto", "overflowX": "auto", "height": "380px", "display": "none"},
-								),
-								dcc.Textarea(
-									id = "scoring_text_area",
-									value = "",
-									style= {"width": "98%", "height": "380px"}
-								),
 								html.Div([
-										dcc.Dropdown(
-											id="graph_dropdown",
-											options=[],
-											clearable=False
+										dash_table.DataTable(
+											id="scoring_datatable",
+											columns=[],
+											data=[],
+											style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
+											style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
+											style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
+											fixed_rows={'headers': True},
+											style_table={"overflowY": "auto", "overflowX": "auto", "height": "380px", "display": "none"},
+									
 										),
-										dcc.Graph(
-											id="graphing",
-											figure={}
-										)
+										dcc.Textarea(
+											id = "scoring_text_area",
+											value = "",
+											style= {"width": "100%", "height": "380px"}
+										),
+										html.Div([
+												dcc.Dropdown(
+													id="graph_dropdown",
+													options=[],
+													clearable=False
+												),
+												dcc.Graph(
+													id="graphing",
+													figure={}
+												)
+											],
+											id="graphing_div",
+											style= {"width": "100%", "height": "380px", "display": "none"}
+										),
 									],
-									id="graphing_div",
-									style= {"width": "98%", "height": "380px", "display": "none"}
-								),
+									style= {"width": "100%", "height": "380px"}
+								)
 							],
 						)
 					],
-					style={"display": "inline-block", "float": "right", "width": "78%"}
+					style={"width": "100%"}
 				)
 			],
 			# style={"border": "5px solid grey", "width": "100%"}
@@ -350,6 +378,30 @@ app.layout = html.Div([
 	],
 	id="full_div"
 )
+
+@app.callback(
+	dash.dependencies.Output("login_div", "className"),
+	[dash.dependencies.Input("accordion_button", "n_clicks")],
+	state=[
+		State(component_id="login_div", component_property="className"),
+	],
+	prevent_initial_call=True)
+def callback_login_accordion(clicks, className):
+	if className == "login_off":
+		return "login_on"
+	return "login_off"
+
+@app.callback(
+	dash.dependencies.Output("accordion_button", "className"),
+	[dash.dependencies.Input("accordion_button", "n_clicks")],
+	state=[
+		State(component_id="accordion_button", component_property="className"),
+	],
+	prevent_initial_call=True)
+def callback_login_accordion2(clicks, className):
+	if className == "accordion_active":
+		return "accordion"
+	return "accordion_active"
 
 @app.callback(
 	dash.dependencies.Output("circle", "style"),
@@ -490,14 +542,30 @@ def tabs_content_scoring_tab2(tab, scoring_results):
 
 @app.callback(
 	dash.dependencies.Output("score_value_input", "value"),
-	[dash.dependencies.Input("batch_score_picker", "contents")],
+	[
+		dash.dependencies.Input("batch_score_picker", "contents"),
+		dash.dependencies.Input("customer_list", "value")
+	],
+	state=[
+		State(component_id="score_value_input", component_property="value"),
+	],
 	prevent_initial_call=True)
-def batch_uploader(contents):
-	content_type, content_string = contents.split(',')
-	decoded = base64.b64decode(content_string)
-	text = decoded.decode("utf-8")
-	custs = text.split("\n")
-	return ",".join(custs)
+def batch_uploader(contents, list_value, input_contents):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "batch_score_picker":
+		content_type, content_string = contents.split(",")
+		decoded = base64.b64decode(content_string)
+		text = decoded.decode("utf-8")
+		custs = text.split("\n")
+		return ",".join(custs)
+	if trigger_id == "customer_list":
+		if input_contents != "":
+			l = input_contents.split(",")
+			l.append(list_value)
+			return ",".join(l)
+		else:
+			return list_value
 
 @app.callback(
 	dash.dependencies.Output("graphing_div", "style"),

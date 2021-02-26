@@ -1,0 +1,35 @@
+.accordion {
+  cursor: pointer;
+  /*padding: 18px;*/
+  width: 20%;
+  /*text-align: left;*/
+  outline: none;
+  transition: 0.4s;
+}
+
+.accordion:hover {
+  background-color: #0033cc;
+}
+
+.accordion_active {
+  background-color: #0033cc;
+  width: 100%;
+  transition: 0.4s;
+}
+
+
+.login_off {
+  background-color: #f7f9fc;
+  /*display: none;*/
+  max-height: 0px;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.login_on {
+  background-color: #f7f9fc;
+  display: block;
+  max-height: 100px;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
