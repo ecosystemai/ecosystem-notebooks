@@ -42,6 +42,18 @@ def get_type(t):
 	else:
 		raise RequestTypeError(t)
 
+def create_only_auth(auth, endpoint, **kwargs):
+	url_endpoint = auth.get_server() + endpoint["endpoint"]
+	resp = None
+	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
+	print(call_message)
+	resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), **kwargs)
+	if resp.status_code != 200:
+		error_message = endpoint["error_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"], response_code=resp.status_code)
+		print(error_message)
+		raise ApiError(error_message, response=resp)
+	return resp
+
 def create(auth, endpoint, json=None, params=None, ep_arg=None):
 	url_endpoint = auth.get_server() + endpoint["endpoint"]
 	if ep_arg != None:

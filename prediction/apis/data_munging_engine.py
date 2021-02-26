@@ -1,5 +1,6 @@
 from prediction.endpoints import data_munging_engine as endpoints
 from prediction import request_utils
+from prediction.apis import quickflat as qf
 
 def concat_columns2(auth, database, collection, attribute, separator):
     ep = endpoints.CONCAT_COLUMNS2
@@ -236,3 +237,7 @@ def enrich_sic(auth, database, collection, attribute, find):
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta
+
+def quickflat(config):
+	quick_flat = qf.QuickFlat(config)
+	quick_flat.flatten()

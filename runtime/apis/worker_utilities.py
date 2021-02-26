@@ -163,3 +163,59 @@ def update_predict_param(auth, params):
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta
+
+def upload_file(auth, path, target_path):
+    ep = endpoints.UPLOAD_FILE
+    fileFp = open(path, "rb")
+    files = {"file": fileFp}
+    data = {"path": target_path}
+    resp = request_utils.create_only_auth(auth, ep, data=data, files=files)
+    return resp
+
+def file_database_import(auth, database, collection, file_name):
+    ep = endpoints.FILE_DATABASE_IMPORT
+    param_dict = {
+        "database": database,
+        "collection": collection,
+        "file": file_name
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def update_properties(auth, properties):
+    ep = endpoints.UPDATE_PROPERTIES
+    resp = request_utils.create_only_auth(auth, ep, data=properties)
+    return resp
+
+def refresh(auth):
+    ep = endpoints.REFRESH
+    resp = request_utils.create(auth, ep)
+    meta = resp.content
+    return meta
+
+def get_spend_personality(auth, campaign, channel, customer, params, subcampaign, userid):
+    ep = endpoints.GET_SPEND_PERSONALITY
+    param_dict = {"campaign": campaign,
+                  "channel": channel, 
+                  "customer":customer, 
+                  "params":params, 
+                  "subcampaign":subcampaign, 
+                  "userid":userid}
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+
+def get_financial_wellness(auth, campaign, channel, customer, params, subcampaign, userid):
+    ep = endpoints.GET_FINANCIAL_WELLNESS
+    param_dict = {"campaign": campaign,
+                  "channel": channel, 
+                  "customer":customer, 
+                  "params":params, 
+                  "subcampaign":subcampaign, 
+                  "userid":userid}
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+

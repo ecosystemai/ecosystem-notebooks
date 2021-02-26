@@ -34,3 +34,10 @@ GET_FILE = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+
+EXECUTE_GENERIC = {
+	"type": "post",
+	"endpoint": "/executeGeneric",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
