@@ -737,9 +737,6 @@ def tabs_content_scoring_tab3(clicks):
 	prevent_initial_call=True)
 def tabs_content_scoring_tab2(clicks):
 	global scoring_output
-	print("-----------------------------")
-	print(scoring_output)
-	print("-----------------------------")
 	jstr = json.loads(scoring_output)
 	data_points = []
 	for value in jstr:
