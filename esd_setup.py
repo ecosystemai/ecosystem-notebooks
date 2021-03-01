@@ -3,7 +3,7 @@ from runtime import access
 from prediction import jwt_access
 
 runtime_url = "http://127.0.0.1:8091"
-pred_url = "http://127.0.0.1:3001/api"
+pred_url = "http://127.0.0.1:4000/api"
 pred_username = "admin@ecosystem.ai"
 pred_pass = "password"
 auth = access.Authenticate(runtime_url)

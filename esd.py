@@ -13,6 +13,8 @@ import esd_setup_properties
 import json
 import base64
 import os
+import dash_bootstrap_components as dbc
+
 # runtime_url = "http://127.0.0.1:8091"
 # pred_url = "http://127.0.0.1:4000/api"
 # pred_username = "admin@ecosystem.ai"
@@ -116,7 +118,7 @@ app.layout = html.Div([
 									style={"display": "inline-block", "width": "100px", "height": "100%"}
 								),
 								html.Div([
-										html.Div([], id="circle")
+										html.Label("", id="login_status", style={"font-size": "11px"})
 									],
 									style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "4px", "padding-left": "5px"}
 								)
@@ -307,7 +309,7 @@ app.layout = html.Div([
 									style={"display": "inline-block", "width": "35%", "height": "100%"}
 								),
 								html.Div([
-										html.Div([], id="circle2")
+										html.Label("", id="upload_status", style={"font-size": "11px"})
 									],
 									style={"display": "inline-block", "verticalAlign": "bottom", "padding-bottom": "11px", "padding-left": "5px"}
 								)
@@ -404,7 +406,7 @@ def callback_login_accordion2(clicks, className):
 	return "accordion_active"
 
 @app.callback(
-	dash.dependencies.Output("circle", "style"),
+	dash.dependencies.Output("login_status", "children"),
 	[dash.dependencies.Input("login_button", "n_clicks")],
 	state=[
 		State(component_id="ps_url", component_property="value"),
@@ -419,15 +421,17 @@ def callback_login(clicks, ps_url, ps_username, ps_password, rs_url):
 		sd = ecosystem_scoring_pdash.ScoringDash(rs_url, ps_url, ps_username, ps_password)
 	except:
 		sd = None
-		return {"background": "red"}
-	return {"background": "#00d68f"}
+		return "Error: Could not log in."
+	return "Successfully logged in."
 
 
 @app.callback(
 	dash.dependencies.Output("usecase_dropdown", "options"),
-	[dash.dependencies.Input("circle", "style")],
+	[dash.dependencies.Input("login_status", "children")],
 	prevent_initial_call=True)
-def callback_login2(style):
+def callback_login2(children):
+	if children[:5] == "Error":
+		return {}
 	esd_setup_properties.setup(sd)
 	return convert_list(sd.get_use_case_names())
 
@@ -698,18 +702,18 @@ def upload_file_cto(n_clicks, filename, contents):
 
 
 @app.callback(
-	dash.dependencies.Output("circle2", "style"),
+	dash.dependencies.Output("upload_status", "children"),
 	[dash.dependencies.Input("process_uploads_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
 	],
 	prevent_initial_call=True)
 def callback_process_uploads(clicks, usecase):
-	# try:
-	sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
-	# except:
-	# 	return {"background": "red"}
-	return {"background": "#00d68f"}
+	try:
+		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
+	except:
+		return "Error: Processing uploads failed"
+	return "Uploads successfully uploaded"
 
 if __name__ == "__main__":
 	app.run_server(debug=True)
