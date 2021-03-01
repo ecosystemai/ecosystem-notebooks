@@ -16,7 +16,7 @@ from prediction import jwt_access
 # 	upload_file_pred(auth, path, target_path)
 # 	data_management_engine.csv_import(auth, database, feature_store, feature_store_file)
 
-pred_url = "http://127.0.0.1:4000/api"
+pred_url = "http://127.0.0.1:3001/api"
 pred_username = "admin@ecosystem.ai"
 pred_pass = "password"
 
