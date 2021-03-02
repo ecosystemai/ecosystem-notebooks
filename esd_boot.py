@@ -86,7 +86,7 @@ navbar = dbc.Navbar([
 		dbc.Row(
 			[
 				dbc.Col(html.Img(src=ECO_LOGO, height="30px"), md=1),
-				dbc.Col(dbc.NavbarBrand("Ecosystem.AI Runtime Scoring Dashboard", className="ml-2")),
+				dbc.Col(dbc.NavbarBrand("Runtime Scoring Dashboard", className="ml-2")),
 			],
 			align="center",
 			no_gutters=True,
@@ -411,30 +411,33 @@ scoring_component = html.Div([
 									dbc.CardBody([
 											dbc.Tabs([
 													dbc.Tab(
+														html.Div(
+															# dash_table.DataTable(
+															# 	id="scoring_datatable",
+															# 	columns=[],
+															# 	data=[],
+															# 	style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
+															# 	style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
+															# 	style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
+															# 	fixed_rows={"headers": True},
+															# 	style_table={"overflowY": "auto", "overflowX": "auto", "height": "580px"},
+																
+															# ),
+															id="scoring_div",
+															style={"overflow-y": "scroll", "max-height": "580px"}
+														),
+														label="Scoring",
+														tab_id="scoring_table"
+													),
+													dbc.Tab(
 														html.Div([],
 															id = "scoring_text_area",
 															className="tree",
 															style= {"width": "100%", "height": "495px"}
+
 														),
 														label="Scoring Raw",
 														tab_id="scoring"
-													),
-													dbc.Tab(
-														html.Div(
-															dash_table.DataTable(
-																id="scoring_datatable",
-																columns=[],
-																data=[],
-																style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
-																style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
-																style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
-																fixed_rows={"headers": True},
-																style_table={"overflowY": "auto", "overflowX": "auto", "height": "580px"},
-																
-															)
-														),
-														label="Scoring",
-														tab_id="scoring_table"
 													),
 													dbc.Tab(
 														html.Div([
@@ -456,7 +459,7 @@ scoring_component = html.Div([
 													),
 												],
 												id="tabs_scoring",
-												active_tab="scoring",
+												active_tab="scoring_table",
 											)
 										]
 									)
@@ -482,6 +485,10 @@ footer = dbc.Card(
 		style={"padding-top": "2.0rem", "padding-bottom": "2.0rem"}
 	)
 )
+script = html.Div([
+			html.Script("console.log(5 + 6);")
+	]
+)
 app.layout = html.Div([
 		dtc.SideBar([
 				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt", className="sideBarItem"),
@@ -493,7 +500,7 @@ app.layout = html.Div([
 			# bg_color="#1144dd"
 		),
 		
-		html.Div([login_component, scoring_component, footer], id="page_content", className="page_content"),
+		html.Div([login_component, scoring_component, footer, script], id="page_content", className="page_content"),
 	], 
 	style={"position": "relative"}
 )
@@ -576,7 +583,7 @@ def callback_find_filter_button(n_clicks, usecase, find_filter):
 	return opts
 
 @app.callback(
-	dash.dependencies.Output("scoring_text_area", "children"),
+	dash.dependencies.Output("score_buffer", "children"),
 	[dash.dependencies.Input("score_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -584,19 +591,37 @@ def callback_find_filter_button(n_clicks, usecase, find_filter):
 	],
 	prevent_initial_call=True)
 def callback_score_button(n_clicks, usecase, score_value):
-	global scoring_output
-	outputs_text = sd.score_btn_eventhandler(usecase, score_value)
-	scoring_output = outputs_text
-	outputs = html.Div([
-			html.Script("""
-				const data ='[{"field1": "hello","field2": "bye","customer": 1},{"field1": "hello1","field2": "bye1","customer": 2},{"field1": "hello2","field2": "bye2","customer": 3}]';
-				const tree = JsonView.createTree();
-				JsonView.render(tree, document.querySelector('.tree'));
-				JsonView.expandChildren(tree);
-			""")
-		]
-	)
+	outputs = sd.score_btn_eventhandler(usecase, score_value)
 	return outputs
+
+
+
+@app.callback(
+	dash.dependencies.Output("scoring_text_area", "children"),
+	[dash.dependencies.Input("score_button", "n_clicks")],
+	prevent_initial_call=True)
+def callback_score_button(n_clicks):
+	return []
+
+app.clientside_callback(
+	dash.dependencies.ClientsideFunction(
+		namespace="clientside",
+		function_name="json_viewer"
+	),
+	dash.dependencies.Output("scoring_text_area", "style"),
+	[dash.dependencies.Input("scoring_text_area", "children")],
+	state=[
+		State(component_id="usecase_dropdown", component_property="value"),
+		State(component_id="score_value_input", component_property="value"),
+	],
+	prevent_initial_call=True)
+# def callback_score_button(n_clicks, usecase, score_value):
+# 	# outputs_text = sd.score_btn_eventhandler(usecase, score_value)
+# 	outputs = html.Div([
+# 			html.Script()
+# 		]
+# 	)
+# 	return outputs
 
 @app.callback(
 	dash.dependencies.Output("score_value_input", "value"),
@@ -638,11 +663,10 @@ def tabs_content_graphing(tab):
 
 @app.callback(
 	dash.dependencies.Output("graph_dropdown", "options"),
-	[dash.dependencies.Input("score_button", "n_clicks")],
+	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
-def tabs_content_graphing2(clicks):
-	global scoring_output
-	jstr = json.loads(scoring_output)
+def tabs_content_graphing2(children):
+	jstr = json.loads(children)
 	value = jstr[0]
 	flat = json_flatten(value, "")
 	l = list(flat.keys())
@@ -651,10 +675,12 @@ def tabs_content_graphing2(clicks):
 @app.callback(
 	dash.dependencies.Output("graphing", "figure"),
 	[dash.dependencies.Input("graph_dropdown", "value")],
+	state=[
+		State(component_id="score_buffer", component_property="children"),
+	],
 	prevent_initial_call=True)
-def tabs_content_graphing3(graph_dropdown_value):
-	global scoring_output
-	jstr = json.loads(scoring_output)
+def tabs_content_graphing3(graph_dropdown_value, children):
+	jstr = json.loads(children)
 	data_points = []
 	for value in jstr:
 		flat = json_flatten(value, "")
@@ -763,37 +789,37 @@ def callback_process_uploads(clicks, usecase):
 		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
 	except:
 		return "Error: Processing uploads failed"
-	return "Uploads successfully uploaded"
+	return "Uploads successfully processed"
+
+# @app.callback(
+# 	dash.dependencies.Output("scoring_datatable", "columns"),
+# 	[dash.dependencies.Input("score_button", "n_clicks")],
+# 	prevent_initial_call=True)
+# def tabs_content_scoring_tab3(clicks):
+# 	global scoring_output
+# 	jstr = json.loads(scoring_output)
+# 	flat = json_flatten(jstr[0], "")
+# 	columns = []
+# 	for key in flat.keys():
+# 		value = {
+# 			"name": key,
+# 			"id": key
+# 		}
+# 		columns.append(value)
+# 	return columns
 
 @app.callback(
-	dash.dependencies.Output("scoring_datatable", "columns"),
-	[dash.dependencies.Input("score_button", "n_clicks")],
+	dash.dependencies.Output("scoring_div", "children"),
+	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
-def tabs_content_scoring_tab3(clicks):
-	global scoring_output
-	jstr = json.loads(scoring_output)
-	flat = json_flatten(jstr[0], "")
-	columns = []
-	for key in flat.keys():
-		value = {
-			"name": key,
-			"id": key
-		}
-		columns.append(value)
-	return columns
-
-@app.callback(
-	dash.dependencies.Output("scoring_datatable", "data"),
-	[dash.dependencies.Input("score_button", "n_clicks")],
-	prevent_initial_call=True)
-def tabs_content_scoring_tab2(clicks):
-	global scoring_output
-	jstr = json.loads(scoring_output)
+def tabs_content_scoring_tab2(children):
+	jstr = json.loads(children)
 	data_points = []
 	for value in jstr:
 		flat = json_flatten(value, "")
 		data_points.append(flat)
-	return data_points
+	df = pd.DataFrame(data_points)
+	return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 
 
 @app.callback(
