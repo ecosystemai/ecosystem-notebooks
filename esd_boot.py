@@ -17,9 +17,8 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 import dash_trich_components as dtc
 
-
 ECO_LOGO = "./assets/favicon.ico"
-
+CURRENT_YEAR = "2021"
 sd = None
 tmp_dir = "tmp/"
 if not os.path.exists(tmp_dir):
@@ -50,7 +49,8 @@ def convert_list(l):
 # app = dash.Dash(__name__)
 # BOOTSTRAP,GRID,CERULEAN,COSMO,CYBORG,DARKLY,FLATLY,JOURNAL,LITERA,LUMEN,LUX,MATERIA,MINTY,PULSE,SANDSTONE,SIMPLEX,SKETCHY,SLATE,SOLAR,SPACELAB,SUPERHERO,UNITED,YETI
 external_scripts = []
-external_stylesheets = [dbc.themes.GRID, "https://use.fontawesome.com/releases/v5.15.1/css/all.css"]
+external_stylesheets = ["https://use.fontawesome.com/releases/v5.15.1/css/all.css"]
+# external_stylesheets = ["https://use.fontawesome.com/releases/v5.15.1/css/all.css"]
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 server = app.server
 table_data = [
@@ -92,8 +92,7 @@ navbar = dbc.Navbar([
 			no_gutters=True,
 		),
 	],
-	color="dark",
-	dark=True,
+	color="white",
 	sticky="top",
 )
 
@@ -106,7 +105,14 @@ login_component = html.Div([
 		html.Div([
 				dbc.Card(
 					dbc.CardBody([
-							html.H3("Login Details:", className="card-title"),
+							html.Label(html.B("Login Details"), style={"margin-bottom": "0rem"}),
+						],
+						style={"padding": "0.75rem"}
+					),
+				),
+				html.Br(),
+				dbc.Card(
+					dbc.CardBody([
 							dbc.Form(
 								[
 									dbc.FormGroup(
@@ -155,15 +161,15 @@ login_component = html.Div([
 									),
 								]
 							),
-							dbc.Button("Login", id="login_button", color="primary", className="mr-1"),
+							dbc.Button("Login", outline=True, id="login_button", color="primary", className="mr-1"),
 							html.Label("", id="login_status", style={"display": "none"}),
 							html.Div([], id="login_alert_box")
 						]
 					)
 				)
 			],
-			style={"padding-left": "10px", "padding-right": "10px", "padding-top": "10px"}
-		)
+			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
+		),
 	],
 	id="login_component",
 	style={"display": "none"}
@@ -178,14 +184,21 @@ scoring_component = html.Div([
 							html.Div([
 									dbc.Card(
 										dbc.CardBody([
-												html.H3("Use Case Details:", className="card-title"),
+												html.Label(html.B("Use Case Details"), style={"margin-bottom": "0rem"}),
+											],
+											style={"padding": "0.75rem"}
+										),
+									),
+									html.Br(),
+									dbc.Card(
+										dbc.CardBody([
 												html.Label("Use Case"),
 												dcc.Dropdown(
 													id="usecase_dropdown",
 													# options=convert_list(sd.get_use_case_names()),
 													clearable=False,
 													persistence=True,
-													style={"font-size": "13px"}
+													# style={"font-size": "13px"}
 												),
 												html.Br(),
 												html.Label("Find Filter"),
@@ -197,7 +210,7 @@ scoring_component = html.Div([
 															value="{}"
 														),
 														dbc.InputGroupAddon(
-															dbc.Button("Filter", color="primary", id="filter_button"),
+															dbc.Button("Filter", outline=True, color="primary", id="filter_button"),
 															addon_type="append",
 														),
 													]
@@ -222,14 +235,15 @@ scoring_component = html.Div([
 															value=""
 														),
 														dbc.InputGroupAddon(
-															dbc.Button("Score", color="primary", id="score_button"),
+															dbc.Button("Score", outline=True, color="primary", id="score_button"),
 															addon_type="append",
 														),
 													]
 												),
+												html.Label("", id="score_buffer", style={"display": "none"}),
 												html.Br(),
 												dcc.Upload(
-													dbc.Button("Batch Score", color="primary", className="mr-1"),
+													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
 													id="batch_score_picker"
 												)
 											]
@@ -245,14 +259,21 @@ scoring_component = html.Div([
 								[
 									dbc.Card(
 										dbc.CardBody([
+												html.Label(html.B("Transaction Details"), style={"margin-bottom": "0rem"}),
+											],
+											style={"padding": "0.75rem"}
+										),
+									),
+									html.Br(),
+									dbc.Card(
+										dbc.CardBody([
 												html.Div([
-														html.H3("Transaction Details:", className="card-title"),
 														html.Div([
 																dbc.ListGroup([], id="table_div", style={"overflow-y": "scroll", "max-height": "500px"})
 															],
 														)
 													],
-													style={"height": "598px"}
+													style={"height": "553px"}
 												)
 												# dash_table.DataTable(
 												# 	id="datatable",
@@ -276,9 +297,16 @@ scoring_component = html.Div([
 							html.Div(
 								[
 									dbc.Card(
+										dbc.CardBody([
+												html.Label(html.B("Upload Data"), style={"margin-bottom": "0rem"}),
+											],
+											style={"padding": "0.75rem"}
+										),
+									),
+									html.Br(),
+									dbc.Card(
 										dbc.CardBody(
 											html.Div([
-													html.H3("Upload Data:", className="card-title"),
 													html.Label("Customer Data"),
 													html.Br(),
 													dbc.InputGroup(
@@ -287,13 +315,14 @@ scoring_component = html.Div([
 																id="upload_customer_data"
 															),
 															dbc.InputGroupAddon(
-																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), color="primary"), id="customer_upload_picker",),
+																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker",),
 																addon_type="append",
 															),
 														]
 													),
 													html.Br(),
-													dbc.Button("Upload", 
+													dbc.Button("Upload",
+														outline=True, 
 														color="primary",
 														className="mr-1",
 														id="customer_upload_button"
@@ -309,13 +338,14 @@ scoring_component = html.Div([
 																id="upload_transaction_data"
 															),
 															dbc.InputGroupAddon(
-																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), color="primary"), id="transaction_upload_picker",),
+																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker",),
 																addon_type="append",
 															),
 														]
 													),
 													html.Br(),
 													dbc.Button("Upload", 
+														outline=True,
 														color="primary",
 														className="mr-1",
 														id="transaction_upload_button"
@@ -331,13 +361,14 @@ scoring_component = html.Div([
 																id="upload_cto_data"
 															),
 															dbc.InputGroupAddon(
-																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), color="primary"), id="cto_upload_picker",),
+																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker",),
 																addon_type="append",
 															),
 														]
 													),
 													html.Br(),
-													dbc.Button("Upload", 
+													dbc.Button("Upload",
+														outline=True, 
 														color="primary",
 														className="mr-1",
 														id="cto_upload_button"
@@ -345,14 +376,15 @@ scoring_component = html.Div([
 													html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
 													html.Br(),
 													html.Br(),
-													dbc.Button("Process Uploads", 
+													dbc.Button("Process Uploads",
+														outline=True, 
 														color="primary",
 														className="mr-1",
 														id="process_uploads_button"
 													),				
 													html.Label("", id="upload_status")
 												],
-												style={"height": "598px"}
+												style={"height": "553px"}
 											)
 										)
 									)
@@ -366,83 +398,102 @@ scoring_component = html.Div([
 				html.Br(),
 				html.Div([
 						html.Div(
-							dbc.Card(
-								dbc.CardBody([
-										html.H3("Scoring Output", className="card-title"),
-										dbc.Tabs([
-												dbc.Tab(
-													html.Div([],
-														id = "scoring_text_area",
-														className="tree",
-														style= {"width": "100%", "height": "495px"}
-													),
-													label="Scoring Raw",
-													tab_id="scoring"
-												),
-												dbc.Tab(
-													html.Div(
-														dash_table.DataTable(
-															id="scoring_datatable",
-															columns=[],
-															data=[],
-															style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
-															style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
-															style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
-															fixed_rows={"headers": True},
-															style_table={"overflowY": "auto", "overflowX": "auto", "height": "580px"},
-															
-														)
-													),
-													label="Scoring",
-													tab_id="scoring_table"
-												),
-												dbc.Tab(
-													html.Div([
-															dcc.Dropdown(
-																id="graph_dropdown",
-																options=[],
-																clearable=False
-															),
-															dcc.Graph(
-																id="graphing",
-																figure={}
-															)
-														],
-														id="graphing_div",
-														style= {"width": "100%", "height": "580px"}
-													),
-													label="Graph",
-													tab_id="graph"
-												),
+							[
+								dbc.Card(
+										dbc.CardBody([
+												html.Label(html.B("Scoring Output"), style={"margin-bottom": "0rem"}),
 											],
-											id="tabs_scoring",
-											active_tab="scoring",
-										)
-									]
+											style={"padding": "0.75rem"}
+										),
+									),
+								html.Br(),
+								dbc.Card(
+									dbc.CardBody([
+											dbc.Tabs([
+													dbc.Tab(
+														html.Div([],
+															id = "scoring_text_area",
+															className="tree",
+															style= {"width": "100%", "height": "495px"}
+														),
+														label="Scoring Raw",
+														tab_id="scoring"
+													),
+													dbc.Tab(
+														html.Div(
+															dash_table.DataTable(
+																id="scoring_datatable",
+																columns=[],
+																data=[],
+																style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
+																style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
+																style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
+																fixed_rows={"headers": True},
+																style_table={"overflowY": "auto", "overflowX": "auto", "height": "580px"},
+																
+															)
+														),
+														label="Scoring",
+														tab_id="scoring_table"
+													),
+													dbc.Tab(
+														html.Div([
+																dcc.Dropdown(
+																	id="graph_dropdown",
+																	options=[],
+																	clearable=False
+																),
+																dcc.Graph(
+																	id="graphing",
+																	figure={}
+																)
+															],
+															id="graphing_div",
+															style= {"width": "100%", "height": "580px"}
+														),
+														label="Graph",
+														tab_id="graph"
+													),
+												],
+												id="tabs_scoring",
+												active_tab="scoring",
+											)
+										]
+									)
 								)
-							)
+							]
 							# style={"width": "100%"}
 						)
 					],
 					# style={"border": "5px solid grey", "width": "100%"}
 				)
 			],
-			style={"padding-left": "10px", "padding-right": "10px", "padding-top": "10px"}
+			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
 		)
 	],
 	id="scoring_component",
 	style={"display": "none"}
 )
 
+footer = dbc.Card(
+	dbc.CardBody([
+			"Runtime Scoring Dashboard for ", html.A("ecosystem.Ai", href="https://ecosystem.ai/"), " ", CURRENT_YEAR
+		],
+		style={"padding-top": "2.0rem", "padding-bottom": "2.0rem"}
+	)
+)
 app.layout = html.Div([
 		dtc.SideBar([
-				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt"),
-				dtc.SideBarItem(id="id_2", label="Scoring", icon="fas fa-chart-line")
+				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt", className="sideBarItem"),
+				dtc.SideBarItem(id="id_2", label="Scoring", icon="fas fa-chart-line", className="sideBarItem")
 			],
-			bg_color="#343a40"
+			className="sideBar"
+			# text_color="#ffffff"
+			# bg_color="#343a40"
 			# bg_color="#1144dd"
 		),
-		html.Div([login_component, scoring_component], id="page_content", className="page_content"),
+		
+		html.Div([login_component, scoring_component, footer], id="page_content", className="page_content"),
 	], 
 	style={"position": "relative"}
 )
@@ -757,10 +808,9 @@ def toggle_collapse(input1, input2):
 	btn_df = btn_df.fillna(0)
 
 	if btn_df.idxmax(axis=1).values == "input1":
-		return {}
+		return {"background-color": "#edf1f7", "min-height": "90vh"}
 	if btn_df.idxmax(axis=1).values == "input2":
 		return {"display": "none"}
-	
 
 @app.callback(
 	dash.dependencies.Output("scoring_component", "style"),
@@ -776,6 +826,6 @@ def toggle_collapse(input1, input2):
 	if btn_df.idxmax(axis=1).values == "input1":
 		return {"display": "none"}
 	if btn_df.idxmax(axis=1).values == "input2":
-		return {}
+		return {"background-color": "#edf1f7", "min-height": "90vh"}
 if __name__ == "__main__":
 	app.run_server(debug=True)
