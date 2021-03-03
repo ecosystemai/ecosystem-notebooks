@@ -231,12 +231,11 @@ var JsonView = (function (exports) {
 
 window.dash_clientside = Object.assign({}, window.dash_clientside, {
     clientside: {
-        json_viewer: function(clicks, largeValue1, largeValue2) {
-		 	const data = [{"givenName": "Vas","surName": "Sudanagunta","children": [{"givenName": "Natalia", "age": 5},{"givenName": "Aida","age": 17}],"address": {"state": "NY","city": "Brooklyn","street": "718 Marcus Garvey Ave"}}];
+        json_viewer: function(data) {
 		 	const tree = JsonView.createTree(data);
 		 	JsonView.render(tree, document.querySelector('.tree'));
 		 	JsonView.expandChildren(tree);
-		 	return {"width": "100%", "height": "495px"};
+		 	return {"width": "100%", "height": "495px", "overflow-y": "scroll"};
         }
     }
 });

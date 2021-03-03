@@ -12,10 +12,20 @@ from prediction.apis import worker_file_service
 from prediction.apis import data_management_engine
 from prediction.apis import data_munging_engine
 from prediction.apis import utilities
+import csv
+import ntpath
 
 
 SPENDING_PERSONALITY = worker_utilities.get_spend_personality
 FINANCIAL_WELLNESS = worker_utilities.get_financial_wellness
+
+
+def function_from_string(s):
+	if s == "financial_wellness":
+		return FINANCIAL_WELLNESS
+	if s == "spending_personality":
+		return SPENDING_PERSONALITY
+	return None
 
 def represents_int(s):
 	try: 
@@ -46,25 +56,48 @@ def upload_import_pred(auth, path, target_path, database, feature_store, feature
 	data_management_engine.csv_import(auth, database, feature_store, feature_store_file)
 
 def save_file(contents, name):
-	f = open(name, "w")
+	f = open(name, "wb")
 	f.write(contents)
 
 def save_coded_file(contents, name):
 	content_type, content_string = contents.split(',')
+	print(content_type)
+	print(content_string[:50])
 	decoded = base64.b64decode(content_string)
-	text = decoded.decode("utf-8")
-	save_file(text, name)
+	save_file(decoded, name)
 
-def create_use_case(auth, p_auth, name, local_file_path, target_path, database, model, key_field, function, feature_store, feature_store_file, properties, additional=None, additional_file=None): 
-		path = local_file_path + model
-		upload_file_runtime(auth, path, target_path)
-		path = local_file_path + feature_store_file
-		upload_import_runtime(auth, path, target_path, database, feature_store, feature_store_file)
-		upload_import_pred(p_auth, path, target_path, database, feature_store, feature_store_file)
+def extract(content, start, end):
+	start_index = content.find(start)
+	end_index = content.find(end, start_index + len(start))
+	value = content[start_index+len(start): end_index]
+	return value
 
-		if additional != None and additional_file != None:
-			path = local_file_path + additional_file
-			upload_import_runtime(auth, path, target_path, database, additional, additional_file)
+def extract_properties(properties):
+	prop_start = "predictor.param.lookup={"
+	prop_end = "}}"
+	contents = extract(properties, prop_start, prop_end)
+
+	p_start = "predictor:'"
+	p_end = "'"
+	predictor = extract(contents, p_start, p_end)
+
+	d_start = "db:'"
+	d_end = "'"
+	database = extract(contents, d_start, d_end)
+
+	t_start = "table:'"
+	t_end = "'"
+	table = extract(contents, t_start, t_end)
+
+	l_start = "lookup:{"
+	l_end = "}"
+	lookup = extract(contents, l_start, l_end)
+
+	k_start = "key:'"
+	k_end = "'"
+	key = extract(lookup, k_start, k_end)
+
+	return predictor, database, table, key
 
 class ScoringDash():
 	def __init__(self, runtime_url, pred_url, pred_username, pred_pass):
@@ -72,6 +105,26 @@ class ScoringDash():
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.use_cases = {}
 		self.to_upload = {}
+
+	def upload_use_case_files(self, target_path, database, model_path, fs_path, feature_store, ad_path=None, additional=None): 
+		feature_store_file = ntpath.basename(fs_path)
+		upload_file_runtime(self.auth, model_path, target_path)
+		upload_import_runtime(self.auth, fs_path, target_path, database, feature_store, feature_store_file)
+		upload_import_pred(self.p_auth, fs_path, target_path, database, feature_store, feature_store_file)
+
+		if additional != None:
+			additional_file = ntpath.basename(ad_path)
+			upload_import_runtime(self.auth, ad_path, target_path, database, additional, additional_file)
+
+	def read_use_cases(self):
+		database = "profilesMaster"
+		collection = "dashboards"
+		find = {}
+		total_to_process = 100000
+		projections = {}
+		skip = 0
+		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
+		print(results)
 
 	def load_use_case(self, name, database, key_field, function, feature_store, properties): 
 		use_case = {
@@ -90,21 +143,32 @@ class ScoringDash():
 		if size < 1:
 			size = 1
 		return "\t"*(size*2)
-	    
-	def get_key_categories(self, use_case_name, find_text):
-		use_case = self.use_cases[use_case_name]
+	  
+	def get_key_categories(self, usecase_name, find_text):
+		use_case = self.use_cases[usecase_name]
 		unique_values = self.get_unique_values(use_case["name"], use_case["key_field"], find_text)
 		text_list = []
 		for key in sorted(unique_values):
 			value = {
-				"label": "{}:{}{}".format(key, self.spaces_num(key, 20), unique_values[key]),
+				"label": "{}".format(key),
 				"value": key
 			}
 			text_list.append(value)
-		return text_list
+		return text_list  
+	# def get_key_categories(self, usecase_name, find_text):
+	# 	use_case = self.use_cases[usecase_name]
+	# 	unique_values = self.get_unique_values(use_case["name"], use_case["key_field"], find_text)
+	# 	text_list = []
+	# 	for key in sorted(unique_values):
+	# 		value = {
+	# 			"label": "{}:{}{}".format(key, self.spaces_num(key, 20), unique_values[key]),
+	# 			"value": key
+	# 		}
+	# 		text_list.append(value)
+	# 	return text_list
 	    
-	def setup_use_case(self, use_case_name):
-		use_case = self.use_cases[use_case_name]
+	def setup_use_case(self, usecase_name):
+		use_case = self.use_cases[usecase_name]
 		worker_utilities.update_properties(self.auth, use_case["properties"])
 		worker_utilities.refresh(self.auth)
     
@@ -129,8 +193,8 @@ class ScoringDash():
 		userid = "test_user"
 		return self.use_cases[use_case]["function"](self.auth, campaign, channel, value, params, sub_campaign, userid) 
 
-	def get_unique_values(self, use_case_name, field, find):
-		use_case = self.use_cases[use_case_name]
+	def get_unique_values(self, usecase_name, field, find):
+		use_case = self.use_cases[usecase_name]
 		database = use_case["database"]
 		collection = use_case["feature_store"]
 		categoryfield = field
@@ -138,8 +202,8 @@ class ScoringDash():
 		results = data_munging_engine.get_categories(self.p_auth, database, collection, categoryfield, find, total_to_process) 
 		return results
 	    
-	def get_documents_for_key_value(self, use_case_name, value):
-		use_case = self.use_cases[use_case_name]
+	def get_documents_for_key_value(self, usecase_name, value):
+		use_case = self.use_cases[usecase_name]
 		database = use_case["database"]
 		collection = use_case["feature_store"]
 		field = use_case["key_field"]
@@ -162,8 +226,8 @@ class ScoringDash():
 					result[key] = str(value)
 		return results
 
-	def get_documents_for_key_value_header(self, use_case_name, value):
-		use_case = self.use_cases[use_case_name]
+	def get_documents_for_key_value_header(self, usecase_name, value):
+		use_case = self.use_cases[usecase_name]
 		database = use_case["database"]
 		collection = use_case["feature_store"]
 		field = use_case["key_field"]
@@ -361,9 +425,34 @@ class ScoringDash():
 				filenames.append(key)
 			self.upload_text_input3.value = "; ".join(filenames)
 
-	def find_btn_eventhandler(self, use_case_name, find_filter):
-		filtered_values = self.get_key_categories(use_case_name, find_filter)
+	def find_btn_eventhandler(self, usecase_name, find_filter):
+		filtered_values = self.get_key_categories(usecase_name, find_filter)
 		return filtered_values
+
+	def get_properties(self):
+		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards", "{}", 1000000, "{}", 0)
+		for entry in data_results:
+			properties = entry["properties"]
+			usecase_name = entry["usecase"]
+			predictor, database, feature_store, key_field = extract_properties(properties)
+			function = function_from_string(predictor)
+			self.load_use_case(usecase_name, database, key_field, function, feature_store, properties)
+
+	def preprocess_properties(self, usecase_name, properties):
+		headers = ["usecase", "properties"]
+		l = [usecase_name, properties]
+		data = [headers, l]
+		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards", "{}", 1000000, "{}", 0)
+		for entry in data_results:
+			usecase = entry["usecase"]
+			prop = entry["properties"]
+			data.append([usecase, prop])
+		with open("tmp/properties.csv", "w", newline="") as f:
+			writer = csv.writer(f)
+			writer.writerows(data)
+
+		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards")
+		upload_import_pred(self.p_auth, "tmp/properties.csv", "/", "profilesMaster", "dashboards", "properties.csv")
 
 	def upload_btn_eventhandler(self, path, filename, content):
 		fp = path + filename
@@ -380,8 +469,8 @@ class ScoringDash():
 		save_coded_file(content, fp)
 		self.to_upload["CTO"] = [fp, filename]
 
-	def process_upload_btn_eventhandler(self, use_case_name, tmp_file_path):
-		use_case = self.use_cases[use_case_name]
+	def process_upload_btn_eventhandler(self, usecase_name, tmp_file_path):
+		use_case = self.use_cases[usecase_name]
 		for fp in self.to_upload.keys():
 			if fp == "customers":
 				feature_store = "customers_upload"
