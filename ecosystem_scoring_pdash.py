@@ -21,7 +21,7 @@ FINANCIAL_WELLNESS = worker_utilities.get_financial_wellness
 
 
 def function_from_string(s):
-	if s == "financial_wellness":
+	if s == "wellness_score":
 		return FINANCIAL_WELLNESS
 	if s == "spending_personality":
 		return SPENDING_PERSONALITY
@@ -55,14 +55,16 @@ def upload_import_pred(auth, path, target_path, database, feature_store, feature
 	upload_file_pred(auth, path, target_path)
 	data_management_engine.csv_import(auth, database, feature_store, feature_store_file)
 
+def save_file_text(text, name):
+	f = open(name, "w")
+	f.write(text)
+
 def save_file(contents, name):
 	f = open(name, "wb")
 	f.write(contents)
 
 def save_coded_file(contents, name):
 	content_type, content_string = contents.split(',')
-	print(content_type)
-	print(content_string[:50])
 	decoded = base64.b64decode(content_string)
 	save_file(decoded, name)
 
@@ -101,6 +103,7 @@ def extract_properties(properties):
 
 class ScoringDash():
 	def __init__(self, runtime_url, pred_url, pred_username, pred_pass):
+		self.user = pred_username
 		self.auth = access.Authenticate(runtime_url)
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.use_cases = {}
@@ -124,7 +127,6 @@ class ScoringDash():
 		projections = {}
 		skip = 0
 		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
-		print(results)
 
 	def load_use_case(self, name, database, key_field, function, feature_store, properties): 
 		use_case = {
@@ -186,11 +188,12 @@ class ScoringDash():
 		else:
 			value = value
 		self.setup_use_case(use_case)
-		campaign = use_case
+		campaign = self.use_cases[use_case]["name"]
 		sub_campaign = "Na"
 		channel = "APP"
 		params = "{}"
-		userid = "test_user"
+		userid = self.user
+		# userid = "test_user"
 		return self.use_cases[use_case]["function"](self.auth, campaign, channel, value, params, sub_campaign, userid) 
 
 	def get_unique_values(self, usecase_name, field, find):
@@ -435,6 +438,7 @@ class ScoringDash():
 			properties = entry["properties"]
 			usecase_name = entry["usecase"]
 			predictor, database, feature_store, key_field = extract_properties(properties)
+			print(predictor)
 			function = function_from_string(predictor)
 			self.load_use_case(usecase_name, database, key_field, function, feature_store, properties)
 
@@ -522,7 +526,7 @@ class ScoringDash():
 		path = "/data/"
 		lines = 1000000
 		content = worker_file_service.get_file_tail(self.p_auth, path, filename, lines)
-		save_file(content, tmp_file_path)
+		save_file_text(content, tmp_file_path)
 		target_path = "/"
 		feature_store_file = "to_upload.csv"
 		upload_import_runtime(self.auth, tmp_file_path, target_path, use_case["database"], use_case["feature_store"], feature_store_file)

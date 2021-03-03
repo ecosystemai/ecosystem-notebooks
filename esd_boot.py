@@ -281,13 +281,10 @@ scoring_component = html.Div([
 											dbc.Tabs([
 													dbc.Tab(
 														html.Div([
+																html.Br(),
 																html.Label("Database"),
 																html.Br(),
 																dcc.Input(id="upload_database"),
-																html.Br(),
-																html.Label("Target Feature Store"),
-																html.Br(),
-																dcc.Input(id="upload_target_fs"),
 																html.Br(),
 																html.Label("Model"),
 																html.Br(),
@@ -302,6 +299,10 @@ scoring_component = html.Div([
 																		),
 																	]
 																),
+																html.Label("Target Feature Store"),
+																html.Br(),
+																dcc.Input(id="upload_target_fs"),
+																html.Br(),
 																html.Label("Feature Store"),
 																html.Br(),
 																dbc.InputGroup(
@@ -311,6 +312,23 @@ scoring_component = html.Div([
 																		),
 																		dbc.InputGroupAddon(
 																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_fs_picker",),
+																			addon_type="append",
+																		),
+																	]
+																),
+																html.Label("Target Additional File"),
+																html.Br(),
+																dcc.Input(id="upload_target_ad"),
+																html.Br(),
+																html.Label("Additional File"),
+																html.Br(),
+																dbc.InputGroup(
+																	[
+																		dcc.Input(
+																			id="upload_ad"
+																		),
+																		dbc.InputGroupAddon(
+																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker",),
 																			addon_type="append",
 																		),
 																	]
@@ -719,10 +737,11 @@ def callback_login3(children):
 	dash.dependencies.Output("usecase_dropdown", "options"),
 	[	
 		dash.dependencies.Input("login_status", "children"),
-		dash.dependencies.Input("usecase_dropdown", "value")
+		dash.dependencies.Input("usecase_dropdown", "value"),
+		dash.dependencies.Input("properties_button_label", "hidden")
 	],
 	prevent_initial_call=True)
-def callback_login2(children, value):
+def callback_login2(children, value, hidden):
 	try:
 		sd.get_properties()
 		return convert_list(sd.get_use_case_names())
@@ -733,10 +752,11 @@ def callback_login2(children, value):
 	dash.dependencies.Output("usecase_dropdown2", "options"),
 	[	
 		dash.dependencies.Input("login_status", "children"),
-		dash.dependencies.Input("usecase_dropdown", "value")
+		dash.dependencies.Input("usecase_dropdown", "value"),
+		dash.dependencies.Input("properties_button_label", "hidden")
 	],
 	prevent_initial_call=True)
-def callback_login2_2(children, value):
+def callback_login2_2(children, value, hidden):
 	try:
 		sd.get_properties()
 		return convert_list(sd.get_use_case_names())
@@ -1081,6 +1101,16 @@ def upload_prep_fs(contents, filename):
 	return filename
 
 @app.callback(
+	dash.dependencies.Output("upload_ad", "value"),
+	[dash.dependencies.Input("upload_ad_picker", "contents")],
+	state=[
+		State(component_id="upload_ad_picker", component_property="filename"),
+	],
+	prevent_initial_call=True)
+def upload_prep_af(contents, filename):
+	return filename
+
+@app.callback(
 	dash.dependencies.Output("graphing_adv_div", "children"),
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
@@ -1116,18 +1146,26 @@ def tabs_content_graphing4(scoring_results):
 	state=[
 		State(component_id="upload_database", component_property="value"),
 		State(component_id="upload_target_fs", component_property="value"),
+		State(component_id="upload_target_ad", component_property="value"),
 		State(component_id="upload_model_picker", component_property="filename"),
 		State(component_id="upload_model_picker", component_property="contents"),
 		State(component_id="upload_fs_picker", component_property="filename"),
-		State(component_id="upload_fs_picker", component_property="contents")
+		State(component_id="upload_fs_picker", component_property="contents"),
+		State(component_id="upload_ad_picker", component_property="filename"),
+		State(component_id="upload_ad_picker", component_property="contents")
 	],
 	prevent_initial_call=True)
-def upload_files(n_clicks, database, target_fs, model_name, model_content, fs_name, fs_content):
+def upload_files(n_clicks, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
 	sd.upload_btn_eventhandler(tmp_dir, model_name, model_content)
 	sd.upload_btn_eventhandler(tmp_dir, fs_name, fs_content)
+	sd.upload_btn_eventhandler(tmp_dir, ad_name, ad_content)
 	model_path = tmp_dir + model_name
 	fs_path = tmp_dir + fs_name
-	sd.upload_use_case_files("/", database, model_path, fs_path, target_fs)
+	ad_path = tmp_dir + ad_name
+	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
+		sd.upload_use_case_files("/", database, model_path, fs_path, target_fs)
+	else:
+		sd.upload_use_case_files("/", database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
 	return False
 
 @app.callback(
