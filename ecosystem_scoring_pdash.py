@@ -51,7 +51,7 @@ def upload_import_runtime(auth, path, target_path, database, feature_store, feat
 	worker_utilities.file_database_import(auth, database, feature_store, feature_store_file)
 
 def upload_file_pred(auth, data_path, path, target_path):
-	worker_file_service.upload_file(auth, path, "/data/" +  target_path)
+	worker_file_service.upload_file(auth, path, data_path + target_path)
 
 def upload_import_pred(auth, data_path, path, target_path, database, feature_store, feature_store_file):
 	upload_file_pred(auth, data_path, path, target_path)
