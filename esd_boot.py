@@ -704,11 +704,11 @@ app.layout = html.Div([
 	prevent_initial_call=True)
 def callback_login(clicks, ps_url, ps_username, ps_password):
 	global sd
-	try:
-		sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password)
-	except:
-		sd = None
-		return "Error: Could not log in."
+	# try:
+	sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password)
+	# except:
+	# 	sd = None
+	# 	return "Error: Could not log in."
 		
 	return "Successfully logged in."
 
