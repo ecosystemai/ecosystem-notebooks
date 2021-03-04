@@ -35,6 +35,8 @@ def get_file_tail(auth, path, file_path, lines):
 def get_property(auth, property_key):
 	ep = endpoints.GET_PROPERTY
 	resp = request_utils.create_only_auth(auth, ep, data=property_key)
+	print("_____________")
+	print(resp)
 	data = resp.content.decode("utf-8")
 	print(data)
 	return data
