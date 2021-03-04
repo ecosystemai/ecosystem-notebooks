@@ -37,7 +37,7 @@ def get_property(auth, property_key):
 	param_dict = {
 		"key": property_key
 	}
-	resp = request_utils.create_only_auth(auth, ep, params=property_key)
+	resp = request_utils.create_only_auth(auth, ep, params=param_dict)
 	print("_____________")
 	print(resp)
 	data = resp.content.decode("utf-8")
