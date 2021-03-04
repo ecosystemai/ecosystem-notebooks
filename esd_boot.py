@@ -113,20 +113,10 @@ login_component = html.Div([
 														),
 													]
 												),
-												dbc.FormGroup(
-													[
-														dbc.Label("Runtime Server URL"),
-														dbc.Input(
-															# placeholder="Enter Runtime Server URL",
-															id="rs_url",
-															type="text",
-															value="http://127.0.0.1:8091"
-														),
-													]
-												),
 											]
 										),
 										dbc.Button("Login", outline=True, id="login_button", color="primary", className="mr-1"),
+										html.Br(),
 										html.Label("", id="login_status", style={"display": "none"}),
 										html.Div([], id="login_alert_box"),
 										html.Br(),
@@ -167,11 +157,13 @@ scoring_component = html.Div([
 												html.Label("Use Case"),
 												dcc.Dropdown(
 													id="usecase_dropdown",
-													# options=convert_list(sd.get_use_case_names()),
 													clearable=False,
 													persistence=True,
-													# style={"font-size": "13px"}
 												),
+												html.Br(),
+												dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
+												html.Br(),
+												html.Label("Connection successfull.", id="test_conn_label", hidden=True),
 												html.Br(),
 												html.Label("Find Filter"),
 												html.Br(),
@@ -247,16 +239,6 @@ scoring_component = html.Div([
 													],
 													style={"height": "553px"}
 												)
-												# dash_table.DataTable(
-												# 	id="datatable",
-												# 	columns=columns,
-												# 	data=table_data,
-												# 	style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
-												# 	style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
-												# 	style_cell={"textAlign": "left", "minWidth": "80px", "font-family": "arial", "font-size": "11px"},
-												# 	fixed_rows={"headers": True},
-												# 	style_table={"overflowY": "auto", "overflowX": "auto", "height": "280px"},
-												# )
 											]
 										)
 									)
@@ -352,6 +334,10 @@ scoring_component = html.Div([
 																html.Label("Use Case Name"),
 																html.Br(),
 																dcc.Input(id="usecase_name"),
+																html.Br(),
+																html.Label("Runtime URL"),
+																html.Br(),
+																dcc.Input(id="usecase_runtime_url"),
 																html.Br(),
 																html.Label("Properties"),
 																dcc.Textarea(
@@ -505,9 +491,10 @@ scoring_component = html.Div([
 														tab_id="scoring_table"
 													),
 													dbc.Tab(
-														html.Div([],
+														# html.Div([],
+														dbc.Textarea(
 															id = "scoring_text_area",
-															className="tree",
+															# className="tree",
 															style= {"width": "100%", "height": "495px"}
 
 														),
@@ -713,13 +700,12 @@ app.layout = html.Div([
 		State(component_id="ps_url", component_property="value"),
 		State(component_id="ps_username", component_property="value"),
 		State(component_id="ps_password", component_property="value"),
-		State(component_id="rs_url", component_property="value"),
 	],
 	prevent_initial_call=True)
-def callback_login(clicks, ps_url, ps_username, ps_password, rs_url):
+def callback_login(clicks, ps_url, ps_username, ps_password):
 	global sd
 	try:
-		sd = ecosystem_scoring_pdash.ScoringDash(rs_url, ps_url, ps_username, ps_password)
+		sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password)
 	except:
 		sd = None
 		return "Error: Could not log in."
@@ -839,21 +825,26 @@ def callback_score_button2(n_clicks, usecase, score_value):
 	outputs = sd.score_btn_eventhandler(usecase, score_value)
 	return outputs
 
-@app.callback(
-	dash.dependencies.Output("scoring_text_area", "children"),
-	[dash.dependencies.Input("score_button", "n_clicks")],
-	prevent_initial_call=True)
-def callback_score_button(n_clicks):
-	return []
+# app.clientside_callback(
+# 	dash.dependencies.ClientsideFunction(
+# 		namespace="clientside",
+# 		function_name="json_viewer"
+# 	),
+# 	dash.dependencies.Output("scoring_text_area", "style"),
+# 	[dash.dependencies.Input("score_buffer", "children")],
+# 	prevent_initial_call=True)
 
-app.clientside_callback(
-	dash.dependencies.ClientsideFunction(
-		namespace="clientside",
-		function_name="json_viewer"
-	),
-	dash.dependencies.Output("scoring_text_area", "style"),
-	[dash.dependencies.Input("score_buffer", "children")],
+@app.callback(
+	dash.dependencies.Output("scoring_text_area", "value"),
+	[
+		dash.dependencies.Input("score_button", "n_clicks"),
+		dash.dependencies.Input("score_buffer", "children")
+	],
 	prevent_initial_call=True)
+def callback_score_button(n_clicks, score_b):
+	j = json.loads(score_b)
+	pj = json.dumps(j, indent=4, sort_keys=True)
+	return pj
 
 @app.callback(
 	dash.dependencies.Output("score_value_input", "value"),
@@ -1079,15 +1070,28 @@ def callback_process_uploads(clicks, usecase):
 	return "Uploads successfully processed"
 
 @app.callback(
+	dash.dependencies.Output("test_conn_label", "hidden"),
+	[dash.dependencies.Input("test_conn_button", "n_clicks")],
+	state=[
+		State(component_id="usecase_dropdown", component_property="value"),
+	],
+	prevent_initial_call=True)
+def process_properties(n_clicks, usecase_name):
+	if sd.test_connection(usecase_name):
+		return False
+	return True
+
+@app.callback(
 	dash.dependencies.Output("properties_button_label", "hidden"),
 	[dash.dependencies.Input("properties_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_name", component_property="value"),
+		State(component_id="usecase_runtime_url", component_property="value"),
 		State(component_id="properties_textarea", component_property="value"),
 	],
 	prevent_initial_call=True)
-def process_properties(n_clicks, usecase_name, properties):
-	sd.preprocess_properties(usecase_name, properties)
+def process_properties(n_clicks, usecase_name, runtime_url, properties):
+	sd.preprocess_properties(usecase_name, runtime_url, properties)
 	return False
 
 @app.callback(
@@ -1154,6 +1158,7 @@ def tabs_content_graphing4(scoring_results):
 	dash.dependencies.Output("files_button_label", "hidden"),
 	[dash.dependencies.Input("files_button", "n_clicks")],
 	state=[
+		State(component_id="usecase_dropdown", component_property="value"),
 		State(component_id="upload_database", component_property="value"),
 		State(component_id="upload_target_fs", component_property="value"),
 		State(component_id="upload_target_ad", component_property="value"),
@@ -1165,7 +1170,7 @@ def tabs_content_graphing4(scoring_results):
 		State(component_id="upload_ad_picker", component_property="contents")
 	],
 	prevent_initial_call=True)
-def upload_files(n_clicks, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
+def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
 	sd.upload_btn_eventhandler(tmp_dir, model_name, model_content)
 	sd.upload_btn_eventhandler(tmp_dir, fs_name, fs_content)
 	sd.upload_btn_eventhandler(tmp_dir, ad_name, ad_content)
@@ -1173,9 +1178,9 @@ def upload_files(n_clicks, database, target_fs, target_ad, model_name, model_con
 	fs_path = tmp_dir + fs_name
 	ad_path = tmp_dir + ad_name
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
-		sd.upload_use_case_files("/", database, model_path, fs_path, target_fs)
+		sd.upload_use_case_files(usecase, "/", database, model_path, fs_path, target_fs)
 	else:
-		sd.upload_use_case_files("/", database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
+		sd.upload_use_case_files(usecase, "/", database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
 	return False
 
 @app.callback(
@@ -1209,39 +1214,56 @@ def tabs_content_scoring_tab2(children):
 	[
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
-		dash.dependencies.Input("id_3", "n_clicks_timestamp")
+		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("login_status", "children")
 	],
 )
-def toggle_collapse(input1, input2, input3):
-	btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
-	btn_df = btn_df.fillna(0)
+def toggle_collapse(input1, input2, input3, login_status):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "login_status":
+		if login_status[:5] == "Error":			
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+		else:
+			return {"display": "none"}
+	else:
+		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+		btn_df = btn_df.fillna(0)
 
-	if btn_df.idxmax(axis=1).values == "input1":
-		return {"background-color": "#edf1f7", "min-height": "90vh"}
-	if btn_df.idxmax(axis=1).values == "input2":
-		return {"display": "none"}
-	if btn_df.idxmax(axis=1).values == "input3":
-		return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input1" or btn_df.idxmax(axis=1).values == "input4":
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+		if btn_df.idxmax(axis=1).values == "input2":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input3":
+			return {"display": "none"}
 
 @app.callback(
 	dash.dependencies.Output("scoring_component", "style"),
 	[
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
-		dash.dependencies.Input("id_3", "n_clicks_timestamp")
+		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("login_status", "children")
 	],
 	prevent_initial_call=True)
-def toggle_collapse(input1, input2, input3):
-	btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
-	btn_df = btn_df.fillna(0)
+def toggle_collapse(input1, input2, input3, login_status):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "login_status":
+		if login_status[:5] == "Error":
+			return {"display": "none"}
+		else:
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+	else:
+		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+		btn_df = btn_df.fillna(0)
 
-	if btn_df.idxmax(axis=1).values == "input1":
-		return {"display": "none"}
-	if btn_df.idxmax(axis=1).values == "input2":
-		return {"background-color": "#edf1f7", "min-height": "90vh"}
-	if btn_df.idxmax(axis=1).values == "input3":
-		return {"display": "none"}
-
+		if btn_df.idxmax(axis=1).values == "input1":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input2":
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+		if btn_df.idxmax(axis=1).values == "input3":
+			return {"display": "none"}
 
 @app.callback(
 	dash.dependencies.Output("batch_scoring_component", "style"),

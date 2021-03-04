@@ -18,3 +18,10 @@ GET_FILE_TAIL = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+
+GET_PROPERTY = {
+	"type": "get",
+	"endpoint": "/getProperty",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}

@@ -31,3 +31,8 @@ def get_file_tail(auth, path, file_path, lines):
 		new_rows.append(row[2:])
 	new_data = "\n".join(new_rows)
 	return new_data
+
+def get_property(auth, property_key):
+	ep = endpoints.GET_PROPERTY
+	resp = request_utils.create_only_auth(auth, ep, data=property_key)
+	return resp
