@@ -63,6 +63,12 @@ def save_file(contents, name):
 	f = open(name, "wb")
 	f.write(contents)
 
+def decode_text(contents):
+	content_type, content_string = contents.split(',')
+	decoded = base64.b64decode(content_string)
+	decoded_text = decoded.decode("UTF-8")
+	return decoded_text
+
 def save_coded_file(contents, name):
 	content_type, content_string = contents.split(',')
 	decoded = base64.b64decode(content_string)

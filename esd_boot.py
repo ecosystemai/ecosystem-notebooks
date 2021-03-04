@@ -359,6 +359,8 @@ scoring_component = html.Div([
 																	style={"width": "100%", "height": "200px"},
 																),
 																html.Br(),
+																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker",),
+																html.Br(),
 																dbc.Button("Upload",
 																	outline=True, 
 																	color="primary",
@@ -656,7 +658,7 @@ batch_scoring_component = html.Div([
 										dbc.CardBody([
 												html.Div([
 														html.Div([
-																dbc.ListGroup([], id="table_div2", style={"overflow-y": "scroll", "max-height": "590px"})
+																dbc.ListGroup([], id="table_div2", style={"overflow-y": "scroll", "max-height": "657px"})
 															],
 														)
 													],
@@ -986,6 +988,14 @@ def tabs_content_graphing3(graph_dropdown_value, children):
 		)
 	)
 	return figure
+
+
+@app.callback(
+	dash.dependencies.Output("properties_textarea", "value"),
+	[dash.dependencies.Input("upload_properties_picker", "contents")],
+	prevent_initial_call=True)
+def upload_properties(contents):
+	return ecosystem_scoring_pdash.decode_text(contents)
 
 @app.callback(
 	dash.dependencies.Output("upload_customer_data", "value"),
