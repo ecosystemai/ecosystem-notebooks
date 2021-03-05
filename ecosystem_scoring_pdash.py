@@ -114,9 +114,6 @@ class ScoringDash():
 		self.user = pred_username
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.data_path = worker_file_service.get_property(self.p_auth, "user.data")
-		self.r_data_path = worker_utilities.get_property(self.auth, "user.data")
-		self.r_model_d_path = worker_utilities.get_property(self.auth, "user.deployed.models")
-		self.r_model_g_path = worker_utilities.get_property(self.auth, "user.generated.models")
 		self.use_cases = {}
 		self.to_upload = {}
 
@@ -128,19 +125,20 @@ class ScoringDash():
 			return True
 		return False
 
-	def upload_use_case_files(self, usecase_name, target_path, database, model_path, fs_path, feature_store, ad_path=None, additional=None):
+	def upload_use_case_files(self, usecase_name, database, model_path, fs_path, feature_store, ad_path=None, additional=None):
 		use_case = self.use_cases[usecase_name]
+		self.setup_use_case(usecase_name)
 		feature_store_file = ntpath.basename(fs_path)
-		if self.r_model_d_path == "" or self.r_model_d_path == None:
-			upload_file_runtime(use_case["auth"], model_path, self.r_model_g_path)
+		if use_case["model_d_path"] == "" or use_case["model_d_path"] == None:
+			upload_file_runtime(use_case["auth"], model_path, use_case["model_g_path"])
 		else:
-			upload_file_runtime(use_case["auth"], model_path, self.r_model_d_path)
-		upload_import_runtime(use_case["auth"], fs_path, self.r_data_path, database, feature_store, feature_store_file)
+			upload_file_runtime(use_case["auth"], model_path, use_case["model_d_path"])
+		upload_import_runtime(use_case["auth"], fs_path, use_case["data_path"], database, feature_store, feature_store_file)
 		upload_import_pred(self.p_auth, self.data_path, fs_path, database, feature_store, feature_store_file)
 
 		if additional != None:
 			additional_file = ntpath.basename(ad_path)
-			upload_import_runtime(use_case["auth"], ad_path, self.r_data_path, database, additional, additional_file)
+			upload_import_runtime(use_case["auth"], ad_path, use_case["data_path"], database, additional, additional_file)
 
 	def read_use_cases(self):
 		database = "profilesMaster"
@@ -152,6 +150,7 @@ class ScoringDash():
 		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
 
 	def load_use_case(self, name, database, key_field, function, feature_store, properties, runtime_url): 
+		auth = access.Authenticate(runtime_url)
 		use_case = {
 			"name": name,
 			"database": database,
@@ -160,7 +159,10 @@ class ScoringDash():
 			"properties": properties,
 			"function": function,
 			"runtime_url": runtime_url,
-			"auth": access.Authenticate(runtime_url)
+			"auth": auth,
+			"data_path": worker_utilities.get_property(auth, "user.data"),
+			"model_d_path": worker_utilities.get_property(auth, "user.deployed.models"),
+			"model_g_path": worker_utilities.get_property(auth, "user.generated.models")
 		}
 		self.use_cases[name] = use_case
 
@@ -484,9 +486,14 @@ class ScoringDash():
 		with open("tmp/properties.csv", "w", newline="") as f:
 			writer = csv.writer(f)
 			writer.writerows(data)
-
+		# try:
+		predictor, database, feature_store, key_field = extract_properties(properties)
+		function = function_from_string(predictor)
+		self.load_use_case(usecase_name, database, key_field, function, feature_store, properties, runtime_url)
+		usecase = self.use_cases[usecase_name]
+		self.setup_use_case(usecase_name)
 		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards")
-		upload_import_pred(self.p_auth, self.data_path, "tmp/properties.csv", self.r_data_path, "profilesMaster", "dashboards", "properties.csv")
+		upload_import_pred(self.p_auth, self.data_path, "tmp/properties.csv", "profilesMaster", "dashboards", "properties.csv")
 
 	def upload_btn_eventhandler(self, path, filename, content):
 		fp = path + filename
@@ -509,15 +516,15 @@ class ScoringDash():
 			if fp == "customers":
 				feature_store = "customers_upload"
 				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], self.r_data_path, use_case["database"], feature_store, self.to_upload[fp][1])
+				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
 			elif fp == "transactions":
 				feature_store = "transactions_upload"
 				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], self.r_data_path, use_case["database"], feature_store, self.to_upload[fp][1])
+				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
 			elif fp == "CTO":
 				feature_store = "CTO_upload"
 				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], self.r_data_path, use_case["database"], feature_store, self.to_upload[fp][1])
+				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
 			else:
 				print("ERROR unreachable state.")
 
@@ -557,8 +564,8 @@ class ScoringDash():
 		lines = 1000000
 		content = worker_file_service.get_file_tail(self.p_auth, path, filename, lines)
 		save_file_text(content, tmp_file_path)
-		target_path = self.r_data_path
+		target_path = use_case["data_path"]
 		feature_store_file = "to_upload.csv"
 		upload_import_runtime(use_case["auth"], tmp_file_path, target_path, use_case["database"], use_case["feature_store"], feature_store_file)
-		upload_import_pred(self.p_auth, self.data_path, tmp_file_path, target_path, use_case["database"], use_case["feature_store"], feature_store_file)
+		upload_import_pred(self.p_auth, self.data_path, tmp_file_path, use_case["database"], use_case["feature_store"], feature_store_file)
 # 27787506

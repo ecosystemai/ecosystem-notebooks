@@ -118,7 +118,12 @@ login_component = html.Div([
 										dbc.Button("Login", outline=True, id="login_button", color="primary", className="mr-1"),
 										html.Br(),
 										html.Label("", id="login_status", style={"display": "none"}),
-										html.Div([], id="login_alert_box"),
+										html.Br(),
+										dbc.Toast(
+											id="login_toast",
+											duration=5000,
+											is_open=False,
+										),
 										html.Br(),
 										html.Label("ecosystem.Ai Dashboard {}".format(VERSION))
 									]
@@ -264,6 +269,42 @@ scoring_component = html.Div([
 													dbc.Tab(
 														html.Div([
 																html.Div([
+																		html.Label("Use Case Name"),
+																		html.Br(),
+																		dcc.Input(id="usecase_name"),
+																		html.Br(),
+																		html.Label("Runtime URL"),
+																		html.Br(),
+																		dcc.Input(id="usecase_runtime_url"),
+																		html.Br(),
+																		html.Label("Properties"),
+																		dcc.Textarea(
+																			id="properties_textarea",
+																			style={"width": "100%", "height": "200px"},
+																		),
+																		html.Br(),
+																		dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker",),
+																	],
+																	style={"border": "1px solid grey", "padding": "5px"}
+																),
+																html.Br(),
+																dbc.Button("Upload",
+																	outline=True, 
+																	color="primary",
+																	className="mr-1",
+																	id="properties_button"
+																),
+																html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
+
+															],
+															style={"height": "550px"}
+														),
+														label="Use Case",
+														tab_id="setup_properties"
+													),
+													dbc.Tab(
+														html.Div([
+																html.Div([
 																		html.Label("Database"),
 																		html.Br(),
 																		dcc.Input(id="upload_database"),
@@ -277,7 +318,9 @@ scoring_component = html.Div([
 																		dbc.InputGroup(
 																			[
 																				dcc.Input(
-																					id="upload_model"
+																					id="upload_model",
+																					disabled=True,
+																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
 																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_model_picker",),
@@ -292,14 +335,16 @@ scoring_component = html.Div([
 																html.Div([
 																		html.Label("Target Feature Store"),
 																		html.Br(),
-																		dcc.Input(id="upload_target_fs"),
+																		dcc.Input(id="upload_target_fs", style={"width": "60%"}),
 																		html.Br(),
 																		html.Label("Feature Store"),
 																		html.Br(),
 																		dbc.InputGroup(
 																			[
 																				dcc.Input(
-																					id="upload_fs"
+																					id="upload_fs",
+																					disabled=True,
+																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
 																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_fs_picker",),
@@ -309,14 +354,16 @@ scoring_component = html.Div([
 																		),
 																		html.Label("Target Additional File"),
 																		html.Br(),
-																		dcc.Input(id="upload_target_ad"),
+																		dcc.Input(id="upload_target_ad", style={"width": "60%"}),
 																		html.Br(),
 																		html.Label("Additional File"),
 																		html.Br(),
 																		dbc.InputGroup(
 																			[
 																				dcc.Input(
-																					id="upload_ad"
+																					id="upload_ad",
+																					disabled=True,
+																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
 																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker",),
@@ -343,106 +390,84 @@ scoring_component = html.Div([
 													),
 													dbc.Tab(
 														html.Div([
-																html.Label("Use Case Name"),
-																html.Br(),
-																dcc.Input(id="usecase_name"),
-																html.Br(),
-																html.Label("Runtime URL"),
-																html.Br(),
-																dcc.Input(id="usecase_runtime_url"),
-																html.Br(),
-																html.Label("Properties"),
-																dcc.Textarea(
-																	id="properties_textarea",
-																	style={"width": "100%", "height": "200px"},
-																),
-																html.Br(),
-																dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker",),
-																html.Br(),
-																dbc.Button("Upload",
-																	outline=True, 
-																	color="primary",
-																	className="mr-1",
-																	id="properties_button"
-																),
-																html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
-																
-															],
-															style={"height": "550px"}
-														),
-														label="Use Case",
-														tab_id="setup_properties"
-													),
-													dbc.Tab(
-														html.Div([
-																html.Label("Customer Data"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_customer_data"
+																html.Div([
+																		html.Label("Customer Data"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_customer_data",
+																					disabled=True,
+																					style={"width": "60%"}
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker",),
-																			addon_type="append",
+																		html.Br(),
+																		dbc.Button("Upload",
+																			outline=True, 
+																			color="primary",
+																			className="mr-1",
+																			id="customer_upload_button"
 																		),
-																	]
-																),
-																html.Br(),
-																dbc.Button("Upload",
-																	outline=True, 
-																	color="primary",
-																	className="mr-1",
-																	id="customer_upload_button"
-																),
-																html.Label("Uploaded File.", id="upload_button_label1", hidden=True),
-																html.Br(),
-																html.Br(),
-																html.Label("Transaction Data"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_transaction_data"
+																		html.Label("Uploaded File.", id="upload_button_label1", hidden=True),
+																		html.Br(),
+																		html.Br(),
+																		html.Label("Transaction Data"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_transaction_data",
+																					disabled=True,
+																					style={"width": "60%"}
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker",),
-																			addon_type="append",
+																		html.Br(),
+																		dbc.Button("Upload", 
+																			outline=True,
+																			color="primary",
+																			className="mr-1",
+																			id="transaction_upload_button"
 																		),
-																	]
-																),
-																html.Br(),
-																dbc.Button("Upload", 
-																	outline=True,
-																	color="primary",
-																	className="mr-1",
-																	id="transaction_upload_button"
-																),
-																html.Label("Uploaded File.", id="upload_button_label2", hidden=True),
-																html.Br(),
-																html.Br(),
-																html.Label("CTO Data"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_cto_data"
+																		html.Label("Uploaded File.", id="upload_button_label2", hidden=True),
+																		html.Br(),
+																		html.Br(),
+																		html.Label("CTO Data"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_cto_data",
+																					disabled=True,
+																					style={"width": "60%"}
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker",),
-																			addon_type="append",
+																		html.Br(),
+																		dbc.Button("Upload",
+																			outline=True, 
+																			color="primary",
+																			className="mr-1",
+																			id="cto_upload_button"
 																		),
-																	]
+																		html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
+																		html.Br(),
+																	],
+																	style={"border": "1px solid grey", "padding": "5px"}
 																),
-																html.Br(),
-																dbc.Button("Upload",
-																	outline=True, 
-																	color="primary",
-																	className="mr-1",
-																	id="cto_upload_button"
-																),
-																html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
-																html.Br(),
 																html.Br(),
 																dbc.Button("Process Uploads",
 																	outline=True, 
@@ -510,7 +535,7 @@ scoring_component = html.Div([
 															style= {"width": "100%", "height": "495px"}
 
 														),
-														label="Scoring Raw",
+														label="Scoring Result",
 														tab_id="scoring"
 													),
 													dbc.Tab(
@@ -725,7 +750,14 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 	return "Successfully logged in."
 
 @app.callback(
-	dash.dependencies.Output("login_alert_box", "children"),
+	dash.dependencies.Output("login_toast", "is_open"),
+	[dash.dependencies.Input("login_status", "children")],
+	prevent_initial_call=True)
+def callback_login4(children):
+	return True
+
+@app.callback(
+	dash.dependencies.Output("login_toast", "children"),
 	[dash.dependencies.Input("login_status", "children")],
 	prevent_initial_call=True)
 def callback_login3(children):
@@ -849,11 +881,10 @@ def callback_score_button2(n_clicks, usecase, score_value):
 @app.callback(
 	dash.dependencies.Output("scoring_text_area", "value"),
 	[
-		dash.dependencies.Input("score_button", "n_clicks"),
 		dash.dependencies.Input("score_buffer", "children")
 	],
 	prevent_initial_call=True)
-def callback_score_button(n_clicks, score_b):
+def callback_score_buffer( score_b):
 	j = json.loads(score_b)
 	pj = json.dumps(j, indent=4, sort_keys=True)
 	return pj
@@ -1088,7 +1119,7 @@ def callback_process_uploads(clicks, usecase):
 		State(component_id="usecase_dropdown", component_property="value"),
 	],
 	prevent_initial_call=True)
-def process_properties(n_clicks, usecase_name):
+def test_connection(n_clicks, usecase_name):
 	if sd.test_connection(usecase_name):
 		return False
 	return True
@@ -1239,15 +1270,20 @@ def toggle_collapse(input1, input2, input3, login_status):
 		else:
 			return {"display": "none"}
 	else:
-		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
-		btn_df = btn_df.fillna(0)
-
-		if btn_df.idxmax(axis=1).values == "input1" or btn_df.idxmax(axis=1).values == "input4":
+		if len(login_status) <= 2:
 			return {"background-color": "#edf1f7", "min-height": "90vh"}
-		if btn_df.idxmax(axis=1).values == "input2":
-			return {"display": "none"}
-		if btn_df.idxmax(axis=1).values == "input3":
-			return {"display": "none"}
+		elif login_status[:5] == "Error":
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+		else:
+			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+			btn_df = btn_df.fillna(0)
+
+			if btn_df.idxmax(axis=1).values == "input1" or btn_df.idxmax(axis=1).values == "input4":
+				return {"background-color": "#edf1f7", "min-height": "90vh"}
+			if btn_df.idxmax(axis=1).values == "input2":
+				return {"display": "none"}
+			if btn_df.idxmax(axis=1).values == "input3":
+				return {"display": "none"}
 
 @app.callback(
 	dash.dependencies.Output("scoring_component", "style"),
@@ -1267,15 +1303,20 @@ def toggle_collapse(input1, input2, input3, login_status):
 		else:
 			return {"background-color": "#edf1f7", "min-height": "90vh"}
 	else:
-		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
-		btn_df = btn_df.fillna(0)
+		if len(login_status) <= 2:
+			return {"display": "none"}
+		elif login_status[:5] == "Error":
+			return {"display": "none"}
+		else:
+			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+			btn_df = btn_df.fillna(0)
 
-		if btn_df.idxmax(axis=1).values == "input1":
-			return {"display": "none"}
-		if btn_df.idxmax(axis=1).values == "input2":
-			return {"background-color": "#edf1f7", "min-height": "90vh"}
-		if btn_df.idxmax(axis=1).values == "input3":
-			return {"display": "none"}
+			if btn_df.idxmax(axis=1).values == "input1":
+				return {"display": "none"}
+			if btn_df.idxmax(axis=1).values == "input2":
+				return {"background-color": "#edf1f7", "min-height": "90vh"}
+			if btn_df.idxmax(axis=1).values == "input3":
+				return {"display": "none"}
 
 @app.callback(
 	dash.dependencies.Output("batch_scoring_component", "style"),
@@ -1284,17 +1325,25 @@ def toggle_collapse(input1, input2, input3, login_status):
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_3", "n_clicks_timestamp")
 	],
+	state=[
+		State(component_id="login_status", component_property="children"),
+	],
 )
-def toggle_collapse(input1, input2, input3):
-	btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
-	btn_df = btn_df.fillna(0)
+def toggle_collapse(input1, input2, input3, login_status):
+	if len(login_status) <= 2:
+		return {"display": "none"}
+	elif login_status[:5] == "Error":
+		return {"display": "none"}
+	else:
+		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+		btn_df = btn_df.fillna(0)
 
-	if btn_df.idxmax(axis=1).values == "input1":
-		return {"display": "none"}
-	if btn_df.idxmax(axis=1).values == "input2":
-		return {"display": "none"}
-	if btn_df.idxmax(axis=1).values == "input3":
-		return {"background-color": "#edf1f7", "min-height": "90vh"}
+		if btn_df.idxmax(axis=1).values == "input1":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input2":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input3":
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
 
 if __name__ == "__main__":
 	app.run_server(debug=True)
