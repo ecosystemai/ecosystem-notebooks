@@ -263,57 +263,69 @@ scoring_component = html.Div([
 											dbc.Tabs([
 													dbc.Tab(
 														html.Div([
-																html.Br(),
-																html.Label("Database"),
-																html.Br(),
-																dcc.Input(id="upload_database"),
-																html.Br(),
-																html.Label("Model"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_model"
-																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_model_picker",),
-																			addon_type="append",
-																		),
-																	]
+																html.Div([
+																		html.Label("Database"),
+																		html.Br(),
+																		dcc.Input(id="upload_database"),
+																	],
+																	style={"border": "1px solid grey", "padding": "5px"}
 																),
-																html.Label("Target Feature Store"),
 																html.Br(),
-																dcc.Input(id="upload_target_fs"),
-																html.Br(),
-																html.Label("Feature Store"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_fs"
+																html.Div([
+																		html.Label("Model"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_model"
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_model_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_fs_picker",),
-																			addon_type="append",
-																		),
-																	]
+																	],
+																	style={"border": "1px solid grey", "padding": "5px"}
 																),
-																html.Label("Target Additional File"),
 																html.Br(),
-																dcc.Input(id="upload_target_ad"),
-																html.Br(),
-																html.Label("Additional File"),
-																html.Br(),
-																dbc.InputGroup(
-																	[
-																		dcc.Input(
-																			id="upload_ad"
+																html.Div([
+																		html.Label("Target Feature Store"),
+																		html.Br(),
+																		dcc.Input(id="upload_target_fs"),
+																		html.Br(),
+																		html.Label("Feature Store"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_fs"
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_fs_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																		dbc.InputGroupAddon(
-																			dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker",),
-																			addon_type="append",
+																		html.Label("Target Additional File"),
+																		html.Br(),
+																		dcc.Input(id="upload_target_ad"),
+																		html.Br(),
+																		html.Label("Additional File"),
+																		html.Br(),
+																		dbc.InputGroup(
+																			[
+																				dcc.Input(
+																					id="upload_ad"
+																				),
+																				dbc.InputGroupAddon(
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker",),
+																					addon_type="append",
+																				),
+																			]
 																		),
-																	]
+																	],
+																	style={"border": "1px solid grey", "padding": "5px"}
 																),
 																html.Br(),
 																dbc.Button("Upload",
@@ -324,7 +336,7 @@ scoring_component = html.Div([
 																),
 																html.Label("Uploaded Usecase.", id="files_button_label", hidden=True),
 															],
-															style={"height": "510px"}
+															style={"height": "550px"}
 														),
 														label="Files",
 														tab_id="setup_files"
@@ -356,7 +368,7 @@ scoring_component = html.Div([
 																html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
 																
 															],
-															style={"height": "510px"}
+															style={"height": "550px"}
 														),
 														label="Use Case",
 														tab_id="setup_properties"
@@ -1178,9 +1190,9 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	fs_path = tmp_dir + fs_name
 	ad_path = tmp_dir + ad_name
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
-		sd.upload_use_case_files(usecase, "/", database, model_path, fs_path, target_fs)
+		sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
 	else:
-		sd.upload_use_case_files(usecase, "/", database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
+		sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
 	return False
 
 @app.callback(

@@ -183,6 +183,15 @@ def file_database_import(auth, database, collection, file_name):
     meta = resp.json()
     return meta
 
+def get_property(auth, property_key):
+	ep = endpoints.GET_PROPERTY
+	param_dict = {
+		"key": property_key
+	}
+	resp = request_utils.create_only_auth(auth, ep, params=param_dict)
+	data = resp.content.decode("utf-8")
+	return data
+
 def update_properties(auth, properties):
     ep = endpoints.UPDATE_PROPERTIES
     resp = request_utils.create_only_auth(auth, ep, data=properties)
@@ -196,12 +205,13 @@ def refresh(auth):
 
 def get_spend_personality(auth, campaign, channel, customer, params, subcampaign, userid):
     ep = endpoints.GET_SPEND_PERSONALITY
-    param_dict = {"campaign": campaign,
-                  "channel": channel, 
-                  "customer":customer, 
-                  "params":params, 
-                  "subcampaign":subcampaign, 
-                  "userid":userid}
+    param_dict = {
+    	"campaign": campaign,
+      "channel": channel, 
+      "customer":customer, 
+      "params":params, 
+      "subcampaign":subcampaign, 
+      "userid":userid}
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta

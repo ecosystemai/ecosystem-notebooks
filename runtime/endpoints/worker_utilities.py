@@ -96,6 +96,13 @@ FILE_DATABASE_IMPORT = {
 	"error_message": "{type} {endpoint} {response_code}"
 }
 
+GET_PROPERTY = {
+	"type": "get",
+	"endpoint": "/getProperty",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
 UPDATE_PROPERTIES = {
 	"type": "post",
 	"endpoint": "/updateProperties",
