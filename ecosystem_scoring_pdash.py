@@ -51,8 +51,6 @@ def upload_import_runtime(auth, path, target_path, database, feature_store, feat
 	worker_utilities.file_database_import(auth, database, feature_store, feature_store_file)
 
 def upload_file_pred(auth, data_path, path, target_path):
-	print("LOOK HERE")
-	print(str(data_path) + target_path)
 	worker_file_service.upload_file(auth, path, str(data_path) + target_path)
 
 def upload_import_pred(auth, data_path, path, target_path, database, feature_store, feature_store_file):
@@ -458,12 +456,15 @@ class ScoringDash():
 	def get_properties(self):
 		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards", "{}", 1000000, "{}", 0)
 		for entry in data_results:
-			properties = entry["properties"]
-			usecase_name = entry["usecase"]
-			rurl = entry["runtime_url"]
-			predictor, database, feature_store, key_field = extract_properties(properties)
-			function = function_from_string(predictor)
-			self.load_use_case(usecase_name, database, key_field, function, feature_store, properties, rurl)
+			try:
+				properties = entry["properties"]
+				usecase_name = entry["usecase"]
+				rurl = entry["runtime_url"]
+				predictor, database, feature_store, key_field = extract_properties(properties)
+				function = function_from_string(predictor)
+				self.load_use_case(usecase_name, database, key_field, function, feature_store, properties, rurl)
+			except:
+				continue
 
 	def preprocess_properties(self, usecase_name, runtime_url, properties):
 		headers = ["usecase", "runtime_url", "properties"]
