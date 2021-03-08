@@ -87,7 +87,8 @@ login_component = html.Div([
 															# placeholder="Enter Prediction Server URL", 
 															id="ps_url",
 															type="text",
-															value="http://127.0.0.1:3001/api"
+															value="http://demo.ecosystem.ai:3001/api"
+															# value="http://127.0.0.1:3001/api"
 														),
 													]
 												),
@@ -98,7 +99,7 @@ login_component = html.Div([
 															# placeholder="Enter Prediction Server Username", 
 															id="ps_username",
 															type="text",
-															value="admin@ecosystem.ai"
+															value="user@ecosystem.ai"
 														),
 													]
 												),
@@ -119,11 +120,12 @@ login_component = html.Div([
 										html.Br(),
 										html.Label("", id="login_status", style={"display": "none"}),
 										html.Br(),
-										dbc.Toast(
-											id="login_toast",
-											duration=5000,
-											is_open=False,
-										),
+										html.Div(id="login_alert_div"),
+										# dbc.Toast(
+										# 	id="login_toast",
+										# 	duration=5000,
+										# 	is_open=False,
+										# ),
 										html.Br(),
 										html.Label("ecosystem.Ai Dashboard {}".format(VERSION))
 									]
@@ -168,7 +170,9 @@ scoring_component = html.Div([
 												html.Br(),
 												dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
 												html.Br(),
-												html.Label("Connection successfull.", id="test_conn_label", hidden=True),
+												html.Br(),
+												# html.Label("", id="test_conn_label", hidden=True),
+												html.Div(id="test_conn_alert_div"),
 												html.Br(),
 												html.Label("Find Filter"),
 												html.Br(),
@@ -238,11 +242,11 @@ scoring_component = html.Div([
 										dbc.CardBody([
 												html.Div([
 														html.Div([
-																dbc.ListGroup([], id="table_div", style={"overflow-y": "scroll", "max-height": "500px"})
+																dbc.ListGroup([], id="table_div", style={"overflow-y": "scroll", "max-height": "600px"})
 															],
 														)
 													],
-													style={"height": "553px"}
+													style={"min-height": "633px"}
 												)
 											]
 										)
@@ -294,10 +298,13 @@ scoring_component = html.Div([
 																	className="mr-1",
 																	id="properties_button"
 																),
-																html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
+																html.Br(),
+																html.Br(),
+																html.Div("", id="usecase_upload_alert_div"),
+																# html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
 
 															],
-															style={"height": "550px"}
+															style={"min-height": "592px"}
 														),
 														label="Use Case",
 														tab_id="setup_properties"
@@ -381,9 +388,12 @@ scoring_component = html.Div([
 																	className="mr-1",
 																	id="files_button"
 																),
-																html.Label("Uploaded Usecase.", id="files_button_label", hidden=True),
+																html.Br(),
+																html.Br(),
+																html.Div("", id="files_upload_alert_div"),
+																# html.Label("Uploaded Files.", id="files_button_label", hidden=True),
 															],
-															style={"height": "550px"}
+															style={"min-height": "592px"}
 														),
 														label="Files",
 														tab_id="setup_files"
@@ -474,12 +484,15 @@ scoring_component = html.Div([
 																	color="primary",
 																	className="mr-1",
 																	id="process_uploads_button"
-																),				
-																html.Label("", id="upload_status")
+																),
+																html.Br(),
+																html.Br(),
+																html.Div("", id="continuous_upload_alert_div")
+																# html.Label("", id="upload_status")
 															],
-															style={"height": "510px"}
+															style={"min-height": "592px"}
 														),
-														label="Upload",
+														label="Continuous",
 														tab_id="upload_files"
 													)
 												]
@@ -510,17 +523,6 @@ scoring_component = html.Div([
 											dbc.Tabs([
 													dbc.Tab(
 														html.Div(
-															# dash_table.DataTable(
-															# 	id="scoring_datatable",
-															# 	columns=[],
-															# 	data=[],
-															# 	style_header={"backgroundColor": "#3366ff", "color": "white", "font-size": "13px"},
-															# 	style_data_conditional=[{"if": {"row_index": "odd"}, "backgroundColor": "#f7f9fc"}],
-															# 	style_cell={"textAlign": "left", "minWidth": "250px", "whiteSpace": "normal", "height": "auto", "font-family": "arial", "font-size": "11px"},
-															# 	fixed_rows={"headers": True},
-															# 	style_table={"overflowY": "auto", "overflowX": "auto", "height": "580px"},
-																
-															# ),
 															id="scoring_div",
 															style={"overflow-y": "scroll", "max-height": "580px"}
 														),
@@ -749,28 +751,28 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 		
 	return "Successfully logged in."
 
-@app.callback(
-	dash.dependencies.Output("login_toast", "is_open"),
-	[dash.dependencies.Input("login_status", "children")],
-	prevent_initial_call=True)
-def callback_login4(children):
-	return True
+# @app.callback(
+# 	dash.dependencies.Output("login_toast", "is_open"),
+# 	[dash.dependencies.Input("login_status", "children")],
+# 	prevent_initial_call=True)
+# def callback_login4(children):
+# 	return True
 
 @app.callback(
-	dash.dependencies.Output("login_toast", "children"),
+	dash.dependencies.Output("login_alert_div", "children"),
 	[dash.dependencies.Input("login_status", "children")],
 	prevent_initial_call=True)
 def callback_login3(children):
 	if children[:5] == "Error":
-		return dbc.Alert("Error: Could not log in.", color="danger")
-	return dbc.Alert("Successfully logged in.", color="primary")
+		return dbc.Alert("Error: Could not log in.", color="danger", duration=5000)
+	return dbc.Alert("Successfully logged in.", color="primary", duration=5000)
 
 @app.callback(
 	dash.dependencies.Output("usecase_dropdown", "options"),
 	[	
 		dash.dependencies.Input("login_status", "children"),
 		dash.dependencies.Input("usecase_dropdown", "value"),
-		dash.dependencies.Input("properties_button_label", "hidden")
+		dash.dependencies.Input("usecase_upload_alert_div", "children")
 	],
 	prevent_initial_call=True)
 def callback_login2(children, value, hidden):
@@ -785,7 +787,7 @@ def callback_login2(children, value, hidden):
 	[	
 		dash.dependencies.Input("login_status", "children"),
 		dash.dependencies.Input("usecase_dropdown", "value"),
-		dash.dependencies.Input("properties_button_label", "hidden")
+		dash.dependencies.Input("usecase_upload_alert_div", "children")
 	],
 	prevent_initial_call=True)
 def callback_login2_2(children, value, hidden):
@@ -1099,7 +1101,7 @@ def upload_file_cto(n_clicks, filename, contents):
 
 
 @app.callback(
-	dash.dependencies.Output("upload_status", "children"),
+	dash.dependencies.Output("continuous_upload_alert_div", "children"),
 	[dash.dependencies.Input("process_uploads_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1108,12 +1110,12 @@ def upload_file_cto(n_clicks, filename, contents):
 def callback_process_uploads(clicks, usecase):
 	try:
 		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
+		return dbc.Alert("Successfully processed new uploads.", color="primary", duration=5000)
 	except:
-		return "Error: Processing uploads failed"
-	return "Uploads successfully processed"
-
+		return dbc.Alert("Error: Could not process new uploads.", color="danger", duration=5000)
+		
 @app.callback(
-	dash.dependencies.Output("test_conn_label", "hidden"),
+	dash.dependencies.Output("test_conn_alert_div", "children"),
 	[dash.dependencies.Input("test_conn_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1121,11 +1123,11 @@ def callback_process_uploads(clicks, usecase):
 	prevent_initial_call=True)
 def test_connection(n_clicks, usecase_name):
 	if sd.test_connection(usecase_name):
-		return False
-	return True
+		return dbc.Alert("Connection Successful.", color="primary", duration=5000)
+	return dbc.Alert("Error: Could not connected to '{}' runtime server.".format(usecase_name), color="danger", duration=5000)
 
 @app.callback(
-	dash.dependencies.Output("properties_button_label", "hidden"),
+	dash.dependencies.Output("usecase_upload_alert_div", "children"),
 	[dash.dependencies.Input("properties_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_name", component_property="value"),
@@ -1134,8 +1136,11 @@ def test_connection(n_clicks, usecase_name):
 	],
 	prevent_initial_call=True)
 def process_properties(n_clicks, usecase_name, runtime_url, properties):
-	sd.preprocess_properties(usecase_name, runtime_url, properties)
-	return False
+	try:
+		sd.preprocess_properties(usecase_name, runtime_url, properties)
+		return dbc.Alert("Successfully uploaded usecase: {}.".format(usecase_name), color="primary", duration=5000)
+	except:
+		return dbc.Alert("Error: Could not upload usecase: {}.".format(usecase_name), color="danger", duration=5000)
 
 @app.callback(
 	dash.dependencies.Output("upload_model", "value"),
@@ -1198,7 +1203,7 @@ def tabs_content_graphing4(scoring_results):
 	return graph
 
 @app.callback(
-	dash.dependencies.Output("files_button_label", "hidden"),
+	dash.dependencies.Output("files_upload_alert_div", "children"),
 	[dash.dependencies.Input("files_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1221,10 +1226,17 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	fs_path = tmp_dir + fs_name
 	ad_path = tmp_dir + ad_name
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
-		sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
+		try:
+			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
+			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
+		except:
+			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
 	else:
-		sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
-	return False
+		try:
+			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
+			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
+		except:
+			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
 
 @app.callback(
 	dash.dependencies.Output("scoring_div", "children"),

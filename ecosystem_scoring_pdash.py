@@ -149,14 +149,16 @@ class ScoringDash():
 		skip = 0
 		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
 
-	def load_use_case(self, name, database, key_field, function, feature_store, properties, runtime_url): 
+	def load_use_case(self, name, database, key_field, predictor, feature_store, properties, runtime_url): 
 		auth = access.Authenticate(runtime_url)
+		function = function_from_string(predictor)
 		use_case = {
 			"name": name,
 			"database": database,
 			"key_field": key_field,
 			"feature_store": feature_store,
 			"properties": properties,
+			"predictor": predictor,
 			"function": function,
 			"runtime_url": runtime_url,
 			"auth": auth,
@@ -195,11 +197,14 @@ class ScoringDash():
 	# 		}
 	# 		text_list.append(value)
 	# 	return text_list
-	    
+	
+	def setup_use_case_straight(self, auth, properties):
+		worker_utilities.update_properties(auth, properties)
+		worker_utilities.refresh(auth)
+
 	def setup_use_case(self, usecase_name):
 		use_case = self.use_cases[usecase_name]
-		worker_utilities.update_properties(use_case["auth"], use_case["properties"])
-		worker_utilities.refresh(use_case["auth"])
+		self.setup_use_case_straight(use_case["auth"], use_case["properties"])
     
 	def get_use_case_names(self):
 		return list(self.use_cases.keys())
@@ -468,8 +473,7 @@ class ScoringDash():
 				usecase_name = entry["usecase"]
 				rurl = entry["runtime_url"]
 				predictor, database, feature_store, key_field = extract_properties(properties)
-				function = function_from_string(predictor)
-				self.load_use_case(usecase_name, database, key_field, function, feature_store, properties, rurl)
+				self.load_use_case(usecase_name, database, key_field, predictor, feature_store, properties, rurl)
 			except:
 				continue
 
@@ -488,10 +492,11 @@ class ScoringDash():
 			writer.writerows(data)
 		# try:
 		predictor, database, feature_store, key_field = extract_properties(properties)
-		function = function_from_string(predictor)
-		self.load_use_case(usecase_name, database, key_field, function, feature_store, properties, runtime_url)
-		usecase = self.use_cases[usecase_name]
-		self.setup_use_case(usecase_name)
+		auth = access.Authenticate(runtime_url)
+		self.setup_use_case_straight(auth, properties)
+		self.load_use_case(usecase_name, database, key_field, predictor, feature_store, properties, runtime_url)
+		# usecase = self.use_cases[usecase_name]
+		# self.setup_use_case(usecase_name)
 		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards")
 		upload_import_pred(self.p_auth, self.data_path, "tmp/properties.csv", "profilesMaster", "dashboards", "properties.csv")
 
