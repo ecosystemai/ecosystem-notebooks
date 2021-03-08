@@ -22,6 +22,7 @@ CURRENT_YEAR = "2021"
 VERSION = "0.5.9780"
 sd = None
 tmp_dir = "tmp/"
+export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
 	os.mkdir(tmp_dir)
 
@@ -246,7 +247,7 @@ scoring_component = html.Div([
 															],
 														)
 													],
-													style={"min-height": "633px"}
+													style={"min-height": "640px"}
 												)
 											]
 										)
@@ -304,7 +305,7 @@ scoring_component = html.Div([
 																# html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
 
 															],
-															style={"min-height": "592px"}
+															style={"min-height": "598px"}
 														),
 														label="Use Case",
 														tab_id="setup_properties"
@@ -393,7 +394,7 @@ scoring_component = html.Div([
 																html.Div("", id="files_upload_alert_div"),
 																# html.Label("Uploaded Files.", id="files_button_label", hidden=True),
 															],
-															style={"min-height": "592px"}
+															style={"min-height": "598px"}
 														),
 														label="Files",
 														tab_id="setup_files"
@@ -490,7 +491,7 @@ scoring_component = html.Div([
 																html.Div("", id="continuous_upload_alert_div")
 																# html.Label("", id="upload_status")
 															],
-															style={"min-height": "592px"}
+															style={"min-height": "598px"}
 														),
 														label="Continuous",
 														tab_id="upload_files"
@@ -745,7 +746,8 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 	global sd
 	try:
 		sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password)
-	except:
+	except Exception as e:
+		print(e)
 		sd = None
 		return "Error: Could not log in."
 		
@@ -779,7 +781,8 @@ def callback_login2(children, value, hidden):
 	try:
 		sd.get_properties()
 		return convert_list(sd.get_use_case_names())
-	except:
+	except Exception as e:
+		print(e)
 		return {}
 
 @app.callback(
@@ -794,7 +797,8 @@ def callback_login2_2(children, value, hidden):
 	try:
 		sd.get_properties()
 		return convert_list(sd.get_use_case_names())
-	except:
+	except Exception as e:
+		print(e)
 		return {}
 
 @app.callback(
@@ -1111,7 +1115,8 @@ def callback_process_uploads(clicks, usecase):
 	try:
 		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
 		return dbc.Alert("Successfully processed new uploads.", color="primary", duration=5000)
-	except:
+	except Exception as e:
+		print(e)
 		return dbc.Alert("Error: Could not process new uploads.", color="danger", duration=5000)
 		
 @app.callback(
@@ -1139,7 +1144,8 @@ def process_properties(n_clicks, usecase_name, runtime_url, properties):
 	try:
 		sd.preprocess_properties(usecase_name, runtime_url, properties)
 		return dbc.Alert("Successfully uploaded usecase: {}.".format(usecase_name), color="primary", duration=5000)
-	except:
+	except Exception as e:
+		print(e)
 		return dbc.Alert("Error: Could not upload usecase: {}.".format(usecase_name), color="danger", duration=5000)
 
 @app.callback(
@@ -1229,13 +1235,15 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
 			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
-		except:
+		except Exception as e:
+			print(e)
 			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
 	else:
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
 			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
-		except:
+		except Exception as e:
+			print(e)
 			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
 
 @app.callback(
@@ -1262,6 +1270,7 @@ def tabs_content_scoring_tab2(children):
 		flat = json_flatten(value, "")
 		data_points.append(flat)
 	df = pd.DataFrame(data_points)
+	df.to_csv(export_tmp)
 	return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
 
 @app.callback(
