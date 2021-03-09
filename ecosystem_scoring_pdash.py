@@ -416,11 +416,11 @@ class ScoringDash():
 			sv = sv.strip()
 			result = self.score(usecase, sv)
 			if len(result["final_result"]) == 0:
-				errors.append("Value: '{}' not found in feature store. Upload data.\n".format(sv))
+				errors.append(sv)
 			else:
 				results.append(result)
 		if len(errors) >= 1:
-			return errors
+			raise Exception("Values: {} not found in featues store. Upload data.".format(errors))
 		return json.dumps(results, indent=2)
 
 	def dropdown_case_eventhandler(self, change):

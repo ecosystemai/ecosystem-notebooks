@@ -16,10 +16,14 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 import dash_trich_components as dtc
 import dash_pivottable
+import logging
+
+logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 ECO_LOGO = "./assets/favicon.ico"
 CURRENT_YEAR = "2021"
 VERSION = "0.5.9780"
+
 sd = None
 tmp_dir = "tmp/"
 export_tmp = tmp_dir + "dashboard_export.csv"
@@ -88,8 +92,8 @@ login_component = html.Div([
 															# placeholder="Enter Prediction Server URL", 
 															id="ps_url",
 															type="text",
-															value="http://demo.ecosystem.ai:3001/api"
-															# value="http://127.0.0.1:3001/api"
+															# value="http://demo.ecosystem.ai:3001/api"
+															value="http://127.0.0.1:3001/api"
 														),
 													]
 												),
@@ -174,7 +178,6 @@ scoring_component = html.Div([
 												html.Br(),
 												# html.Label("", id="test_conn_label", hidden=True),
 												html.Div(id="test_conn_alert_div"),
-												html.Br(),
 												html.Label("Find Filter"),
 												html.Br(),
 												dbc.InputGroup(
@@ -214,11 +217,13 @@ scoring_component = html.Div([
 														),
 													]
 												),
-												html.Label("", id="score_buffer", style={"display": "none"}),
 												html.Br(),
+												html.Div([], id="score_alert_div"),
+												html.Label("", id="score_buffer", style={"display": "none"}),
 												dcc.Upload(
 													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
-													id="batch_score_picker"
+													id="batch_score_picker",
+													style={"display": "inline-block"}
 												)
 											]
 										)
@@ -247,7 +252,7 @@ scoring_component = html.Div([
 															],
 														)
 													],
-													style={"min-height": "640px"}
+													style={"min-height": "615px"}
 												)
 											]
 										)
@@ -288,7 +293,7 @@ scoring_component = html.Div([
 																			style={"width": "100%", "height": "200px"},
 																		),
 																		html.Br(),
-																		dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker",),
+																		dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker", style={"display": "inline-block"}),
 																	],
 																	style={"border": "1px solid grey", "padding": "5px"}
 																),
@@ -305,7 +310,7 @@ scoring_component = html.Div([
 																# html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
 
 															],
-															style={"min-height": "598px"}
+															style={"min-height": "573px"}
 														),
 														label="Use Case",
 														tab_id="setup_properties"
@@ -331,7 +336,7 @@ scoring_component = html.Div([
 																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_model_picker",),
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_model_picker", style={"display": "inline-block"}),
 																					addon_type="append",
 																				),
 																			]
@@ -374,7 +379,7 @@ scoring_component = html.Div([
 																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker",),
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_ad_picker", style={"display": "inline-block"}),
 																					addon_type="append",
 																				),
 																			]
@@ -412,7 +417,7 @@ scoring_component = html.Div([
 																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker",),
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker", style={"display": "inline-block"}),
 																					addon_type="append",
 																				),
 																			]
@@ -437,7 +442,7 @@ scoring_component = html.Div([
 																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker",),
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker", style={"display": "inline-block"}),
 																					addon_type="append",
 																				),
 																			]
@@ -462,7 +467,7 @@ scoring_component = html.Div([
 																					style={"width": "60%"}
 																				),
 																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker",),
+																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker", style={"display": "inline-block"}),
 																					addon_type="append",
 																				),
 																			]
@@ -656,14 +661,23 @@ batch_scoring_component = html.Div([
 														),
 													]
 												),
-												html.Label("", id="score_buffer2", style={"display": "none"}),
 												html.Br(),
+												html.Div([], id="score_alert_div2"),
+												html.Label("", id="score_buffer2", style={"display": "none"}),
 												dcc.Upload(
 													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
-													id="batch_score_picker2"
+													id="batch_score_picker2",
+													style={"display": "inline-block"}
+												),
+												html.Br(),
+												html.A(
+													children=dbc.Button("Download Scoring Results", outline=True, color="primary", className="mr-1", id="download_score_button", disabled=True),
+													download="export.csv",
+													href="/export",
+													target="_blank"
 												)
 											],
-											style={"height": "700px"}
+											style={"min-height": "750px"}
 										)
 									)
 								],
@@ -689,7 +703,7 @@ batch_scoring_component = html.Div([
 															],
 														)
 													],
-													style={"height": "657px"}
+													style={"height": "712px"}
 												)
 											]
 										)
@@ -723,15 +737,19 @@ app.layout = html.Div([
 				dtc.SideBarItem(id="id_3", label="Scoring", icon="fas fa-chart-line", className="sideBarItem")
 			],
 			className="sideBar"
-			# text_color="#ffffff"
-			# bg_color="#343a40"
-			# bg_color="#1144dd"
 		),
 		
 		html.Div([login_component, scoring_component, batch_scoring_component, footer], id="page_content", className="page_content"),
 	], 
 	style={"position": "relative"}
 )
+
+@app.server.route("/export") 
+def download_csv():
+	return flask.send_file(export_tmp,
+					mimetype="text/csv",
+					attachment_filename="export.csv",
+					as_attachment=True)
 
 @app.callback(
 	dash.dependencies.Output("login_status", "children"),
@@ -752,13 +770,6 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 		return "Error: Could not log in."
 		
 	return "Successfully logged in."
-
-# @app.callback(
-# 	dash.dependencies.Output("login_toast", "is_open"),
-# 	[dash.dependencies.Input("login_status", "children")],
-# 	prevent_initial_call=True)
-# def callback_login4(children):
-# 	return True
 
 @app.callback(
 	dash.dependencies.Output("login_alert_div", "children"),
@@ -852,7 +863,10 @@ def callback_find_filter_button2(n_clicks, usecase, find_filter):
 	return opts
 
 @app.callback(
-	dash.dependencies.Output("score_buffer", "children"),
+	[
+		dash.dependencies.Output("score_buffer", "children"),
+		dash.dependencies.Output("score_alert_div", "children")
+	],
 	[dash.dependencies.Input("score_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -860,11 +874,20 @@ def callback_find_filter_button2(n_clicks, usecase, find_filter):
 	],
 	prevent_initial_call=True)
 def callback_score_button(n_clicks, usecase, score_value):
-	outputs = sd.score_btn_eventhandler(usecase, score_value)
-	return outputs
+	if score_value == "":
+		return None, dbc.Alert("Error: Could not score: Score Value field is empty.", color="danger", duration=5000)
+	try:
+		outputs = sd.score_btn_eventhandler(usecase, score_value)
+		return outputs, []
+	except Exception as e:
+		print(e)
+		return None, dbc.Alert("Error: Could not score: {}".format(e), color="danger", duration=5000)
 
 @app.callback(
-	dash.dependencies.Output("score_buffer2", "children"),
+	[
+		dash.dependencies.Output("score_buffer2", "children"),
+		dash.dependencies.Output("score_alert_div2", "children")
+	],
 	[dash.dependencies.Input("score_button2", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown2", component_property="value"),
@@ -872,8 +895,14 @@ def callback_score_button(n_clicks, usecase, score_value):
 	],
 	prevent_initial_call=True)
 def callback_score_button2(n_clicks, usecase, score_value):
-	outputs = sd.score_btn_eventhandler(usecase, score_value)
-	return outputs
+	if score_value == "":
+		return None, dbc.Alert("Error: Could not score: Score Value field is empty.", color="danger", duration=5000)
+	try:
+		outputs = sd.score_btn_eventhandler(usecase, score_value)
+		return outputs, []
+	except Exception as e:
+		print(e)
+		return None, dbc.Alert("Error: Could not score: {}".format(e), color="danger", duration=5000)
 
 # app.clientside_callback(
 # 	dash.dependencies.ClientsideFunction(
@@ -891,9 +920,13 @@ def callback_score_button2(n_clicks, usecase, score_value):
 	],
 	prevent_initial_call=True)
 def callback_score_buffer( score_b):
-	j = json.loads(score_b)
-	pj = json.dumps(j, indent=4, sort_keys=True)
-	return pj
+	try:
+		j = json.loads(score_b)
+		pj = json.dumps(j, indent=4, sort_keys=True)
+		return pj
+	except Exception as e:
+		print(e)
+		return None
 
 @app.callback(
 	dash.dependencies.Output("score_value_input", "value"),
@@ -985,11 +1018,15 @@ def tabs_content_graphing(tab):
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_graphing2(children):
-	jstr = json.loads(children)
-	value = jstr[0]
-	flat = json_flatten(value, "")
-	l = list(flat.keys())
-	return convert_list(l)
+	try:
+		jstr = json.loads(children)
+		value = jstr[0]
+		flat = json_flatten(value, "")
+		l = list(flat.keys())
+		return convert_list(l)
+	except Exception as e:
+		print(e)
+		return None
 
 @app.callback(
 	dash.dependencies.Output("graphing", "figure"),
@@ -1183,30 +1220,34 @@ def upload_prep_af(contents, filename):
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_graphing4(scoring_results):
-	jstr = json.loads(scoring_results)
-	data_points = []
-	for value in jstr:
-		flat = json_flatten(value, "")
-		data_points.append(flat)
-	df = pd.DataFrame(data_points)
-	columns = list(df.columns)
-	odd_header = columns[0]
-	if odd_header == "customer":
-		odd_header = columns[1]
-	l = [columns]
-	l.extend(df.values.tolist())
-	graph = dash_pivottable.PivotTable(
-		id="graphing_adv",
-		data=l,
-		cols=["customer"],
-		colOrder="key_a_to_z",
-		rows=[],
-		rowOrder="key_a_to_z",
-		rendererName="Line Chart",
-		aggregatorName="List Unique Values",
-		vals=[odd_header]
-	)
-	return graph
+	try:
+		jstr = json.loads(scoring_results)
+		data_points = []
+		for value in jstr:
+			flat = json_flatten(value, "")
+			data_points.append(flat)
+		df = pd.DataFrame(data_points)
+		columns = list(df.columns)
+		odd_header = columns[0]
+		if odd_header == "customer":
+			odd_header = columns[1]
+		l = [columns]
+		l.extend(df.values.tolist())
+		graph = dash_pivottable.PivotTable(
+			id="graphing_adv",
+			data=l,
+			cols=["customer"],
+			colOrder="key_a_to_z",
+			rows=[],
+			rowOrder="key_a_to_z",
+			rendererName="Line Chart",
+			aggregatorName="List Unique Values",
+			vals=[odd_header]
+		)
+		return graph
+	except Exception as e:
+		print(e)
+		return None
 
 @app.callback(
 	dash.dependencies.Output("files_upload_alert_div", "children"),
@@ -1250,28 +1291,46 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	dash.dependencies.Output("scoring_div", "children"),
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
-def tabs_content_scoring_tab2(children):
-	jstr = json.loads(children)
-	data_points = []
-	for value in jstr:
-		flat = json_flatten(value, "")
-		data_points.append(flat)
-	df = pd.DataFrame(data_points)
-	return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+def tabs_content_scoring_tab(children):
+	try:
+		jstr = json.loads(children)
+		data_points = []
+		for value in jstr:
+			flat = json_flatten(value, "")
+			data_points.append(flat)
+		df = pd.DataFrame(data_points)
+		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+	except Exception as e:
+		print(e)
+		return None
+
+@app.callback(
+	dash.dependencies.Output("download_score_button", "disabled"),
+	[dash.dependencies.Input("score_buffer2", "children")],
+	prevent_initial_call=True)
+def activate_downloader(children):
+	if children != "" and children != None:
+		return False
+	return True
+	
 
 @app.callback(
 	dash.dependencies.Output("table_div2", "children"),
 	[dash.dependencies.Input("score_buffer2", "children")],
 	prevent_initial_call=True)
 def tabs_content_scoring_tab2(children):
-	jstr = json.loads(children)
-	data_points = []
-	for value in jstr:
-		flat = json_flatten(value, "")
-		data_points.append(flat)
-	df = pd.DataFrame(data_points)
-	df.to_csv(export_tmp)
-	return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+	try:
+		jstr = json.loads(children)
+		data_points = []
+		for value in jstr:
+			flat = json_flatten(value, "")
+			data_points.append(flat)
+		df = pd.DataFrame(data_points)
+		df.to_csv(export_tmp)
+		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+	except Exception as e:
+		print(e)
+		return None
 
 @app.callback(
 	dash.dependencies.Output("login_component", "style"),
