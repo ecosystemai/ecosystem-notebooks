@@ -30,7 +30,16 @@ export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
 	os.mkdir(tmp_dir)
 
-
+def generate_toast(message, header, icon):
+	return dbc.Toast(
+		message,
+		header=header,
+		is_open=True,
+		dismissable=True,
+		icon=icon,
+		duration=10000,
+		style={"position": "fixed", "top": 66, "right": 10, "width": 350, "zIndex": 10}
+	)
 
 def json_flatten(jdict, key_prefix):
 	rdict = {}
@@ -126,11 +135,6 @@ login_component = html.Div([
 										html.Label("", id="login_status", style={"display": "none"}),
 										html.Br(),
 										html.Div(id="login_alert_div"),
-										# dbc.Toast(
-										# 	id="login_toast",
-										# 	duration=5000,
-										# 	is_open=False,
-										# ),
 										html.Br(),
 										html.Label("ecosystem.Ai Dashboard {}".format(VERSION))
 									]
@@ -176,8 +180,6 @@ scoring_component = html.Div([
 												dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
 												html.Br(),
 												html.Br(),
-												# html.Label("", id="test_conn_label", hidden=True),
-												html.Div(id="test_conn_alert_div"),
 												html.Label("Find Filter"),
 												html.Br(),
 												dbc.InputGroup(
@@ -218,7 +220,6 @@ scoring_component = html.Div([
 													]
 												),
 												html.Br(),
-												html.Div([], id="score_alert_div"),
 												html.Label("", id="score_buffer", style={"display": "none"}),
 												dcc.Upload(
 													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
@@ -278,14 +279,17 @@ scoring_component = html.Div([
 											dbc.Tabs([
 													dbc.Tab(
 														html.Div([
+																html.Br(),
 																html.Div([
 																		html.Label("Use Case Name"),
 																		html.Br(),
 																		dcc.Input(id="usecase_name"),
 																		html.Br(),
+																		html.Br(),
 																		html.Label("Runtime URL"),
 																		html.Br(),
 																		dcc.Input(id="usecase_runtime_url"),
+																		html.Br(),
 																		html.Br(),
 																		html.Label("Properties"),
 																		dcc.Textarea(
@@ -295,7 +299,7 @@ scoring_component = html.Div([
 																		html.Br(),
 																		dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="upload_properties_picker", style={"display": "inline-block"}),
 																	],
-																	style={"border": "1px solid grey", "padding": "5px"}
+																	style={"border": "1px solid #dee2e6", "padding": "5px"}
 																),
 																html.Br(),
 																dbc.Button("Upload",
@@ -304,11 +308,6 @@ scoring_component = html.Div([
 																	className="mr-1",
 																	id="properties_button"
 																),
-																html.Br(),
-																html.Br(),
-																html.Div("", id="usecase_upload_alert_div"),
-																# html.Label("Uploaded Usecase.", id="properties_button_label", hidden=True),
-
 															],
 															style={"min-height": "573px"}
 														),
@@ -317,12 +316,13 @@ scoring_component = html.Div([
 													),
 													dbc.Tab(
 														html.Div([
+																html.Br(),
 																html.Div([
 																		html.Label("Database"),
 																		html.Br(),
 																		dcc.Input(id="upload_database"),
 																	],
-																	style={"border": "1px solid grey", "padding": "5px"}
+																	style={"border": "1px solid #dee2e6", "padding": "5px"}
 																),
 																html.Br(),
 																html.Div([
@@ -342,13 +342,14 @@ scoring_component = html.Div([
 																			]
 																		),
 																	],
-																	style={"border": "1px solid grey", "padding": "5px"}
+																	style={"border": "1px solid #dee2e6", "padding": "5px"}
 																),
 																html.Br(),
 																html.Div([
 																		html.Label("Target Feature Store"),
 																		html.Br(),
 																		dcc.Input(id="upload_target_fs", style={"width": "60%"}),
+																		html.Br(),
 																		html.Br(),
 																		html.Label("Feature Store"),
 																		html.Br(),
@@ -365,9 +366,11 @@ scoring_component = html.Div([
 																				),
 																			]
 																		),
+																		html.Br(),
 																		html.Label("Target Additional File"),
 																		html.Br(),
 																		dcc.Input(id="upload_target_ad", style={"width": "60%"}),
+																		html.Br(),
 																		html.Br(),
 																		html.Label("Additional File"),
 																		html.Br(),
@@ -385,7 +388,7 @@ scoring_component = html.Div([
 																			]
 																		),
 																	],
-																	style={"border": "1px solid grey", "padding": "5px"}
+																	style={"border": "1px solid #dee2e6", "padding": "5px"}
 																),
 																html.Br(),
 																dbc.Button("Upload",
@@ -393,11 +396,7 @@ scoring_component = html.Div([
 																	color="primary",
 																	className="mr-1",
 																	id="files_button"
-																),
-																html.Br(),
-																html.Br(),
-																html.Div("", id="files_upload_alert_div"),
-																# html.Label("Uploaded Files.", id="files_button_label", hidden=True),
+																)
 															],
 															style={"min-height": "598px"}
 														),
@@ -406,6 +405,7 @@ scoring_component = html.Div([
 													),
 													dbc.Tab(
 														html.Div([
+																html.Br(),
 																html.Div([
 																		html.Label("Customer Data"),
 																		html.Br(),
@@ -482,7 +482,7 @@ scoring_component = html.Div([
 																		html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
 																		html.Br(),
 																	],
-																	style={"border": "1px solid grey", "padding": "5px"}
+																	style={"border": "1px solid #dee2e6", "padding": "5px"}
 																),
 																html.Br(),
 																dbc.Button("Process Uploads",
@@ -490,11 +490,7 @@ scoring_component = html.Div([
 																	color="primary",
 																	className="mr-1",
 																	id="process_uploads_button"
-																),
-																html.Br(),
-																html.Br(),
-																html.Div("", id="continuous_upload_alert_div")
-																# html.Label("", id="upload_status")
+																)
 															],
 															style={"min-height": "598px"}
 														),
@@ -662,7 +658,6 @@ batch_scoring_component = html.Div([
 													]
 												),
 												html.Br(),
-												html.Div([], id="score_alert_div2"),
 												html.Label("", id="score_buffer2", style={"display": "none"}),
 												dcc.Upload(
 													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
@@ -738,8 +733,18 @@ app.layout = html.Div([
 			],
 			className="sideBar"
 		),
-		
-		html.Div([login_component, scoring_component, batch_scoring_component, footer], id="page_content", className="page_content"),
+		html.Div([
+				html.Div([], id="login_toast_div"),
+				html.Div([], id="usecase_toast_div"),
+				html.Div([], id="connection_test_toast_div"),
+				html.Div([], id="files_toast_div"),
+				html.Div([], id="continuous_toast_div"),
+				html.Div([], id="score_toast_div"),
+				html.Div([], id="score_toast_div2	"),
+			],
+			id="toast_div"
+		),
+		html.Div([login_component, scoring_component, batch_scoring_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
 	], 
 	style={"position": "relative"}
 )
@@ -772,20 +777,20 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 	return "Successfully logged in."
 
 @app.callback(
-	dash.dependencies.Output("login_alert_div", "children"),
+	dash.dependencies.Output("login_toast_div", "children"),
 	[dash.dependencies.Input("login_status", "children")],
 	prevent_initial_call=True)
 def callback_login3(children):
 	if children[:5] == "Error":
-		return dbc.Alert("Error: Could not log in.", color="danger", duration=5000)
-	return dbc.Alert("Successfully logged in.", color="primary", duration=5000)
+		return generate_toast("Error: Could not log in.", "Error", "danger")
+	return generate_toast("Successfully logged in.", "Success", "primary")
 
 @app.callback(
 	dash.dependencies.Output("usecase_dropdown", "options"),
 	[	
 		dash.dependencies.Input("login_status", "children"),
 		dash.dependencies.Input("usecase_dropdown", "value"),
-		dash.dependencies.Input("usecase_upload_alert_div", "children")
+		dash.dependencies.Input("usecase_toast_div", "children")
 	],
 	prevent_initial_call=True)
 def callback_login2(children, value, hidden):
@@ -801,7 +806,7 @@ def callback_login2(children, value, hidden):
 	[	
 		dash.dependencies.Input("login_status", "children"),
 		dash.dependencies.Input("usecase_dropdown", "value"),
-		dash.dependencies.Input("usecase_upload_alert_div", "children")
+		dash.dependencies.Input("usecase_toast_div", "children")
 	],
 	prevent_initial_call=True)
 def callback_login2_2(children, value, hidden):
@@ -865,7 +870,7 @@ def callback_find_filter_button2(n_clicks, usecase, find_filter):
 @app.callback(
 	[
 		dash.dependencies.Output("score_buffer", "children"),
-		dash.dependencies.Output("score_alert_div", "children")
+		dash.dependencies.Output("score_toast_div", "children")
 	],
 	[dash.dependencies.Input("score_button", "n_clicks")],
 	state=[
@@ -875,18 +880,19 @@ def callback_find_filter_button2(n_clicks, usecase, find_filter):
 	prevent_initial_call=True)
 def callback_score_button(n_clicks, usecase, score_value):
 	if score_value == "":
-		return None, dbc.Alert("Error: Could not score: Score Value field is empty.", color="danger", duration=5000)
+		return None, generate_toast("Error: Could not score: Score Value field is empty.", "Error", "danger")
 	try:
 		outputs = sd.score_btn_eventhandler(usecase, score_value)
 		return outputs, []
 	except Exception as e:
 		print(e)
-		return None, dbc.Alert("Error: Could not score: {}".format(e), color="danger", duration=5000)
+		return None, generate_toast("Error: Could not score: {}".format(e), "Error", "danger")
+
 
 @app.callback(
 	[
 		dash.dependencies.Output("score_buffer2", "children"),
-		dash.dependencies.Output("score_alert_div2", "children")
+		dash.dependencies.Output("score_toast_div2", "children")
 	],
 	[dash.dependencies.Input("score_button2", "n_clicks")],
 	state=[
@@ -896,13 +902,13 @@ def callback_score_button(n_clicks, usecase, score_value):
 	prevent_initial_call=True)
 def callback_score_button2(n_clicks, usecase, score_value):
 	if score_value == "":
-		return None, dbc.Alert("Error: Could not score: Score Value field is empty.", color="danger", duration=5000)
+		return None, generate_toast("Error: Could not score: Score Value field is empty.", "Error", "danger")
 	try:
 		outputs = sd.score_btn_eventhandler(usecase, score_value)
 		return outputs, []
 	except Exception as e:
 		print(e)
-		return None, dbc.Alert("Error: Could not score: {}".format(e), color="danger", duration=5000)
+		return None, generate_toast("Error: Could not score: {}".format(e), "Error", "danger")
 
 # app.clientside_callback(
 # 	dash.dependencies.ClientsideFunction(
@@ -1142,7 +1148,7 @@ def upload_file_cto(n_clicks, filename, contents):
 
 
 @app.callback(
-	dash.dependencies.Output("continuous_upload_alert_div", "children"),
+	dash.dependencies.Output("continuous_toast_div", "children"),
 	[dash.dependencies.Input("process_uploads_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1151,13 +1157,14 @@ def upload_file_cto(n_clicks, filename, contents):
 def callback_process_uploads(clicks, usecase):
 	try:
 		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
-		return dbc.Alert("Successfully processed new uploads.", color="primary", duration=5000)
+		return generate_toast("Successfully processed new uploads.", "Success", "primary")
 	except Exception as e:
 		print(e)
-		return dbc.Alert("Error: Could not process new uploads.", color="danger", duration=5000)
+		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
+
 		
 @app.callback(
-	dash.dependencies.Output("test_conn_alert_div", "children"),
+	dash.dependencies.Output("connection_test_toast_div", "children"),
 	[dash.dependencies.Input("test_conn_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1165,11 +1172,11 @@ def callback_process_uploads(clicks, usecase):
 	prevent_initial_call=True)
 def test_connection(n_clicks, usecase_name):
 	if sd.test_connection(usecase_name):
-		return dbc.Alert("Connection Successful.", color="primary", duration=5000)
-	return dbc.Alert("Error: Could not connected to '{}' runtime server.".format(usecase_name), color="danger", duration=5000)
+		return generate_toast("Connection Successful.", "Success", "primary")
+	return generate_toast("Error: Could not connected to '{}' runtime server.".format(usecase_name), "Error", "danger")
 
 @app.callback(
-	dash.dependencies.Output("usecase_upload_alert_div", "children"),
+	dash.dependencies.Output("usecase_toast_div", "children"),
 	[dash.dependencies.Input("properties_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_name", component_property="value"),
@@ -1180,10 +1187,11 @@ def test_connection(n_clicks, usecase_name):
 def process_properties(n_clicks, usecase_name, runtime_url, properties):
 	try:
 		sd.preprocess_properties(usecase_name, runtime_url, properties)
-		return dbc.Alert("Successfully uploaded usecase: {}.".format(usecase_name), color="primary", duration=5000)
+		return generate_toast("Successfully uploaded usecase: {}.".format(usecase_name), "Success", "primary")
 	except Exception as e:
 		print(e)
-		return dbc.Alert("Error: Could not upload usecase: {}.".format(usecase_name), color="danger", duration=5000)
+		return generate_toast("Error: Could not upload usecase: {}.".format(usecase_name), "Error", "danger")
+
 
 @app.callback(
 	dash.dependencies.Output("upload_model", "value"),
@@ -1250,7 +1258,7 @@ def tabs_content_graphing4(scoring_results):
 		return None
 
 @app.callback(
-	dash.dependencies.Output("files_upload_alert_div", "children"),
+	dash.dependencies.Output("files_toast_div", "children"),
 	[dash.dependencies.Input("files_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
@@ -1266,26 +1274,31 @@ def tabs_content_graphing4(scoring_results):
 	],
 	prevent_initial_call=True)
 def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
-	sd.upload_btn_eventhandler(tmp_dir, model_name, model_content)
-	sd.upload_btn_eventhandler(tmp_dir, fs_name, fs_content)
-	sd.upload_btn_eventhandler(tmp_dir, ad_name, ad_content)
+	try:
+		sd.upload_btn_eventhandler(tmp_dir, model_name, model_content)
+		sd.upload_btn_eventhandler(tmp_dir, fs_name, fs_content)
+		sd.upload_btn_eventhandler(tmp_dir, ad_name, ad_content)
+	except Exception as e:
+		print(e)
+		return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
 	model_path = tmp_dir + model_name
 	fs_path = tmp_dir + fs_name
 	ad_path = tmp_dir + ad_name
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
-			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
+			return generate_toast("Successfully uploaded files.", "Success", "primary")
 		except Exception as e:
 			print(e)
-			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
+			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
 	else:
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
-			return dbc.Alert("Successfully uploaded files.", color="primary", duration=5000)
+			return generate_toast("Successfully uploaded files.", "Success", "primary")
 		except Exception as e:
 			print(e)
-			return dbc.Alert("Error: Could not upload files.", color="danger", duration=5000)
+			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
+
 
 @app.callback(
 	dash.dependencies.Output("scoring_div", "children"),
