@@ -16,11 +16,15 @@ from prediction.apis import utilities
 import csv
 import ntpath
 import uuid
-
+import datetime
+from datetime import timezone
 
 SPENDING_PERSONALITY = worker_utilities.get_spend_personality
 FINANCIAL_WELLNESS = worker_utilities.get_financial_wellness
 
+
+def get_utc_timestamp():
+	return datetime.datetime.now().replace(tzinfo=timezone.utc).timestamp()
 
 def function_from_string(s):
 	if s == "wellness_score":
@@ -115,7 +119,23 @@ class ScoringDash():
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.data_path = worker_file_service.get_property(self.p_auth, "user.data")
 		self.use_cases = {}
-		self.to_upload = {}
+		# self.to_upload = {}
+
+	def get_runtime_url(self, usecase_name):
+		use_case = self.use_cases[usecase_name]
+		return use_case["runtime_url"]
+
+	def get_properties(self, usecase_name):
+		use_case = self.use_cases[usecase_name]
+		return use_case["properties"]
+
+	def get_predictor_type(self, usecase_name):
+		use_case = self.use_cases[usecase_name]
+		return use_case["predictor"]
+
+	def get_key_field(self, usecase_name):
+		use_case = self.use_cases[usecase_name]
+		return use_case["key_field"]
 
 	def test_connection(self, usecase_name):
 		use_case = self.use_cases[usecase_name]
@@ -186,17 +206,6 @@ class ScoringDash():
 			}
 			text_list.append(value)
 		return text_list  
-	# def get_key_categories(self, usecase_name, find_text):
-	# 	use_case = self.use_cases[usecase_name]
-	# 	unique_values = self.get_unique_values(use_case["name"], use_case["key_field"], find_text)
-	# 	text_list = []
-	# 	for key in sorted(unique_values):
-	# 		value = {
-	# 			"label": "{}:{}{}".format(key, self.spaces_num(key, 20), unique_values[key]),
-	# 			"value": key
-	# 		}
-	# 		text_list.append(value)
-	# 	return text_list
 	
 	def setup_use_case_straight(self, auth, properties):
 		worker_utilities.update_properties(auth, properties)
@@ -290,124 +299,6 @@ class ScoringDash():
 			break
 		return columns
 
-	def setup_display(self):
-		ucns = self.get_use_case_names()
-		self.dropdown_case = widgets.Dropdown(options = ucns, value = ucns[0], layout=widgets.Layout(width="84%", left="13px"))
-		self.dropdown_customer = widgets.Select(
-			options=[],
-			rows=10,
-			disabled=False,
-			layout=widgets.Layout(width="90%")
-		)
-		self.label_case = widgets.Label("Use Case", layout=widgets.Layout(width="90%"))
-		self.label_customer = widgets.Label("Customer", layout=widgets.Layout(width="90%"))
-		self.label_other = widgets.Label("Transactions", layout=widgets.Layout(width="90%"))
-		self.text_area = widgets.Textarea(
-			disabled=True,
-			layout=widgets.Layout(width="90%", height="100%")
-		)
-
-		self.text_area2 = widgets.Textarea(
-			disabled=True,
-			layout=widgets.Layout(width="91%", height="95%", left="12px")
-		)
-		self.score_btn = widgets.Button(description="Score")
-		self.score_input = widgets.Text(
-			description="Score Value",
-			disabled=False,
-			layout=widgets.Layout(width="62%")
-		)
-
-		self.find_label = widgets.Label("Find Filter", layout=widgets.Layout(width="90%"))
-		self.find_btn = widgets.Button(description="Filter", layout=widgets.Layout(width="50px"))
-		self.find_input = widgets.Text(
-			description="",
-			value="{}",
-			disabled=False,
-			layout=widgets.Layout(width="69%")
-		)
-
-		self.label_upload = widgets.Label("", layout=widgets.Layout(width="100%"))
-		self.label_upload_h1 = widgets.Label("Customer Data", layout=widgets.Layout(width="100%"))
-		self.label_upload_h2 = widgets.Label("Transaction Data", layout=widgets.Layout(width="100%"))
-		self.label_upload_h3 = widgets.Label("CTO", layout=widgets.Layout(width="100%"))
-		self.upload_text_input = widgets.Text(
-			description="",
-			disabled=True,
-			layout=widgets.Layout(width="90%")
-		)
-		self.upload_input = widgets.FileUpload(
-			disabled=False,
-			accept = "",
-			multiple=True,
-			layout=widgets.Layout(width="30px")
-		)
-		self.upload_text_input2 = widgets.Text(
-			description="",
-			disabled=True,
-			layout=widgets.Layout(width="90%")
-		)
-		self.upload_input2 = widgets.FileUpload(
-			disabled=False,
-			accept = "",
-			multiple=True,
-			layout=widgets.Layout(width="30px")
-		)
-		self.upload_text_input3 = widgets.Text(
-			description="",
-			disabled=True,
-			layout=widgets.Layout(width="90%")
-		)
-		self.upload_input3 = widgets.FileUpload(
-			disabled=False,
-			accept = "",
-			multiple=True,
-			layout=widgets.Layout(width="30px")
-		)
-		self.table_out = widgets.Output(layout=widgets.Layout(overflow_y="auto", overflow_x="auto", width="100%", height="100%"))
-		self.upload_btn = widgets.Button(description="Upload")
-		self.label_upload_done = widgets.Label("", layout=widgets.Layout(width="50%"))
-		self.hbox_upload_btn = widgets.HBox([self.upload_btn, self.label_upload_done])
-		self.upload_btn2 = widgets.Button(description="Upload")
-		self.label_upload_done2 = widgets.Label("", layout=widgets.Layout(width="50%"))
-		self.hbox_upload_btn2 = widgets.HBox([self.upload_btn2, self.label_upload_done2])
-		self.upload_btn3 = widgets.Button(description="Upload")
-		self.label_upload_done3 = widgets.Label("", layout=widgets.Layout(width="50%"))
-		self.hbox_upload_btn3 = widgets.HBox([self.upload_btn3, self.label_upload_done3])
-		self.process_upload_btn = widgets.Button(description="Process Uploads", layout=widgets.Layout(width="90%"))
-		self.reupload_btn = widgets.Button(description="Re upload", layout=widgets.Layout(width="90%"))
-		self.hbox_find = widgets.HBox([self.find_input, self.find_btn], layout=widgets.Layout(left="12px", width="90%")) 
-		self.hbox_upload = widgets.HBox([self.upload_text_input, self.upload_input])
-		self.hbox_upload2 = widgets.HBox([self.upload_text_input2, self.upload_input2])
-		self.hbox_upload3 = widgets.HBox([self.upload_text_input3, self.upload_input3])
-		self.vbox_upload = widgets.VBox([self.label_upload, self.label_upload_h1, self.hbox_upload, self.hbox_upload_btn, self.label_upload_h2, self.hbox_upload2, self.hbox_upload_btn2, self.label_upload_h3, self.hbox_upload3, self.hbox_upload_btn3, self.process_upload_btn, self.reupload_btn], layout=widgets.Layout(width="91%"))
-		self.tab = widgets.Tab(layout=widgets.Layout(width="100%", height="90%"))
-		self.tab.children = [self.text_area2, self.vbox_upload]
-		self.tab.set_title(0, "Scoring")
-		self.tab.set_title(1, "Upload")
-		self.hb_btns = widgets.HBox([self.score_input, self.score_btn], layout=widgets.Layout(height="16%"))
-		self.vbox = widgets.VBox([self.label_case, self.dropdown_case, self.find_label, self.hbox_find, self.label_customer, self.dropdown_customer],  layout=widgets.Layout(width="30%"))
-		self.vbox2 = widgets.VBox([self.label_other, self.table_out],  layout=widgets.Layout(width="70%", height="400px"))
-		self.hb = widgets.HBox([self.vbox, self.vbox2])
-		self.hb2 = widgets.HBox([self.tab], layout=widgets.Layout(height="90%", width="100%"))
-		self.vbox_bot = widgets.VBox([self.hb_btns, self.hb2], layout=widgets.Layout(width="100%", height="600px"))
-		# vbox3 = widgets.VBox([self.hb, self.hb2])
-
-		self.dropdown_case.observe(self.dropdown_case_eventhandler, names="value")
-		self.dropdown_customer.observe(self.dropdown_customer_eventhandler, names="value")
-		self.score_btn.on_click(self.score_btn_eventhandler)
-		self.find_btn.on_click(self.find_btn_eventhandler)
-		self.upload_input.observe(self.upload_selector_eventhandler)
-		self.upload_input2.observe(self.upload_selector_eventhandler2)
-		self.upload_input3.observe(self.upload_selector_eventhandler3)
-		self.upload_btn.on_click(self.upload_btn_eventhandler)
-		self.upload_btn2.on_click(self.upload_btn_eventhandler2)
-		self.upload_btn3.on_click(self.upload_btn_eventhandler3)
-		self.process_upload_btn.on_click(self.process_upload_btn_eventhandler)
-		self.reupload_btn.on_click(self.reupload_btn_eventhandler)
-
-		return self.hb, self.vbox_bot
-
 	def score_btn_eventhandler(self, usecase, score_value):
 		svs = score_value.split(",")
 		results = []
@@ -418,6 +309,8 @@ class ScoringDash():
 			if len(result["final_result"]) == 0:
 				errors.append(sv)
 			else:
+				kf_data = self.dropdown_customer_eventhandler(sv, usecase)
+				result["source_data"] = kf_data
 				results.append(result)
 		if len(errors) >= 1:
 			raise Exception("Values: {} not found in featues store. Upload data.".format(errors))
@@ -465,7 +358,7 @@ class ScoringDash():
 		filtered_values = self.get_key_categories(usecase_name, find_filter)
 		return filtered_values
 
-	def get_properties(self):
+	def retrieve_properties(self):
 		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards", "{}", 1000000, "{}", 0)
 		for entry in data_results:
 			try:
@@ -490,48 +383,76 @@ class ScoringDash():
 		with open("tmp/properties.csv", "w", newline="") as f:
 			writer = csv.writer(f)
 			writer.writerows(data)
-		# try:
 		predictor, database, feature_store, key_field = extract_properties(properties)
 		auth = access.Authenticate(runtime_url)
 		self.setup_use_case_straight(auth, properties)
 		self.load_use_case(usecase_name, database, key_field, predictor, feature_store, properties, runtime_url)
-		# usecase = self.use_cases[usecase_name]
-		# self.setup_use_case(usecase_name)
 		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards")
 		upload_import_pred(self.p_auth, self.data_path, "tmp/properties.csv", "profilesMaster", "dashboards", "properties.csv")
 
-	def upload_btn_eventhandler(self, path, filename, content):
-		fp = path + filename
-		save_coded_file(content, fp)
-		self.to_upload["customers"] = [fp, filename]
+	# def upload_continuous_spend_personality(self, c_path, c_filename, c_content, t_path, t_filename, t_content, cto_path, cto_filename, cto_content):
+	# 	c_fp = c_path + c_filename
+	# 	save_coded_file(c_content, c_fp)
+	# 	# self.to_upload["customers"] = [fp, filename]
+	# 	t_fp = t_path + t_filename
+	# 	save_coded_file(t_content, t_fp)
+	# 	# self.to_upload["transactions"] = [fp, filename]
+	# 	cto_fp = cto_path + cto_filename
+	# 	save_coded_file(cto_content, cto_fp)
+	# 	# self.to_upload["CTO"] = [fp, filename]
 
-	def upload_btn_eventhandler2(self, path, filename, content):
-		fp = path + filename
-		save_coded_file(content, fp)
-		self.to_upload["transactions"] = [fp, filename]
+	# def upload_btn_eventhandler(self, path, filename, content):
+	# 	fp = path + filename
+	# 	save_coded_file(content, fp)
+	# 	self.to_upload["customers"] = [fp, filename]
 
-	def upload_btn_eventhandler3(self, path, filename, content):
-		fp = path + filename
-		save_coded_file(content, fp)
-		self.to_upload["CTO"] = [fp, filename]
+	# def upload_btn_eventhandler2(self, path, filename, content):
+	# 	fp = path + filename
+	# 	save_coded_file(content, fp)
+	# 	self.to_upload["transactions"] = [fp, filename]
 
-	def process_upload_btn_eventhandler(self, usecase_name, tmp_file_path):
+	# def upload_btn_eventhandler3(self, path, filename, content):
+	# 	fp = path + filename
+	# 	save_coded_file(content, fp)
+	# 	self.to_upload["CTO"] = [fp, filename]
+
+	def spend_personality_process_uploads(self, usecase_name, tmp_file_path, c_path, c_filename, c_content, t_path, t_filename, t_content, cto_path, cto_filename, cto_content):
+		c_fp = c_path + c_filename
+		save_coded_file(c_content, c_fp)
+		t_fp = t_path + t_filename
+		save_coded_file(t_content, t_fp)
+		cto_fp = cto_path + cto_filename
+		save_coded_file(cto_content, cto_fp)
+
 		use_case = self.use_cases[usecase_name]
-		for fp in self.to_upload.keys():
-			if fp == "customers":
-				feature_store = "customers_upload"
-				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-			elif fp == "transactions":
-				feature_store = "transactions_upload"
-				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-			elif fp == "CTO":
-				feature_store = "CTO_upload"
-				data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-				upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-			else:
-				print("ERROR unreachable state.")
+
+		feature_store = "customers_upload"
+		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		upload_import_pred(self.p_auth, self.data_path, c_fp, use_case["database"], feature_store, c_filename)
+			
+		feature_store = "transactions_upload"
+		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		upload_import_pred(self.p_auth, self.data_path, t_fp, use_case["database"], feature_store, t_filename)
+			
+		feature_store = "CTO_upload"
+		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		upload_import_pred(self.p_auth, self.data_path, cto_fp, use_case["database"], feature_store, cto_filename)
+			
+		# for fp in self.to_upload.keys():
+		# 	if fp == "customers":
+		# 		feature_store = "customers_upload"
+		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
+		# 	elif fp == "transactions":
+		# 		feature_store = "transactions_upload"
+		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
+		# 	elif fp == "CTO":
+		# 		feature_store = "CTO_upload"
+		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
+		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
+		# 	else:
+		# 		print("ERROR unreachable state.")
 
 		file_location = self.data_path
 		py_file = file_location + "enrich_for_runtime.py"

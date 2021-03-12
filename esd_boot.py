@@ -81,6 +81,112 @@ navbar = dbc.Navbar([
 	sticky="top",
 )
 
+continuous_empty = html.Div([
+		html.Label("Predictor type not acceptable.")
+	],
+	style={"min-height": "598px", "display": "none"},
+	id="continuous_empty_div"
+)
+
+continuous_wellness = html.Div([
+		html.Br(),
+		html.Div([
+				html.Label("Customer Data"),
+				html.Br(),
+				dbc.InputGroup(
+					[
+						dcc.Input(
+							id="wellness_upload_customer_data",
+							disabled=True,
+							style={"width": "60%"}
+						),
+						dbc.InputGroupAddon(
+							dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="wellness_customer_upload_picker", style={"display": "inline-block"}),
+							addon_type="append",
+						),
+					]
+				),
+				html.Br(),
+			],
+			style={"border": "1px solid #dee2e6", "padding": "5px"}
+		),
+		html.Br(),
+		dbc.Button("Process Uploads",
+			outline=True, 
+			color="primary",
+			className="mr-1",
+			id="wellness_process_uploads_button"
+		)
+	],
+	style={"min-height": "598px", "display": "none"},
+	id="continuous_wellness_div"
+)
+
+continuous_spend_personality = html.Div([
+		html.Br(),
+		html.Div([
+				html.Label("Customer Data"),
+				html.Br(),
+				dbc.InputGroup(
+					[
+						dcc.Input(
+							id="spend_personality_upload_customer_data",
+							disabled=True,
+							style={"width": "60%"}
+						),
+						dbc.InputGroupAddon(
+							dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="spend_personality_customer_upload_picker", style={"display": "inline-block"}),
+							addon_type="append",
+						),
+					]
+				),
+				html.Br(),
+				html.Label("Transaction Data"),
+				html.Br(),
+				dbc.InputGroup(
+					[
+						dcc.Input(
+							id="spend_personality_upload_transaction_data",
+							disabled=True,
+							style={"width": "60%"}
+						),
+						dbc.InputGroupAddon(
+							dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="spend_personality_transaction_upload_picker", style={"display": "inline-block"}),
+							addon_type="append",
+						),
+					]
+				),
+				html.Br(),
+				html.Label("CTO Data"),
+				html.Br(),
+				dbc.InputGroup(
+					[
+						dcc.Input(
+							id="spend_personality_upload_cto_data",
+							disabled=True,
+							style={"width": "60%"}
+						),
+						dbc.InputGroupAddon(
+							dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="spend_personality_cto_upload_picker", style={"display": "inline-block"}),
+							addon_type="append",
+						),
+					]
+				),
+				html.Br(),
+			],
+			style={"border": "1px solid #dee2e6", "padding": "5px"}
+		),
+		html.Br(),
+		dbc.Button("Process Uploads",
+			outline=True, 
+			color="primary",
+			className="mr-1",
+			id="spend_personality_process_uploads_button"
+		)
+	],
+	style={"min-height": "598px", "display": "none"},
+	id="continuous_spend_personality_div"
+)
 
 login_component = html.Div([
 		navbar,
@@ -174,7 +280,6 @@ scoring_component = html.Div([
 												dcc.Dropdown(
 													id="usecase_dropdown",
 													clearable=False,
-													persistence=True,
 												),
 												html.Br(),
 												dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
@@ -404,95 +509,8 @@ scoring_component = html.Div([
 														tab_id="setup_files"
 													),
 													dbc.Tab(
-														html.Div([
-																html.Br(),
-																html.Div([
-																		html.Label("Customer Data"),
-																		html.Br(),
-																		dbc.InputGroup(
-																			[
-																				dcc.Input(
-																					id="upload_customer_data",
-																					disabled=True,
-																					style={"width": "60%"}
-																				),
-																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="customer_upload_picker", style={"display": "inline-block"}),
-																					addon_type="append",
-																				),
-																			]
-																		),
-																		html.Br(),
-																		dbc.Button("Upload",
-																			outline=True, 
-																			color="primary",
-																			className="mr-1",
-																			id="customer_upload_button"
-																		),
-																		html.Label("Uploaded File.", id="upload_button_label1", hidden=True),
-																		html.Br(),
-																		html.Br(),
-																		html.Label("Transaction Data"),
-																		html.Br(),
-																		dbc.InputGroup(
-																			[
-																				dcc.Input(
-																					id="upload_transaction_data",
-																					disabled=True,
-																					style={"width": "60%"}
-																				),
-																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="transaction_upload_picker", style={"display": "inline-block"}),
-																					addon_type="append",
-																				),
-																			]
-																		),
-																		html.Br(),
-																		dbc.Button("Upload", 
-																			outline=True,
-																			color="primary",
-																			className="mr-1",
-																			id="transaction_upload_button"
-																		),
-																		html.Label("Uploaded File.", id="upload_button_label2", hidden=True),
-																		html.Br(),
-																		html.Br(),
-																		html.Label("CTO Data"),
-																		html.Br(),
-																		dbc.InputGroup(
-																			[
-																				dcc.Input(
-																					id="upload_cto_data",
-																					disabled=True,
-																					style={"width": "60%"}
-																				),
-																				dbc.InputGroupAddon(
-																					dcc.Upload(dbc.Button(html.I(className="fas fa-upload"), outline=True, color="primary"), id="cto_upload_picker", style={"display": "inline-block"}),
-																					addon_type="append",
-																				),
-																			]
-																		),
-																		html.Br(),
-																		dbc.Button("Upload",
-																			outline=True, 
-																			color="primary",
-																			className="mr-1",
-																			id="cto_upload_button"
-																		),
-																		html.Label("Uploaded File.", id="upload_button_label3", hidden=True),
-																		html.Br(),
-																	],
-																	style={"border": "1px solid #dee2e6", "padding": "5px"}
-																),
-																html.Br(),
-																dbc.Button("Process Uploads",
-																	outline=True, 
-																	color="primary",
-																	className="mr-1",
-																	id="process_uploads_button"
-																)
-															],
-															style={"min-height": "598px"}
+														html.Div([continuous_spend_personality, continuous_wellness, continuous_empty],
+															id="continuous_div"
 														),
 														label="Continuous",
 														tab_id="upload_files"
@@ -612,7 +630,6 @@ batch_scoring_component = html.Div([
 													id="usecase_dropdown2",
 													# options=convert_list(sd.get_use_case_names()),
 													clearable=False,
-													persistence=True,
 													# style={"font-size": "13px"}
 												),
 												html.Br(),
@@ -632,6 +649,7 @@ batch_scoring_component = html.Div([
 												),
 												html.Br(),
 												dbc.Button("Select All Filter", outline=True, color="primary", id="filter_button_score2"),
+												html.Br(),
 												html.Br(),
 												html.Label("Customer"),
 												html.Div([
@@ -738,9 +756,11 @@ app.layout = html.Div([
 				html.Div([], id="usecase_toast_div"),
 				html.Div([], id="connection_test_toast_div"),
 				html.Div([], id="files_toast_div"),
-				html.Div([], id="continuous_toast_div"),
+				html.Div([], id="spend_personality_continuous_toast_div"),
 				html.Div([], id="score_toast_div"),
-				html.Div([], id="score_toast_div2	"),
+				html.Div([], id="score_toast_div2"),
+				html.Div([], id="filter_toast_div"),
+				html.Div([], id="filter_toast_div2"),
 			],
 			id="toast_div"
 		),
@@ -793,9 +813,9 @@ def callback_login3(children):
 		dash.dependencies.Input("usecase_toast_div", "children")
 	],
 	prevent_initial_call=True)
-def callback_login2(children, value, hidden):
+def callback_login2(children, value, toast):
 	try:
-		sd.get_properties()
+		sd.retrieve_properties()
 		return convert_list(sd.get_use_case_names())
 	except Exception as e:
 		print(e)
@@ -809,9 +829,9 @@ def callback_login2(children, value, hidden):
 		dash.dependencies.Input("usecase_toast_div", "children")
 	],
 	prevent_initial_call=True)
-def callback_login2_2(children, value, hidden):
+def callback_login2_2(children, value, toast):
 	try:
-		sd.get_properties()
+		sd.retrieve_properties()
 		return convert_list(sd.get_use_case_names())
 	except Exception as e:
 		print(e)
@@ -819,53 +839,109 @@ def callback_login2_2(children, value, hidden):
 
 @app.callback(
 	dash.dependencies.Output("table_div", "children"),
-	[dash.dependencies.Input("customer_list", "value")],
-	state=[
-		State(component_id="usecase_dropdown", component_property="value"),
+	[
+		dash.dependencies.Input("customer_list", "value"),
+		dash.dependencies.Input("usecase_dropdown", "value")
 	],
 	prevent_initial_call=True)
 def callback_customer_list(customer, usecase):
-	data = sd.dropdown_customer_eventhandler(customer, usecase)
-	if len(data) > 1:
-		df = pd.DataFrame(data)
-		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
-	else:
-		group_items = []
-		for entry in data:
-			for key in entry:
-				# group_items.append(dbc.ListGroupItem("{}: {}".format(key, entry[key])))
-				group_items.append(dbc.ListGroupItem(
-					[
-						dbc.ListGroupItemHeading(key),
-						dbc.ListGroupItemText(entry[key]),
-					]
-				))
-		return dbc.ListGroup(group_items)
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "customer_list":
+		data = sd.dropdown_customer_eventhandler(customer, usecase)
+		if len(data) > 1:
+			df = pd.DataFrame(data)
+			return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+		else:
+			group_items = []
+			for entry in data:
+				for key in entry:
+					# group_items.append(dbc.ListGroupItem("{}: {}".format(key, entry[key])))
+					group_items.append(dbc.ListGroupItem(
+						[
+							dbc.ListGroupItemHeading(key),
+							dbc.ListGroupItemText(entry[key]),
+						]
+					))
+			return dbc.ListGroup(group_items)
+	if trigger_id == "usecase_dropdown":
+		return []
+
+@app.callback(
+	dash.dependencies.Output("find_filter_input", "value"),
+	[
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
+	prevent_initial_call=True)
+def clear_find_filter(usecase):
+	return "{}"
+
+@app.callback(
+	dash.dependencies.Output("find_filter_input2", "value"),
+	[
+		dash.dependencies.Input("usecase_dropdown2", "value")
+	],
+	prevent_initial_call=True)
+def clear_find_filter2(usecase):
+	return "{}"
 
 # Buttons
 @app.callback(
-	dash.dependencies.Output("customer_list", "options"),
-	[dash.dependencies.Input("filter_button", "n_clicks")],
+	[
+		dash.dependencies.Output("customer_list", "options"),
+		dash.dependencies.Output("filter_toast_div", "children"),
+	],
+	[
+		dash.dependencies.Input("filter_button", "n_clicks"),
+		dash.dependencies.Input("usecase_dropdown", "value"),
+	],
 	state=[
-		State(component_id="usecase_dropdown", component_property="value"),
 		State(component_id="find_filter_input", component_property="value"),
 	],
 	prevent_initial_call=True)
 def callback_find_filter_button(n_clicks, usecase, find_filter):
-	opts = sd.find_btn_eventhandler(usecase, find_filter)
-	return opts
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "filter_button":
+		if usecase == "" or usecase == None:
+			return [], generate_toast("Error: Could not filter, usecase is not selected.", "Error", "danger")
+		try:
+			opts = sd.find_btn_eventhandler(usecase, find_filter)
+			return opts, []
+		except Exception as e:
+			print(e)
+			return [], generate_toast("Error: Could not filter: {}".format(e), "Error", "danger")
+
+	if trigger_id == "usecase_dropdown":
+		return [], []
 
 @app.callback(
-	dash.dependencies.Output("customer_list2", "options"),
-	[dash.dependencies.Input("filter_button2", "n_clicks")],
+	[
+		dash.dependencies.Output("customer_list2", "options"),
+		dash.dependencies.Output("filter_toast_div2", "children"),
+	],
+	[
+		dash.dependencies.Input("filter_button2", "n_clicks"),
+		dash.dependencies.Input("usecase_dropdown2", "value")
+	],
 	state=[
-		State(component_id="usecase_dropdown2", component_property="value"),
 		State(component_id="find_filter_input2", component_property="value"),
 	],
 	prevent_initial_call=True)
 def callback_find_filter_button2(n_clicks, usecase, find_filter):
-	opts = sd.find_btn_eventhandler(usecase, find_filter)
-	return opts
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "filter_button2":
+		if usecase == "" or usecase == None:
+			return [], generate_toast("Error: Could not filter, usecase is not selected.", "Error", "danger")
+		try:
+			opts = sd.find_btn_eventhandler(usecase, find_filter)
+			return opts, []
+		except Exception as e:
+			print(e)
+			return [], generate_toast("Error: Could not filter: {}".format(e), "Error", "danger")
+	if trigger_id == "usecase_dropdown2":
+		return [], []
 
 @app.callback(
 	[
@@ -938,13 +1014,14 @@ def callback_score_buffer( score_b):
 	dash.dependencies.Output("score_value_input", "value"),
 	[
 		dash.dependencies.Input("batch_score_picker", "contents"),
-		dash.dependencies.Input("customer_list", "value")
+		dash.dependencies.Input("customer_list", "value"),
+		dash.dependencies.Input("usecase_dropdown", "value")
 	],
 	state=[
 		State(component_id="score_value_input", component_property="value"),
 	],
 	prevent_initial_call=True)
-def batch_uploader(contents, list_value, input_contents):
+def batch_uploader(contents, list_value, usecase, input_contents):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "batch_score_picker":
@@ -960,6 +1037,8 @@ def batch_uploader(contents, list_value, input_contents):
 			return ",".join(l)
 		else:
 			return list_value
+	if trigger_id == "usecase_dropdown":
+		return ""
 
 
 @app.callback(
@@ -967,15 +1046,15 @@ def batch_uploader(contents, list_value, input_contents):
 	[
 		dash.dependencies.Input("batch_score_picker2", "contents"),
 		dash.dependencies.Input("customer_list2", "value"),
-		dash.dependencies.Input("filter_button_score2", "n_clicks")
+		dash.dependencies.Input("filter_button_score2", "n_clicks"),
+		dash.dependencies.Input("usecase_dropdown2", "value")
 	],
 	state=[
 		State(component_id="score_value_input2", component_property="value"),
-		State(component_id="usecase_dropdown2", component_property="value"),
 		State(component_id="find_filter_input2", component_property="value"),
 	],
 	prevent_initial_call=True)
-def batch_uploader2(contents, list_value, n_clicks, input_contents, usecase, find_filter):
+def batch_uploader2(contents, list_value, n_clicks, usecase, input_contents, find_filter):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "batch_score_picker2":
@@ -997,7 +1076,9 @@ def batch_uploader2(contents, list_value, n_clicks, input_contents, usecase, fin
 		for result in opts:
 			score_list.append(result["value"])
 		s = ",".join(score_list)
-		return s		
+		return s
+	if trigger_id == "usecase_dropdown2":
+		return ""
 
 @app.callback(
 	dash.dependencies.Output("graphing_div", "style"),
@@ -1075,92 +1156,80 @@ def tabs_content_graphing3(graph_dropdown_value, children):
 
 @app.callback(
 	dash.dependencies.Output("properties_textarea", "value"),
-	[dash.dependencies.Input("upload_properties_picker", "contents")],
+	[
+		dash.dependencies.Input("upload_properties_picker", "contents"),
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
 	prevent_initial_call=True)
-def upload_properties(contents):
-	return ecosystem_scoring_pdash.decode_text(contents)
+def upload_properties(contents, usecase):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "upload_properties_picker":
+		return ecosystem_scoring_pdash.decode_text(contents)
+	if trigger_id == "usecase_dropdown":
+		return sd.get_properties(usecase)
 
 @app.callback(
-	dash.dependencies.Output("upload_customer_data", "value"),
-	[dash.dependencies.Input("customer_upload_picker", "contents")],
+	dash.dependencies.Output("wellness_upload_customer_data", "value"),
+	[dash.dependencies.Input("wellness_customer_upload_picker", "contents")],
 	state=[
-		State(component_id="customer_upload_picker", component_property="filename"),
+		State(component_id="wellness_customer_upload_picker", component_property="filename"),
 	],
 	prevent_initial_call=True)
 def upload_prep_customers(contents, filename):
 	return filename
 
 @app.callback(
-	dash.dependencies.Output("upload_transaction_data", "value"),
-	[dash.dependencies.Input("transaction_upload_picker", "contents")],
+	dash.dependencies.Output("spend_personality_upload_customer_data", "value"),
+	[dash.dependencies.Input("spend_personality_customer_upload_picker", "contents")],
 	state=[
-		State(component_id="transaction_upload_picker", component_property="filename"),
+		State(component_id="spend_personality_customer_upload_picker", component_property="filename"),
+	],
+	prevent_initial_call=True)
+def upload_prep_customers(contents, filename):
+	return filename
+
+@app.callback(
+	dash.dependencies.Output("spend_personality_upload_transaction_data", "value"),
+	[dash.dependencies.Input("spend_personality_transaction_upload_picker", "contents")],
+	state=[
+		State(component_id="spend_personality_transaction_upload_picker", component_property="filename"),
 	],
 	prevent_initial_call=True)
 def upload_prep_transactions(contents, filename):
 	return filename
 
 @app.callback(
-	dash.dependencies.Output("upload_cto_data", "value"),
-	[dash.dependencies.Input("cto_upload_picker", "contents")],
+	dash.dependencies.Output("spend_personality_upload_cto_data", "value"),
+	[dash.dependencies.Input("spend_personality_cto_upload_picker", "contents")],
 	state=[
-		State(component_id="cto_upload_picker", component_property="filename"),
+		State(component_id="spend_personality_cto_upload_picker", component_property="filename"),
 	],
 	prevent_initial_call=True)
 def upload_prep_cto(contents, filename):
 	return filename
 
 @app.callback(
-	dash.dependencies.Output("upload_button_label1", "hidden"),
-	[dash.dependencies.Input("customer_upload_button", "n_clicks")],
-	state=[
-		State(component_id="customer_upload_picker", component_property="filename"),
-		State(component_id="customer_upload_picker", component_property="contents"),
-	],
-	prevent_initial_call=True)
-def upload_file_customers(n_clicks, filename, contents):
-	sd.upload_btn_eventhandler(tmp_dir, filename, contents)
-	return False
-
-@app.callback(
-	dash.dependencies.Output("upload_button_label2", "hidden"),
-	[dash.dependencies.Input("transaction_upload_button", "n_clicks")],
-	state=[
-		State(component_id="transaction_upload_picker", component_property="filename"),
-		State(component_id="transaction_upload_picker", component_property="contents"),
-	],
-	prevent_initial_call=True)
-def upload_file_transactions(n_clicks, filename, contents):
-	sd.upload_btn_eventhandler2(tmp_dir, filename, contents)
-	return False
-
-@app.callback(
-	dash.dependencies.Output("upload_button_label3", "hidden"),
-	[dash.dependencies.Input("cto_upload_button", "n_clicks")],
-	state=[
-		State(component_id="cto_upload_picker", component_property="filename"),
-		State(component_id="cto_upload_picker", component_property="contents"),
-	],
-	prevent_initial_call=True)
-def upload_file_cto(n_clicks, filename, contents):
-	sd.upload_btn_eventhandler3(tmp_dir, filename, contents)
-	return False
-
-
-@app.callback(
-	dash.dependencies.Output("continuous_toast_div", "children"),
-	[dash.dependencies.Input("process_uploads_button", "n_clicks")],
+	dash.dependencies.Output("spend_personality_continuous_toast_div", "children"),
+	[dash.dependencies.Input("spend_personality_process_uploads_button", "n_clicks")],
 	state=[
 		State(component_id="usecase_dropdown", component_property="value"),
+		State(component_id="spend_personality_customer_upload_picker", component_property="filename"),
+		State(component_id="spend_personality_customer_upload_picker", component_property="contents"),
+		State(component_id="spend_personality_transaction_upload_picker", component_property="filename"),
+		State(component_id="spend_personality_transaction_upload_picker", component_property="contents"),
+		State(component_id="spend_personality_cto_upload_picker", component_property="filename"),
+		State(component_id="spend_personality_cto_upload_picker", component_property="contents"),
 	],
 	prevent_initial_call=True)
-def callback_process_uploads(clicks, usecase):
-	try:
-		sd.process_upload_btn_eventhandler(usecase, tmp_dir + "to_upload.csv")
-		return generate_toast("Successfully processed new uploads.", "Success", "primary")
-	except Exception as e:
-		print(e)
-		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
+def callback_process_uploads(clicks, usecase, c_filename, c_content, t_filename, t_content, cto_filename, cto_content):
+	# sd.upload_continuous_spend_personality(tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
+	# try:
+	sd.spend_personality_process_uploads(usecase, tmp_dir + "to_upload.csv", tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
+	return generate_toast("Successfully processed new uploads.", "Success", "primary")
+	# except Exception as e:
+		# print(e)
+		# return generate_toast("Error: Could not process new uploads.", "Error", "danger")
 
 		
 @app.callback(
@@ -1174,6 +1243,20 @@ def test_connection(n_clicks, usecase_name):
 	if sd.test_connection(usecase_name):
 		return generate_toast("Connection Successful.", "Success", "primary")
 	return generate_toast("Error: Could not connected to '{}' runtime server.".format(usecase_name), "Error", "danger")
+
+@app.callback(
+	dash.dependencies.Output("usecase_name", "value"),
+	[dash.dependencies.Input("usecase_dropdown", "value")],
+	prevent_initial_call=True)
+def display_usecase_name(usecase):
+	return usecase
+
+@app.callback(
+	dash.dependencies.Output("usecase_runtime_url", "value"),
+	[dash.dependencies.Input("usecase_dropdown", "value")],
+	prevent_initial_call=True)
+def display_usecase_name(usecase):
+	return sd.get_runtime_url(usecase)
 
 @app.callback(
 	dash.dependencies.Output("usecase_toast_div", "children"),
@@ -1344,6 +1427,53 @@ def tabs_content_scoring_tab2(children):
 	except Exception as e:
 		print(e)
 		return None
+
+
+@app.callback(
+	dash.dependencies.Output("continuous_wellness_div", "style"),
+	[
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
+	prevent_initial_call=True
+)
+def toggle_continuous(dropdown_value):
+	predictor = sd.get_predictor_type(dropdown_value)
+	print("wellness: {}".format(predictor))
+	if predictor == "wellness_score":
+		return {"min-height": "598px"}
+	return {"display": "none"}
+
+@app.callback(
+	dash.dependencies.Output("continuous_spend_personality_div", "style"),
+	[
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
+	prevent_initial_call=True
+)
+def toggle_continuous(dropdown_value):
+	predictor = sd.get_predictor_type(dropdown_value)
+	print("spend: {}".format(predictor))
+	if predictor == "spending_personality":
+		return {"min-height": "598px"}
+	return {"display": "none"}
+
+@app.callback(
+	dash.dependencies.Output("continuous_empty_div", "style"),
+	[
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
+	prevent_initial_call=True
+)
+def toggle_continuous(dropdown_value):
+	predictor = sd.get_predictor_type(dropdown_value)
+	print("spend: {}".format(predictor))
+	if predictor == "wellness_score":
+		return {"display": "none"}
+	if predictor == "spending_personality":
+		return {"display": "none"}
+
+	return {"min-height": "598px"}
+
 
 @app.callback(
 	dash.dependencies.Output("login_component", "style"),
