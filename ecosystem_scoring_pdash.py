@@ -390,31 +390,15 @@ class ScoringDash():
 		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards")
 		upload_import_pred(self.p_auth, self.data_path, "tmp/properties.csv", "profilesMaster", "dashboards", "properties.csv")
 
-	# def upload_continuous_spend_personality(self, c_path, c_filename, c_content, t_path, t_filename, t_content, cto_path, cto_filename, cto_content):
-	# 	c_fp = c_path + c_filename
-	# 	save_coded_file(c_content, c_fp)
-	# 	# self.to_upload["customers"] = [fp, filename]
-	# 	t_fp = t_path + t_filename
-	# 	save_coded_file(t_content, t_fp)
-	# 	# self.to_upload["transactions"] = [fp, filename]
-	# 	cto_fp = cto_path + cto_filename
-	# 	save_coded_file(cto_content, cto_fp)
-	# 	# self.to_upload["CTO"] = [fp, filename]
 
-	# def upload_btn_eventhandler(self, path, filename, content):
-	# 	fp = path + filename
-	# 	save_coded_file(content, fp)
-	# 	self.to_upload["customers"] = [fp, filename]
+	def wellness_process_uploads(self, usecase_name, c_path, c_filename, c_content):
+		c_fp = c_path + c_filename
+		save_coded_file(c_content, c_fp)
 
-	# def upload_btn_eventhandler2(self, path, filename, content):
-	# 	fp = path + filename
-	# 	save_coded_file(content, fp)
-	# 	self.to_upload["transactions"] = [fp, filename]
+		use_case = self.use_cases[usecase_name]
 
-	# def upload_btn_eventhandler3(self, path, filename, content):
-	# 	fp = path + filename
-	# 	save_coded_file(content, fp)
-	# 	self.to_upload["CTO"] = [fp, filename]
+		upload_import_runtime(use_case["auth"], c_fp, use_case["data_path"], use_case["database"], use_case["feature_store"], c_filename)
+		upload_import_pred(self.p_auth, self.data_path, c_fp, use_case["database"], use_case["feature_store"], c_filename)
 
 	def spend_personality_process_uploads(self, usecase_name, tmp_file_path, c_path, c_filename, c_content, t_path, t_filename, t_content, cto_path, cto_filename, cto_content):
 		c_fp = c_path + c_filename
@@ -437,22 +421,6 @@ class ScoringDash():
 		feature_store = "CTO_upload"
 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
 		upload_import_pred(self.p_auth, self.data_path, cto_fp, use_case["database"], feature_store, cto_filename)
-			
-		# for fp in self.to_upload.keys():
-		# 	if fp == "customers":
-		# 		feature_store = "customers_upload"
-		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-		# 	elif fp == "transactions":
-		# 		feature_store = "transactions_upload"
-		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-		# 	elif fp == "CTO":
-		# 		feature_store = "CTO_upload"
-		# 		data_management_engine.drop_document_collection(self.p_auth, use_case["database"], feature_store)
-		# 		upload_import_pred(self.p_auth, self.data_path, self.to_upload[fp][0], use_case["database"], feature_store, self.to_upload[fp][1])
-		# 	else:
-		# 		print("ERROR unreachable state.")
 
 		file_location = self.data_path
 		py_file = file_location + "enrich_for_runtime.py"

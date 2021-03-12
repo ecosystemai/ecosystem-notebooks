@@ -25,6 +25,7 @@ CURRENT_YEAR = "2021"
 VERSION = "0.5.9780"
 
 sd = None
+export_target="export_wow.csv"
 tmp_dir = "tmp/"
 export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
@@ -84,7 +85,7 @@ navbar = dbc.Navbar([
 continuous_empty = html.Div([
 		html.Label("Predictor type not acceptable.")
 	],
-	style={"min-height": "598px", "display": "none"},
+	style={"height": "650px", "display": "none"},
 	id="continuous_empty_div"
 )
 
@@ -118,7 +119,7 @@ continuous_wellness = html.Div([
 			id="wellness_process_uploads_button"
 		)
 	],
-	style={"min-height": "598px", "display": "none"},
+	style={"height": "650px", "display": "none"},
 	id="continuous_wellness_div"
 )
 
@@ -184,7 +185,7 @@ continuous_spend_personality = html.Div([
 			id="spend_personality_process_uploads_button"
 		)
 	],
-	style={"min-height": "598px", "display": "none"},
+	style={"height": "650px", "display": "none"},
 	id="continuous_spend_personality_div"
 )
 
@@ -275,61 +276,66 @@ scoring_component = html.Div([
 									),
 									html.Br(),
 									dbc.Card(
-										dbc.CardBody([
-												html.Label("Use Case"),
-												dcc.Dropdown(
-													id="usecase_dropdown",
-													clearable=False,
-												),
-												html.Br(),
-												dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
-												html.Br(),
-												html.Br(),
-												html.Label("Find Filter"),
-												html.Br(),
-												dbc.InputGroup(
-													[
-														dcc.Input(
-															id="find_filter_input",
-															value="{}"
-														),
-														dbc.InputGroupAddon(
-															dbc.Button("Filter", outline=True, color="primary", id="filter_button"),
-															addon_type="append",
-														),
-													]
-												),
-												html.Br(),
-												html.Label("Customer"),
+										dbc.CardBody([	
 												html.Div([
-														dbc.RadioItems(
-															id="customer_list",
-															options = []
+														html.Label("Use Case"),
+														dcc.Dropdown(
+															id="usecase_dropdown",
+															clearable=False,
 														),
+														html.Br(),
+														dbc.Button("Test Connection", outline=True, color="primary", id="test_conn_button"),
+														html.Br(),
+														html.Br(),
+														html.Label("Find Filter"),
+														html.Br(),
+														dbc.InputGroup(
+															[
+																dcc.Input(
+																	id="find_filter_input",
+																	value="{}"
+																),
+																dbc.InputGroupAddon(
+																	dbc.Button("Filter", outline=True, color="primary", id="filter_button"),
+																	addon_type="append",
+																),
+															]
+														),
+														html.Br(),
+														html.Label("Customer"),
+														html.Div([
+																dbc.Checklist(
+																	id="customer_list",
+																	options = [],
+																	style={"padding-left": "5px"}
+																),
+															],
+															style={"overflow-y": "scroll", "height": "180px", "border": "1px solid grey"}
+														),
+														html.Br(),
+														html.Label("Score Value"),
+														html.Br(),
+														dbc.InputGroup(
+															[
+																dcc.Input(
+																	id="score_value_input",
+																	value=""
+																),
+																dbc.InputGroupAddon(
+																	dbc.Button("Score", outline=True, color="primary", id="score_button"),
+																	addon_type="append",
+																),
+															]
+														),
+														html.Br(),
+														html.Label("", id="score_buffer", style={"display": "none"}),
+														dcc.Upload(
+															dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
+															id="batch_score_picker",
+															style={"display": "inline-block"}
+														)
 													],
-													style={"overflow-y": "scroll", "height": "180px", "border": "1px solid grey"}
-												),
-												html.Br(),
-												html.Label("Score Value"),
-												html.Br(),
-												dbc.InputGroup(
-													[
-														dcc.Input(
-															id="score_value_input",
-															value=""
-														),
-														dbc.InputGroupAddon(
-															dbc.Button("Score", outline=True, color="primary", id="score_button"),
-															addon_type="append",
-														),
-													]
-												),
-												html.Br(),
-												html.Label("", id="score_buffer", style={"display": "none"}),
-												dcc.Upload(
-													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
-													id="batch_score_picker",
-													style={"display": "inline-block"}
+													style={"height": "693px"}
 												)
 											]
 										)
@@ -358,7 +364,7 @@ scoring_component = html.Div([
 															],
 														)
 													],
-													style={"min-height": "615px"}
+													style={"height": "693px"}
 												)
 											]
 										)
@@ -414,7 +420,7 @@ scoring_component = html.Div([
 																	id="properties_button"
 																),
 															],
-															style={"min-height": "573px"}
+															style={"height": "650px"}
 														),
 														label="Use Case",
 														tab_id="setup_properties"
@@ -503,7 +509,7 @@ scoring_component = html.Div([
 																	id="files_button"
 																)
 															],
-															style={"min-height": "598px"}
+															style={"height": "650px"}
 														),
 														label="Files",
 														tab_id="setup_files"
@@ -625,72 +631,76 @@ batch_scoring_component = html.Div([
 									html.Br(),
 									dbc.Card(
 										dbc.CardBody([
-												html.Label("Use Case"),
-												dcc.Dropdown(
-													id="usecase_dropdown2",
-													# options=convert_list(sd.get_use_case_names()),
-													clearable=False,
-													# style={"font-size": "13px"}
-												),
-												html.Br(),
-												html.Label("Find Filter"),
-												html.Br(),
-												dbc.InputGroup(
-													[
-														dcc.Input(
-															id="find_filter_input2",
-															value="{}"
-														),
-														dbc.InputGroupAddon(
-															dbc.Button("Filter", outline=True, color="primary", id="filter_button2"),
-															addon_type="append",
-														),
-													]
-												),
-												html.Br(),
-												dbc.Button("Select All Filter", outline=True, color="primary", id="filter_button_score2"),
-												html.Br(),
-												html.Br(),
-												html.Label("Customer"),
 												html.Div([
-														dbc.RadioItems(
-															id="customer_list2",
-															options = []
+														html.Label("Use Case"),
+														dcc.Dropdown(
+															id="usecase_dropdown2",
+															# options=convert_list(sd.get_use_case_names()),
+															clearable=False,
+															# style={"font-size": "13px"}
 														),
+														html.Br(),
+														html.Label("Find Filter"),
+														html.Br(),
+														dbc.InputGroup(
+															[
+																dcc.Input(
+																	id="find_filter_input2",
+																	value="{}"
+																),
+																dbc.InputGroupAddon(
+																	dbc.Button("Filter", outline=True, color="primary", id="filter_button2"),
+																	addon_type="append",
+																),
+															]
+														),
+														html.Br(),
+														dbc.Button("Select All Filter", outline=True, color="primary", id="filter_button_score2"),
+														html.Br(),
+														html.Br(),
+														html.Label("Customer"),
+														html.Div([
+																dbc.Checklist(
+																	id="customer_list2",
+																	options = [],
+																	style={"padding-left": "5px"}
+																),
+															],
+															style={"overflow-y": "scroll", "height": "240px", "border": "1px solid grey"}
+														),
+														html.Br(),
+														html.Label("Score Value"),
+														html.Br(),
+														dbc.InputGroup(
+															[
+																dcc.Input(
+																	id="score_value_input2",
+																	value=""
+																),
+																dbc.InputGroupAddon(
+																	dbc.Button("Score", outline=True, color="primary", id="score_button2"),
+																	addon_type="append",
+																),
+															]
+														),
+														html.Br(),
+														html.Label("", id="score_buffer2", style={"display": "none"}),
+														dcc.Upload(
+															dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
+															id="batch_score_picker2",
+															style={"display": "inline-block"}
+														),
+														html.Br(),
+														html.A(
+															children=dbc.Button("Download Scoring Results", outline=True, color="primary", className="mr-1", id="download_score_button", disabled=True),
+															download="",
+															href="/export",
+															target="_blank",
+														)
 													],
-													style={"overflow-y": "scroll", "height": "240px", "border": "1px solid grey"}
-												),
-												html.Br(),
-												html.Label("Score Value"),
-												html.Br(),
-												dbc.InputGroup(
-													[
-														dcc.Input(
-															id="score_value_input2",
-															value=""
-														),
-														dbc.InputGroupAddon(
-															dbc.Button("Score", outline=True, color="primary", id="score_button2"),
-															addon_type="append",
-														),
-													]
-												),
-												html.Br(),
-												html.Label("", id="score_buffer2", style={"display": "none"}),
-												dcc.Upload(
-													dbc.Button("Batch Score", outline=True, color="primary", className="mr-1"),
-													id="batch_score_picker2",
-													style={"display": "inline-block"}
-												),
-												html.Br(),
-												html.A(
-													children=dbc.Button("Download Scoring Results", outline=True, color="primary", className="mr-1", id="download_score_button", disabled=True),
-													download="export.csv",
-													href="/export",
-													target="_blank"
+													style={"height": "750px"}
 												)
 											],
-											style={"min-height": "750px"}
 										)
 									)
 								],
@@ -712,11 +722,11 @@ batch_scoring_component = html.Div([
 										dbc.CardBody([
 												html.Div([
 														html.Div([
-																dbc.ListGroup([], id="table_div2", style={"overflow-y": "scroll", "max-height": "657px"})
+																dbc.ListGroup([], id="table_div2", style={"overflow-y": "scroll", "max-height": "730px"})
 															],
 														)
 													],
-													style={"height": "712px"}
+													style={"height": "750px"}
 												)
 											]
 										)
@@ -757,6 +767,7 @@ app.layout = html.Div([
 				html.Div([], id="connection_test_toast_div"),
 				html.Div([], id="files_toast_div"),
 				html.Div([], id="spend_personality_continuous_toast_div"),
+				html.Div([], id="wellness_continuous_toast_div"),
 				html.Div([], id="score_toast_div"),
 				html.Div([], id="score_toast_div2"),
 				html.Div([], id="filter_toast_div"),
@@ -773,7 +784,7 @@ app.layout = html.Div([
 def download_csv():
 	return flask.send_file(export_tmp,
 					mimetype="text/csv",
-					attachment_filename="export.csv",
+					attachment_filename=export_target,
 					as_attachment=True)
 
 @app.callback(
@@ -844,10 +855,13 @@ def callback_login2_2(children, value, toast):
 		dash.dependencies.Input("usecase_dropdown", "value")
 	],
 	prevent_initial_call=True)
-def callback_customer_list(customer, usecase):
+def callback_customer_list(customer_list, usecase):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "customer_list":
+		if len(customer_list) < 1:
+			return []
+		customer = customer_list[-1]
 		data = sd.dropdown_customer_eventhandler(customer, usecase)
 		if len(data) > 1:
 			df = pd.DataFrame(data)
@@ -883,6 +897,9 @@ def clear_find_filter(usecase):
 	],
 	prevent_initial_call=True)
 def clear_find_filter2(usecase):
+	global export_target
+	export_target = "{}_export.csv".format(usecase)
+	print(export_target)
 	return "{}"
 
 # Buttons
@@ -1021,7 +1038,7 @@ def callback_score_buffer( score_b):
 		State(component_id="score_value_input", component_property="value"),
 	],
 	prevent_initial_call=True)
-def batch_uploader(contents, list_value, usecase, input_contents):
+def batch_uploader(contents, customer_list, usecase, input_contents):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "batch_score_picker":
@@ -1031,15 +1048,28 @@ def batch_uploader(contents, list_value, usecase, input_contents):
 		custs = text.split("\n")
 		return ",".join(custs)
 	if trigger_id == "customer_list":
-		if input_contents != "":
-			l = input_contents.split(",")
-			l.append(list_value)
-			return ",".join(l)
-		else:
-			return list_value
+		return ",".join(customer_list)
 	if trigger_id == "usecase_dropdown":
 		return ""
 
+
+@app.callback(
+	dash.dependencies.Output("customer_list", "value"),
+	[
+		dash.dependencies.Input("usecase_dropdown", "value")
+	],
+	prevent_initial_call=True)
+def refresh_customer_list(usecase):
+	return []
+
+@app.callback(
+	dash.dependencies.Output("customer_list2", "value"),
+	[
+		dash.dependencies.Input("usecase_dropdown2", "value")
+	],
+	prevent_initial_call=True)
+def refresh_customer_list2(usecase):
+	return []
 
 @app.callback(
 	dash.dependencies.Output("score_value_input2", "value"),
@@ -1054,7 +1084,7 @@ def batch_uploader(contents, list_value, usecase, input_contents):
 		State(component_id="find_filter_input2", component_property="value"),
 	],
 	prevent_initial_call=True)
-def batch_uploader2(contents, list_value, n_clicks, usecase, input_contents, find_filter):
+def batch_uploader2(contents, customer_list, n_clicks, usecase, input_contents, find_filter):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "batch_score_picker2":
@@ -1063,13 +1093,8 @@ def batch_uploader2(contents, list_value, n_clicks, usecase, input_contents, fin
 		text = decoded.decode("utf-8")
 		custs = text.split("\n")
 		return ",".join(custs)
-	if trigger_id == "customer_list2":
-		if input_contents != "":
-			l = input_contents.split(",")
-			l.append(list_value)
-			return ",".join(l)
-		else:
-			return list_value
+	if trigger_id == "customer_list2":		
+		return ",".join(customer_list)
 	if trigger_id == "filter_button_score2":
 		opts = sd.find_btn_eventhandler(usecase, find_filter)
 		score_list = []
@@ -1210,6 +1235,24 @@ def upload_prep_cto(contents, filename):
 	return filename
 
 @app.callback(
+	dash.dependencies.Output("wellness_continuous_toast_div", "children"),
+	[dash.dependencies.Input("wellness_process_uploads_button", "n_clicks")],
+	state=[
+		State(component_id="usecase_dropdown", component_property="value"),
+		State(component_id="wellness_customer_upload_picker", component_property="filename"),
+		State(component_id="wellness_customer_upload_picker", component_property="contents")
+	],
+	prevent_initial_call=True)
+def callback_process_uploads(clicks, usecase, c_filename, c_content):
+	try:
+		sd.wellness_process_uploads(usecase, tmp_dir, c_filename, c_content)
+		return generate_toast("Successfully processed new uploads.", "Success", "primary")
+	except Exception as e:
+		print(e)
+		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
+
+
+@app.callback(
 	dash.dependencies.Output("spend_personality_continuous_toast_div", "children"),
 	[dash.dependencies.Input("spend_personality_process_uploads_button", "n_clicks")],
 	state=[
@@ -1223,13 +1266,12 @@ def upload_prep_cto(contents, filename):
 	],
 	prevent_initial_call=True)
 def callback_process_uploads(clicks, usecase, c_filename, c_content, t_filename, t_content, cto_filename, cto_content):
-	# sd.upload_continuous_spend_personality(tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
-	# try:
-	sd.spend_personality_process_uploads(usecase, tmp_dir + "to_upload.csv", tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
-	return generate_toast("Successfully processed new uploads.", "Success", "primary")
-	# except Exception as e:
-		# print(e)
-		# return generate_toast("Error: Could not process new uploads.", "Error", "danger")
+	try:
+		sd.spend_personality_process_uploads(usecase, tmp_dir + "to_upload.csv", tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
+		return generate_toast("Successfully processed new uploads.", "Success", "primary")
+	except Exception as e:
+		print(e)
+		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
 
 		
 @app.callback(
@@ -1357,13 +1399,6 @@ def tabs_content_graphing4(scoring_results):
 	],
 	prevent_initial_call=True)
 def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
-	try:
-		sd.upload_btn_eventhandler(tmp_dir, model_name, model_content)
-		sd.upload_btn_eventhandler(tmp_dir, fs_name, fs_content)
-		sd.upload_btn_eventhandler(tmp_dir, ad_name, ad_content)
-	except Exception as e:
-		print(e)
-		return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
 	model_path = tmp_dir + model_name
 	fs_path = tmp_dir + fs_name
 	ad_path = tmp_dir + ad_name
@@ -1440,7 +1475,7 @@ def toggle_continuous(dropdown_value):
 	predictor = sd.get_predictor_type(dropdown_value)
 	print("wellness: {}".format(predictor))
 	if predictor == "wellness_score":
-		return {"min-height": "598px"}
+		return {"height": "650px"}
 	return {"display": "none"}
 
 @app.callback(
@@ -1454,7 +1489,7 @@ def toggle_continuous(dropdown_value):
 	predictor = sd.get_predictor_type(dropdown_value)
 	print("spend: {}".format(predictor))
 	if predictor == "spending_personality":
-		return {"min-height": "598px"}
+		return {"height": "650px"}
 	return {"display": "none"}
 
 @app.callback(
@@ -1472,7 +1507,7 @@ def toggle_continuous(dropdown_value):
 	if predictor == "spending_personality":
 		return {"display": "none"}
 
-	return {"min-height": "598px"}
+	return {"height": "650px"}
 
 
 @app.callback(
