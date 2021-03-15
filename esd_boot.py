@@ -586,9 +586,28 @@ scoring_component = html.Div([
 													),
 													dbc.Tab(
 														html.Div([
+																dbc.Card(
+																	dbc.CardHeader(
+																		dbc.Button("Advanced Options", outline=True, color="link", id="graphing_adv_collapse_button", style={"height": "100%", "width": "100%"}),
+																	)
+																),
+																dbc.Collapse(
+																	html.Div([
+																			dbc.Button("Clear Graph", outline=True, color="primary", id="graphing_adv_clear_button"),
+																			dcc.Dropdown(
+																				id="graph_adv_dropdown",
+																				options=[],
+																				multi=True
+																			)
+																		],
+																	),
+																	id="graphing_adv_collapse"
+																),
+																html.Div([],
+																	id="graphing_adv_div",
+																	style= {"width": "100%", "height": "580px"}
+																)
 															],
-															id="graphing_adv_div",
-															style= {"width": "100%", "height": "580px"}
 														),
 														label="Advanced Graph",
 														tab_id="graph_adv"
@@ -814,7 +833,7 @@ def callback_login(clicks, ps_url, ps_username, ps_password):
 def callback_login3(children):
 	if children[:5] == "Error":
 		return generate_toast("Error: Could not log in.", "Error", "danger")
-	return generate_toast("Successfully logged in.", "Success", "primary")
+	return generate_toast("Successfully logged in.", "Success", "success")
 
 @app.callback(
 	dash.dependencies.Output("usecase_dropdown", "options"),
@@ -1246,7 +1265,7 @@ def upload_prep_cto(contents, filename):
 def callback_process_uploads(clicks, usecase, c_filename, c_content):
 	try:
 		sd.wellness_process_uploads(usecase, tmp_dir, c_filename, c_content)
-		return generate_toast("Successfully processed new uploads.", "Success", "primary")
+		return generate_toast("Successfully processed new uploads.", "Success", "success")
 	except Exception as e:
 		print(e)
 		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
@@ -1268,7 +1287,7 @@ def callback_process_uploads(clicks, usecase, c_filename, c_content):
 def callback_process_uploads(clicks, usecase, c_filename, c_content, t_filename, t_content, cto_filename, cto_content):
 	try:
 		sd.spend_personality_process_uploads(usecase, tmp_dir + "to_upload.csv", tmp_dir, c_filename, c_content, tmp_dir, t_filename, t_content, tmp_dir, cto_filename, cto_content)
-		return generate_toast("Successfully processed new uploads.", "Success", "primary")
+		return generate_toast("Successfully processed new uploads.", "Success", "success")
 	except Exception as e:
 		print(e)
 		return generate_toast("Error: Could not process new uploads.", "Error", "danger")
@@ -1285,7 +1304,7 @@ def test_connection(n_clicks, usecase_name):
 	if usecase_name == "" or usecase_name == None:
 		return generate_toast("Error: No usecase selected.", "Error", "danger")	
 	if sd.test_connection(usecase_name):
-		return generate_toast("Connection Successful.", "Success", "primary")
+		return generate_toast("Connection Successful.", "Success", "success")
 	return generate_toast("Error: Could not connected to '{}' runtime server.".format(usecase_name), "Error", "danger")
 
 @app.callback(
@@ -1314,7 +1333,7 @@ def display_usecase_name(usecase):
 def process_properties(n_clicks, usecase_name, runtime_url, properties):
 	try:
 		sd.preprocess_properties(usecase_name, runtime_url, properties)
-		return generate_toast("Successfully uploaded usecase: {}.".format(usecase_name), "Success", "primary")
+		return generate_toast("Successfully uploaded usecase: {}.".format(usecase_name), "Success", "success")
 	except Exception as e:
 		print(e)
 		return generate_toast("Error: Could not upload usecase: {}.".format(e), "Error", "danger")
@@ -1351,39 +1370,67 @@ def upload_prep_af(contents, filename):
 	return filename
 
 @app.callback(
-	dash.dependencies.Output("graphing_adv_div", "children"),
-	[dash.dependencies.Input("score_buffer", "children")],
+	dash.dependencies.Output("graphing_adv_table", "hiddenAttributes"),
+	[
+		dash.dependencies.Input("graph_adv_dropdown", "value"),
+	],
+	state=[
+		State(component_id="graph_adv_dropdown", component_property="options"),
+	],
 	prevent_initial_call=True)
-def tabs_content_graphing4(scoring_results):
-	# try:
-	jstr = json.loads(scoring_results)
-	data_points = []
-	for value in jstr:
-		flat = json_flatten(value, "")
-		data_points.append(flat)
-	df = pd.DataFrame(data_points)
-	columns = list(df.columns)
-	odd_header = columns[0]
-	if odd_header == "customer":
-		odd_header = columns[1]
-	l = [columns]
-	l.extend(df.values.tolist())
-	print(l)
-	graph = dash_pivottable.PivotTable(
-		# id="graphing_adv",	
-		data=l,
-		cols=["customer"],
-		colOrder="key_a_to_z",
-		rows=[],
-		rowOrder="key_a_to_z",
-		rendererName="Line Chart",
-		aggregatorName="List Unique Values",
-		vals=[odd_header]
-	)
-	return graph
-	# except Exception as e:
-	# 	print(e)
-	# 	return None
+def tabs_content_graphing4_2(values, options):
+	new_options = []
+	for entry in options:
+		new_options.append(entry["value"])
+	for value in values:
+		new_options.remove(value)
+	# print(new_options)
+	return new_options
+
+@app.callback(
+	[
+		dash.dependencies.Output("graphing_adv_div", "children"),
+		dash.dependencies.Output("graph_adv_dropdown", "options")
+	],
+	[
+		dash.dependencies.Input("score_buffer", "children"),
+		dash.dependencies.Input("graphing_adv_clear_button", "n_clicks"),
+	],
+	prevent_initial_call=True)
+def tabs_content_graphing4(scoring_results, n_clicks):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "score_buffer":
+		try:
+			jstr = json.loads(scoring_results)
+			data_points = []
+			for value in jstr:
+				flat = json_flatten(value, "")
+				data_points.append(flat)
+			df = pd.DataFrame(data_points)
+			columns = list(df.columns)
+			odd_header = columns[0]
+			if odd_header == "customer":
+				odd_header = columns[1]
+			l = [columns]
+			l.extend(df.values.tolist())
+			return dash_pivottable.PivotTable(
+						id="graphing_adv_table",
+						data=l,
+						cols=["customer"],
+						colOrder="key_a_to_z",
+						rows=[],
+						rowOrder="key_a_to_z",
+						rendererName="Line Chart",
+						aggregatorName="List Unique Values",
+						vals=[odd_header],
+						unusedOrientationCutoff="Infinity"
+			), convert_list(columns)
+		except Exception as e:
+			print(e)
+			return None, []
+	if trigger_id == "graphing_adv_clear_button":
+		return [], []
 
 @app.callback(
 	dash.dependencies.Output("files_toast_div", "children"),
@@ -1417,7 +1464,7 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs)
-			return generate_toast("Successfully uploaded files.", "Success", "primary")
+			return generate_toast("Successfully uploaded files.", "Success", "success")
 		except Exception as e:
 			print(e)
 			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
@@ -1425,7 +1472,7 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 		ad_path = tmp_dir + ad_name
 		try:
 			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs, ad_path=ad_path, ad_content=ad_content, additional=target_ad)
-			return generate_toast("Successfully uploaded files.", "Success", "primary")
+			return generate_toast("Successfully uploaded files.", "Success", "success")
 		except Exception as e:
 			print(e)
 			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
@@ -1522,6 +1569,20 @@ def toggle_continuous(dropdown_value):
 
 	return {"height": "650px"}
 
+@app.callback(
+	dash.dependencies.Output("graphing_adv_collapse", "is_open"),
+	[
+		dash.dependencies.Input("graphing_adv_collapse_button", "n_clicks")
+	],
+	state=[
+		State(component_id="graphing_adv_collapse", component_property="is_open"),
+	],
+	prevent_initial_call=True
+)
+def graphing_adv_toggle_collapse(n_clicks, is_open):
+	if is_open:
+		return False
+	return True
 
 @app.callback(
 	dash.dependencies.Output("login_component", "style"),
