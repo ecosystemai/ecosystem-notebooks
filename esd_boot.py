@@ -1282,6 +1282,8 @@ def callback_process_uploads(clicks, usecase, c_filename, c_content, t_filename,
 	],
 	prevent_initial_call=True)
 def test_connection(n_clicks, usecase_name):
+	if usecase_name == "" or usecase_name == None:
+		return generate_toast("Error: No usecase selected.", "Error", "danger")	
 	if sd.test_connection(usecase_name):
 		return generate_toast("Connection Successful.", "Success", "primary")
 	return generate_toast("Error: Could not connected to '{}' runtime server.".format(usecase_name), "Error", "danger")
@@ -1315,7 +1317,7 @@ def process_properties(n_clicks, usecase_name, runtime_url, properties):
 		return generate_toast("Successfully uploaded usecase: {}.".format(usecase_name), "Success", "primary")
 	except Exception as e:
 		print(e)
-		return generate_toast("Error: Could not upload usecase: {}.".format(usecase_name), "Error", "danger")
+		return generate_toast("Error: Could not upload usecase: {}.".format(e), "Error", "danger")
 
 
 @app.callback(
@@ -1353,34 +1355,35 @@ def upload_prep_af(contents, filename):
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_graphing4(scoring_results):
-	try:
-		jstr = json.loads(scoring_results)
-		data_points = []
-		for value in jstr:
-			flat = json_flatten(value, "")
-			data_points.append(flat)
-		df = pd.DataFrame(data_points)
-		columns = list(df.columns)
-		odd_header = columns[0]
-		if odd_header == "customer":
-			odd_header = columns[1]
-		l = [columns]
-		l.extend(df.values.tolist())
-		graph = dash_pivottable.PivotTable(
-			id="graphing_adv",
-			data=l,
-			cols=["customer"],
-			colOrder="key_a_to_z",
-			rows=[],
-			rowOrder="key_a_to_z",
-			rendererName="Line Chart",
-			aggregatorName="List Unique Values",
-			vals=[odd_header]
-		)
-		return graph
-	except Exception as e:
-		print(e)
-		return None
+	# try:
+	jstr = json.loads(scoring_results)
+	data_points = []
+	for value in jstr:
+		flat = json_flatten(value, "")
+		data_points.append(flat)
+	df = pd.DataFrame(data_points)
+	columns = list(df.columns)
+	odd_header = columns[0]
+	if odd_header == "customer":
+		odd_header = columns[1]
+	l = [columns]
+	l.extend(df.values.tolist())
+	print(l)
+	graph = dash_pivottable.PivotTable(
+		# id="graphing_adv",	
+		data=l,
+		cols=["customer"],
+		colOrder="key_a_to_z",
+		rows=[],
+		rowOrder="key_a_to_z",
+		rendererName="Line Chart",
+		aggregatorName="List Unique Values",
+		vals=[odd_header]
+	)
+	return graph
+	# except Exception as e:
+	# 	print(e)
+	# 	return None
 
 @app.callback(
 	dash.dependencies.Output("files_toast_div", "children"),
@@ -1399,19 +1402,29 @@ def tabs_content_graphing4(scoring_results):
 	],
 	prevent_initial_call=True)
 def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, model_content, fs_name, fs_content, ad_name, ad_content):
+	if usecase == "" or usecase == None:
+		return generate_toast("Error: Could not upload files: Use case is not selected.", "Error", "danger")
+	if database == None or database == "":
+		return generate_toast("Error: Could not upload files: Database field is empty.", "Error", "danger")
+	if model_name == None or model_name == "":
+		return generate_toast("Error: Could not upload files: Model field is empty.", "Error", "danger")
+	if target_fs == None or target_fs == "":
+		return generate_toast("Error: Could not upload files: Target Feature Store field is empty.", "Error", "danger")
+	if fs_name == None or fs_name == "":
+		return generate_toast("Error: Could not upload files: Feature Store field is empty.", "Error", "danger")
 	model_path = tmp_dir + model_name
 	fs_path = tmp_dir + fs_name
-	ad_path = tmp_dir + ad_name
 	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
 		try:
-			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs)
+			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs)
 			return generate_toast("Successfully uploaded files.", "Success", "primary")
 		except Exception as e:
 			print(e)
 			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
 	else:
+		ad_path = tmp_dir + ad_name
 		try:
-			sd.upload_use_case_files(usecase, database, model_path, fs_path, target_fs, ad_path=ad_path, additional=target_ad)
+			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs, ad_path=ad_path, ad_content=ad_content, additional=target_ad)
 			return generate_toast("Successfully uploaded files.", "Success", "primary")
 		except Exception as e:
 			print(e)

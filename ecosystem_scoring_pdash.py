@@ -145,9 +145,11 @@ class ScoringDash():
 			return True
 		return False
 
-	def upload_use_case_files(self, usecase_name, database, model_path, fs_path, feature_store, ad_path=None, additional=None):
+	def upload_use_case_files(self, usecase_name, database, model_path, model_content, fs_path, fs_content, feature_store, ad_path=None, ad_content=None, additional=None):
 		use_case = self.use_cases[usecase_name]
 		self.setup_use_case(usecase_name)
+		save_coded_file(fs_content, fs_path)
+		save_coded_file(model_content, model_path)
 		feature_store_file = ntpath.basename(fs_path)
 		if use_case["model_d_path"] == "" or use_case["model_d_path"] == None:
 			upload_file_runtime(use_case["auth"], model_path, use_case["model_g_path"])
@@ -157,6 +159,7 @@ class ScoringDash():
 		upload_import_pred(self.p_auth, self.data_path, fs_path, database, feature_store, feature_store_file)
 
 		if additional != None:
+			save_coded_file(ad_content, ad_path)
 			additional_file = ntpath.basename(ad_path)
 			upload_import_runtime(use_case["auth"], ad_path, use_case["data_path"], database, additional, additional_file)
 
