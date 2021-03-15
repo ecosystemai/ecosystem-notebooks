@@ -24,6 +24,7 @@ ECO_LOGO = "./assets/favicon.ico"
 CURRENT_YEAR = "2021"
 VERSION = "0.5.9780"
 
+graphing_adv_refresh = False
 sd = None
 export_target="export_wow.csv"
 tmp_dir = "tmp/"
@@ -593,7 +594,6 @@ scoring_component = html.Div([
 																),
 																dbc.Collapse(
 																	html.Div([
-																			dbc.Button("Clear Graph", outline=True, color="primary", id="graphing_adv_clear_button"),
 																			dcc.Dropdown(
 																				id="graph_adv_dropdown",
 																				options=[],
@@ -773,6 +773,11 @@ footer = dbc.Card(
 )
 
 app.layout = html.Div([
+		dcc.Interval(
+			id="interval",
+			interval=1*1000, # in milliseconds
+			n_intervals=0
+		),
 		dtc.SideBar([
 				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt", className="sideBarItem"),
 				dtc.SideBarItem(id="id_2", label="Explore", icon="fas fa-compass", className="sideBarItem"),
@@ -995,6 +1000,8 @@ def callback_score_button(n_clicks, usecase, score_value):
 		return None, generate_toast("Error: Could not score: Score Value field is empty.", "Error", "danger")
 	try:
 		outputs = sd.score_btn_eventhandler(usecase, score_value)
+		global graphing_adv_refresh
+		graphing_adv_refresh = True
 		return outputs, []
 	except Exception as e:
 		print(e)
@@ -1369,68 +1376,84 @@ def upload_prep_fs(contents, filename):
 def upload_prep_af(contents, filename):
 	return filename
 
-@app.callback(
-	dash.dependencies.Output("graphing_adv_table", "hiddenAttributes"),
-	[
-		dash.dependencies.Input("graph_adv_dropdown", "value"),
-	],
-	state=[
-		State(component_id="graph_adv_dropdown", component_property="options"),
-	],
-	prevent_initial_call=True)
-def tabs_content_graphing4_2(values, options):
-	new_options = []
-	for entry in options:
-		new_options.append(entry["value"])
-	for value in values:
-		new_options.remove(value)
-	# print(new_options)
-	return new_options
+# @app.callback(
+# 	dash.dependencies.Output("graphing_adv_table", "hiddenAttributes"),
+# 	[
+# 		dash.dependencies.Input("graph_adv_dropdown", "value"),
+# 	],
+# 	state=[
+# 		State(component_id="graph_adv_dropdown", component_property="options"),
+# 	],
+# 	prevent_initial_call=True)
+# def tabs_content_graphing4_2(values, options):
+# 	new_options = []
+# 	for entry in options:
+# 		new_options.append(entry["value"])
+# 	for value in values:
+# 		new_options.remove(value)
+# 	# print(new_options)
+# 	return new_options
+
 
 @app.callback(
 	[
 		dash.dependencies.Output("graphing_adv_div", "children"),
-		dash.dependencies.Output("graph_adv_dropdown", "options")
+		dash.dependencies.Output("graph_adv_dropdown", "options"),
 	],
 	[
-		dash.dependencies.Input("score_buffer", "children"),
-		dash.dependencies.Input("graphing_adv_clear_button", "n_clicks"),
+		dash.dependencies.Input("interval", "n_intervals"),
+		dash.dependencies.Input("graph_adv_dropdown", "value"),
+	],
+	state=[
+		State(component_id="score_buffer", component_property="children"),
+		State(component_id="graphing_adv_div", component_property="children"),
 	],
 	prevent_initial_call=True)
-def tabs_content_graphing4(scoring_results, n_clicks):
+def tabs_content_graphing4(interval, dropdown_values, scoring_results, children):
+	global graphing_adv_refresh
+	if graphing_adv_refresh:
+		graphing_adv_refresh = False
+		return "Loading", []
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-	if trigger_id == "score_buffer":
+	if dropdown_values == None:
+		dropdown_values = []
+	if trigger_id == "graph_adv_dropdown":
+		graphing_adv_refresh = True
+		return dash.no_update, dash.no_update
+	if trigger_id == "interval":
 		try:
-			jstr = json.loads(scoring_results)
-			data_points = []
-			for value in jstr:
-				flat = json_flatten(value, "")
-				data_points.append(flat)
-			df = pd.DataFrame(data_points)
-			columns = list(df.columns)
-			odd_header = columns[0]
-			if odd_header == "customer":
-				odd_header = columns[1]
-			l = [columns]
-			l.extend(df.values.tolist())
-			return dash_pivottable.PivotTable(
-						id="graphing_adv_table",
-						data=l,
-						cols=["customer"],
-						colOrder="key_a_to_z",
-						rows=[],
-						rowOrder="key_a_to_z",
-						rendererName="Line Chart",
-						aggregatorName="List Unique Values",
-						vals=[odd_header],
-						unusedOrientationCutoff="Infinity"
-			), convert_list(columns)
+			if children == "Loading":
+				jstr = json.loads(scoring_results)
+				data_points = []
+				for value in jstr:
+					flat = json_flatten(value, "")
+					data_points.append(flat)
+				df = pd.DataFrame(data_points)
+				columns = list(df.columns)
+				odd_header = columns[0]
+				if odd_header == "customer":
+					odd_header = columns[1]
+				l = [columns]
+				l.extend(df.values.tolist())
+				return dash_pivottable.PivotTable(
+							id="graphing_adv_table",
+							data=l,
+							cols=["customer"],
+							colOrder="key_a_to_z",
+							rows=[],
+							rowOrder="key_a_to_z",
+							rendererName="Line Chart",
+							aggregatorName="List Unique Values",
+							vals=[odd_header],
+							unusedOrientationCutoff="Infinity",
+							hiddenAttributes=dropdown_values
+
+				), convert_list(columns)
+			return dash.no_update, dash.no_update
 		except Exception as e:
 			print(e)
-			return None, []
-	if trigger_id == "graphing_adv_clear_button":
-		return [], []
+			return dash.no_update, dash.no_update
 
 @app.callback(
 	dash.dependencies.Output("files_toast_div", "children"),
