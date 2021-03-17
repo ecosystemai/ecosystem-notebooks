@@ -116,10 +116,17 @@ def extract_properties(properties):
 class ScoringDash():
 	def __init__(self, pred_url, pred_username, pred_pass):
 		self.user = pred_username
+		self.p_url = pred_url
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.data_path = worker_file_service.get_property(self.p_auth, "user.data")
 		self.use_cases = {}
 		# self.to_upload = {}
+
+	def get_prediction_databases(self):
+		return data_management_engine.get_document_db_list(self.p_auth, self.p_url)
+
+	def get_prediction_collections(self, database):
+		return data_management_engine.get_document_db_collections(self.p_auth, database)
 
 	def get_runtime_url(self, usecase_name):
 		use_case = self.use_cases[usecase_name]
@@ -249,7 +256,16 @@ class ScoringDash():
 		total_to_process = 100
 		results = data_munging_engine.get_categories(self.p_auth, database, collection, categoryfield, find, total_to_process) 
 		return results
-	    
+ 
+	def get_documents(self, database, collection, field, projections, limit, skip):
+		results = data_management_engine.get_data(self.p_auth, database, collection, field, limit, projections, skip)
+		for result in results:
+			for key in result:
+				value = result[key]
+				if type(value) != str:
+					result[key] = str(value)
+		return results
+
 	def get_documents_for_key_value(self, usecase_name, value):
 		use_case = self.use_cases[usecase_name]
 		database = use_case["database"]

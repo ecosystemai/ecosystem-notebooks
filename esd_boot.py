@@ -25,6 +25,7 @@ CURRENT_YEAR = "2021"
 VERSION = "0.5.9780"
 
 graphing_adv_refresh = False
+custom_graphing_adv_refresh = False
 sd = None
 export_target="export_wow.csv"
 tmp_dir = "tmp/"
@@ -764,6 +765,173 @@ batch_scoring_component = html.Div([
 	style={"display": "none"}
 )
 
+custom_graphing_component = html.Div([
+		navbar,
+		html.Div([
+				dbc.Row(
+					[
+						dbc.Col(
+							html.Div([
+									dbc.Card(
+										dbc.CardBody([
+												html.Label(html.B("Find Details"), style={"margin-bottom": "0rem"}),
+											],
+											style={"padding": "0.75rem"}
+										),
+									),
+									html.Br(),
+									dbc.Card(
+										dbc.CardBody([
+												html.Div([
+														html.Label("Database"),
+														dcc.Dropdown(
+															id="database_dropdown",
+															clearable=False,
+														),
+														html.Br(),
+														html.Label("Collection"),
+														dcc.Dropdown(
+															id="collection_dropdown",
+															clearable=False,
+														),
+														html.Br(),
+														html.Label("Field"),
+														html.Br(),
+														dcc.Input(
+															id="field_input",
+															value="{}"
+														),
+														html.Br(),
+														html.Br(),
+														html.Label("Projections"),
+														html.Br(),
+														dcc.Input(
+															id="projections_input",
+															value="{}"
+														),
+														html.Br(),
+														html.Br(),
+														html.Label("Limit"),
+														html.Br(),
+														dcc.Input(
+															id="limit_input",
+															type="number",
+															value=0
+														),
+														html.Br(),
+														html.Br(),
+														html.Label("Skip"),
+														html.Br(),
+														dcc.Input(
+															id="skip_input",
+															type="number",
+															value=0
+														),
+														html.Br(),
+														html.Br(),
+														html.Label("", id="find_buffer", style={"display": "none"}),
+														dbc.Button("Find",
+															outline=True,
+															color="primary",
+															className="mr-1",
+															id="find_button"
+														),
+													],
+													style={"height": "750px"}
+												)
+											],
+										)
+									)
+								],
+							),
+							md=3
+						),
+						dbc.Col(
+							html.Div(
+								[
+									dbc.Card(
+										dbc.CardBody([
+												html.Label(html.B("Data Details"), style={"margin-bottom": "0rem"}),
+											],
+											style={"padding": "0.75rem"}
+										),
+									),
+									html.Br(),
+									dbc.Card(
+										dbc.CardBody([
+												html.Div([
+														dbc.Tabs([
+																dbc.Tab(
+																	html.Div(
+																		id="custom_graphing_results_div",
+																		style={"overflow-y": "scroll", "max-height": "700px"}
+																	),
+																	label="Results",
+																	tab_id="custom_graphing_table"
+																),
+																dbc.Tab(
+																	# html.Div([],
+																	dbc.Textarea(
+																		id = "custom_graphing_text_area",
+																		# className="tree",
+																		style= {"width": "100%", "height": "700px"}
+
+																	),
+																	label="Raw Results",
+																	tab_id="custom_graphing_raw"
+																),
+																dbc.Tab(
+																	html.Div([
+																			dbc.Card(
+																				dbc.CardHeader(
+																					dbc.Button("Advanced Options", outline=True, color="link", id="custom_graphing_adv_collapse_button", style={"height": "100%", "width": "100%"}),
+																				)
+																			),
+																			dbc.Collapse(
+																				html.Div([
+																						dcc.Dropdown(
+																							id="custom_graph_adv_dropdown",
+																							options=[],
+																							multi=True
+																						)
+																					],
+																				),
+																				id="custom_graphing_adv_collapse"
+																			),
+																			html.Div([],
+																				id="custom_graphing_adv_div",
+																				style= {"width": "100%", "height": "650px"}
+																			)
+																		],
+																	),
+																	label="Advanced Graph",
+																	tab_id="custom_graph_adv"
+																),
+															],
+															id="custom_graphing_tabs",
+															active_tab="custom_graphing_table",
+														)
+													],
+													id="custom_graphing_tab_div",
+													style={"height": "750px"}
+												)
+											]
+										)
+									)
+								],
+							),
+							md=9
+						),
+					],
+				),
+			],
+			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
+		)
+	],
+	id="custom_graphing_component",
+	style={"display": "none"}
+)
+
 footer = dbc.Card(
 	dbc.CardBody([
 			"Dashboard for ", html.A("ecosystem.Ai", href="https://ecosystem.ai/"), " ", CURRENT_YEAR
@@ -781,7 +949,8 @@ app.layout = html.Div([
 		dtc.SideBar([
 				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt", className="sideBarItem"),
 				dtc.SideBarItem(id="id_2", label="Explore", icon="fas fa-compass", className="sideBarItem"),
-				dtc.SideBarItem(id="id_3", label="Scoring", icon="fas fa-chart-line", className="sideBarItem")
+				dtc.SideBarItem(id="id_3", label="Scoring", icon="fas fa-chart-line", className="sideBarItem"),
+				dtc.SideBarItem(id="id_4", label="Custom Graphing", icon="fas fa-chart-line", className="sideBarItem")
 			],
 			className="sideBar"
 		),
@@ -796,10 +965,11 @@ app.layout = html.Div([
 				html.Div([], id="score_toast_div2"),
 				html.Div([], id="filter_toast_div"),
 				html.Div([], id="filter_toast_div2"),
+				html.Div([], id="find_toast_div"),
 			],
 			id="toast_div"
 		),
-		html.Div([login_component, scoring_component, batch_scoring_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
+		html.Div([login_component, scoring_component, batch_scoring_component, custom_graphing_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
 	], 
 	style={"position": "relative"}
 )
@@ -839,6 +1009,73 @@ def callback_login3(children):
 	if children[:5] == "Error":
 		return generate_toast("Error: Could not log in.", "Error", "danger")
 	return generate_toast("Successfully logged in.", "Success", "success")
+
+@app.callback(
+	dash.dependencies.Output("database_dropdown", "options"),
+	[	
+		dash.dependencies.Input("login_status", "children")
+	],
+	prevent_initial_call=True)
+def callback_login3(children):
+	try:
+		databases = sd.get_prediction_databases()
+		new_databases = []
+		for entry in databases["databases"]:
+			new_databases.append(entry["name"])
+		return convert_list(new_databases)
+	except Exception as e:
+		print(e)
+		return []
+
+@app.callback(
+	[
+		dash.dependencies.Output("collection_dropdown", "options"),
+		dash.dependencies.Output("collection_dropdown", "value"),
+	],
+	[	
+		dash.dependencies.Input("database_dropdown", "value")
+	],
+	prevent_initial_call=True)
+def callback_database(database):
+	try:
+		collections = sd.get_prediction_collections(database)
+		new_collections = []
+		for entry in collections["collection"]:
+			new_collections.append(entry["name"])
+		return convert_list(new_collections), None
+	except Exception as e:
+		print(e)
+		return [], None
+
+@app.callback(
+	[
+		dash.dependencies.Output("find_buffer", "children"),
+		dash.dependencies.Output("find_toast_div", "children")
+	],
+	[dash.dependencies.Input("find_button", "n_clicks")],
+	state=[
+		State(component_id="database_dropdown", component_property="value"),
+		State(component_id="collection_dropdown", component_property="value"),
+		State(component_id="field_input", component_property="value"),
+		State(component_id="projections_input", component_property="value"),
+		State(component_id="limit_input", component_property="value"),
+		State(component_id="skip_input", component_property="value"),
+	],
+	prevent_initial_call=True)
+def callback_find_button(n_clicks, database, collection, field, projections, limit, skip):
+	if database == "" or database == None:
+		return None, generate_toast("Error: Could not find: Database not selected.", "Error", "danger")
+	if collection == "" or collection == None:
+		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
+	try:
+		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
+		global custom_graphing_adv_refresh
+		custom_graphing_adv_refresh = True
+		return json.dumps(outputs), []
+	except Exception as e:
+		print(e)
+		return None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
+
 
 @app.callback(
 	dash.dependencies.Output("usecase_dropdown", "options"),
@@ -1044,9 +1281,24 @@ def callback_score_button2(n_clicks, usecase, score_value):
 		dash.dependencies.Input("score_buffer", "children")
 	],
 	prevent_initial_call=True)
-def callback_score_buffer( score_b):
+def callback_score_buffer(score_b):
 	try:
 		j = json.loads(score_b)
+		pj = json.dumps(j, indent=4, sort_keys=True)
+		return pj
+	except Exception as e:
+		print(e)
+		return None
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_text_area", "value"),
+	[
+		dash.dependencies.Input("find_buffer", "children")
+	],
+	prevent_initial_call=True)
+def callback_find_buffer(find_b):
+	try:
+		j = json.loads(find_b)
 		pj = json.dumps(j, indent=4, sort_keys=True)
 		return pj
 	except Exception as e:
@@ -1147,6 +1399,16 @@ def tabs_content_graphing(tab):
 	prevent_initial_call=True)
 def tabs_content_graphing(tab):
 	if tab == "graph_adv":
+		style = {"width": "98%", "height": "380px", "display": "block"}
+	else:
+		return {"display": "none"}
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_adv_div", "style"),
+	[dash.dependencies.Input("custom_graphing_tabs", "active_tab")],
+	prevent_initial_call=True)
+def tabs_content_custom_graphing(tab):
+	if tab == "custom_graph_adv":
 		style = {"width": "98%", "height": "380px", "display": "block"}
 	else:
 		return {"display": "none"}
@@ -1456,6 +1718,66 @@ def tabs_content_graphing4(interval, dropdown_values, scoring_results, children)
 			return dash.no_update, dash.no_update
 
 @app.callback(
+	[
+		dash.dependencies.Output("custom_graphing_adv_div", "children"),
+		dash.dependencies.Output("custom_graph_adv_dropdown", "options"),
+	],
+	[
+		dash.dependencies.Input("interval", "n_intervals"),
+		dash.dependencies.Input("custom_graph_adv_dropdown", "value"),
+	],
+	state=[
+		State(component_id="find_buffer", component_property="children"),
+		State(component_id="custom_graphing_adv_div", component_property="children"),
+	],
+	prevent_initial_call=True)
+def tabs_content_custom_graphing4(interval, dropdown_values, find_results, children):
+	global custom_graphing_adv_refresh
+	if custom_graphing_adv_refresh:
+		custom_graphing_adv_refresh = False
+		return "Loading", []
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if dropdown_values == None:
+		dropdown_values = []
+	if trigger_id == "custom_graph_adv_dropdown":
+		custom_graphing_adv_refresh = True
+		return dash.no_update, dash.no_update
+	if trigger_id == "interval":
+		try:
+			if children == "Loading":
+				jstr = json.loads(find_results)
+				data_points = []
+				for value in jstr:
+					flat = json_flatten(value, "")
+					data_points.append(flat)
+				df = pd.DataFrame(data_points)
+				columns = list(df.columns)
+				# odd_header = columns[0]
+				# if odd_header == "customer":
+				# 	odd_header = columns[1]
+				l = [columns]
+				l.extend(df.values.tolist())
+				return dash_pivottable.PivotTable(
+							id="custom_graphing_adv_table",
+							data=l,
+							# cols=["customer"],
+							colOrder="key_a_to_z",
+							rows=[],
+							rowOrder="key_a_to_z",
+							rendererName="Line Chart",
+							aggregatorName="List Unique Values",
+							# vals=[odd_header],
+							unusedOrientationCutoff="Infinity",
+							hiddenAttributes=dropdown_values
+
+				), convert_list(columns)
+			return dash.no_update, dash.no_update
+		except Exception as e:
+			print(e)
+			return dash.no_update, dash.no_update
+
+@app.callback(
 	dash.dependencies.Output("files_toast_div", "children"),
 	[dash.dependencies.Input("files_button", "n_clicks")],
 	state=[
@@ -1506,6 +1828,23 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_scoring_tab(children):
+	try:
+		jstr = json.loads(children)
+		data_points = []
+		for value in jstr:
+			flat = json_flatten(value, "")
+			data_points.append(flat)
+		df = pd.DataFrame(data_points)
+		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+	except Exception as e:
+		print(e)
+		return None
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_results_div", "children"),
+	[dash.dependencies.Input("find_buffer", "children")],
+	prevent_initial_call=True)
+def tabs_content_results_tab(children):
 	try:
 		jstr = json.loads(children)
 		data_points = []
@@ -1608,15 +1947,31 @@ def graphing_adv_toggle_collapse(n_clicks, is_open):
 	return True
 
 @app.callback(
+	dash.dependencies.Output("custom_graphing_adv_collapse", "is_open"),
+	[
+		dash.dependencies.Input("custom_graphing_adv_collapse_button", "n_clicks")
+	],
+	state=[
+		State(component_id="custom_graphing_adv_collapse", component_property="is_open"),
+	],
+	prevent_initial_call=True
+)
+def custom_graphing_adv_toggle_collapse(n_clicks, is_open):
+	if is_open:
+		return False
+	return True
+
+@app.callback(
 	dash.dependencies.Output("login_component", "style"),
 	[
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_4", "n_clicks_timestamp"),
 		dash.dependencies.Input("login_status", "children")
 	],
 )
-def toggle_collapse(input1, input2, input3, login_status):
+def toggle_collapse(input1, input2, input3, input4, login_status):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "login_status":
@@ -1630,14 +1985,16 @@ def toggle_collapse(input1, input2, input3, login_status):
 		elif login_status[:5] == "Error":
 			return {"background-color": "#edf1f7", "min-height": "90vh"}
 		else:
-			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3], "input4": [input4]})
 			btn_df = btn_df.fillna(0)
 
-			if btn_df.idxmax(axis=1).values == "input1" or btn_df.idxmax(axis=1).values == "input4":
+			if btn_df.idxmax(axis=1).values == "input1":
 				return {"background-color": "#edf1f7", "min-height": "90vh"}
 			if btn_df.idxmax(axis=1).values == "input2":
 				return {"display": "none"}
 			if btn_df.idxmax(axis=1).values == "input3":
+				return {"display": "none"}
+			if btn_df.idxmax(axis=1).values == "input4":
 				return {"display": "none"}
 
 @app.callback(
@@ -1646,10 +2003,11 @@ def toggle_collapse(input1, input2, input3, login_status):
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_4", "n_clicks_timestamp"),
 		dash.dependencies.Input("login_status", "children")
 	],
 	prevent_initial_call=True)
-def toggle_collapse(input1, input2, input3, login_status):
+def toggle_collapse(input1, input2, input3, input4, login_status):
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "login_status":
@@ -1663,7 +2021,7 @@ def toggle_collapse(input1, input2, input3, login_status):
 		elif login_status[:5] == "Error":
 			return {"display": "none"}
 		else:
-			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+			btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3], "input4": [input4]})
 			btn_df = btn_df.fillna(0)
 
 			if btn_df.idxmax(axis=1).values == "input1":
@@ -1672,25 +2030,28 @@ def toggle_collapse(input1, input2, input3, login_status):
 				return {"background-color": "#edf1f7", "min-height": "90vh"}
 			if btn_df.idxmax(axis=1).values == "input3":
 				return {"display": "none"}
+			if btn_df.idxmax(axis=1).values == "input4":
+				return {"display": "none"}
 
 @app.callback(
 	dash.dependencies.Output("batch_scoring_component", "style"),
 	[
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
-		dash.dependencies.Input("id_3", "n_clicks_timestamp")
+		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_4", "n_clicks_timestamp"),
 	],
 	state=[
 		State(component_id="login_status", component_property="children"),
 	],
 )
-def toggle_collapse(input1, input2, input3, login_status):
+def toggle_collapse(input1, input2, input3, input4, login_status):
 	if len(login_status) <= 2:
 		return {"display": "none"}
 	elif login_status[:5] == "Error":
 		return {"display": "none"}
 	else:
-		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3]})
+		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3], "input4": [input4]})
 		btn_df = btn_df.fillna(0)
 
 		if btn_df.idxmax(axis=1).values == "input1":
@@ -1699,6 +2060,40 @@ def toggle_collapse(input1, input2, input3, login_status):
 			return {"display": "none"}
 		if btn_df.idxmax(axis=1).values == "input3":
 			return {"background-color": "#edf1f7", "min-height": "90vh"}
+		if btn_df.idxmax(axis=1).values == "input4":
+			return {"display": "none"}
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_component", "style"),
+	[
+		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_2", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_3", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_4", "n_clicks_timestamp"),
+
+	],
+	state=[
+		State(component_id="login_status", component_property="children"),
+	],
+)
+def toggle_collapse(input1, input2, input3, input4, login_status):
+	if len(login_status) <= 2:
+		return {"display": "none"}
+	elif login_status[:5] == "Error":
+		return {"display": "none"}
+	else:
+		btn_df = pd.DataFrame({"input1": [input1], "input2": [input2], "input3": [input3], "input4": [input4]})
+		btn_df = btn_df.fillna(0)
+
+		if btn_df.idxmax(axis=1).values == "input1":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input2":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input3":
+			return {"display": "none"}
+		if btn_df.idxmax(axis=1).values == "input4":
+			return {"background-color": "#edf1f7", "min-height": "90vh"}
+
 
 if __name__ == "__main__":
 	app.run_server(debug=True)
