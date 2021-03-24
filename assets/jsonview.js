@@ -229,16 +229,13 @@ var JsonView = (function (exports) {
 
 }({}));
 
-window.dash_clientside = Object.assign({}, window.dash_clientside, {
-    clientside: {
-        json_viewer: function(data) {
-		 	const tree = JsonView.createTree(data);
-		 	JsonView.render(tree, document.querySelector('.tree'));
-		 	JsonView.expandChildren(tree);
-		 	return {"width": "100%", "height": "495px", "overflow-y": "scroll"};
-        }
-    }
-});
-
-
-  
+// window.dash_clientside = Object.assign({}, window.dash_clientside, {
+//     clientside: {
+//         json_viewer: function(data) {
+// 		 	const tree = JsonView.createTree(data);
+// 		 	JsonView.render(tree, document.querySelector('.tree'));
+// 		 	JsonView.expandChildren(tree);
+// 		 	return {"width": "100%", "height": "495px", "overflow-y": "scroll"};
+//         }
+//     }
+// });

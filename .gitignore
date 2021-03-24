@@ -1,5 +1,8 @@
 .DS_Store
-
+/dest/*
+/amcharts_4.10.17/*
+/es5/*
+/node_modules/*
 /flask_session/*
 *.pyc
 *.ipynb_checkpoints/

@@ -33,6 +33,11 @@ export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
 	os.mkdir(tmp_dir)
 
+class ActiveStates():
+	def __init__(self):
+		self.score_button_busy = False
+		self.score_button_busy_changed = False
+
 def generate_toast(message, header, icon):
 	return dbc.Toast(
 		message,
@@ -595,10 +600,41 @@ scoring_component = html.Div([
 																),
 																dbc.Collapse(
 																	html.Div([
+																			html.Br(),
+																			html.Label("Add Field to Graph"),
 																			dcc.Dropdown(
 																				id="graph_adv_dropdown",
 																				options=[],
 																				multi=True
+																			),
+																			html.Br(),
+																			dbc.Row(
+																				[
+																					dbc.Col(
+																						html.Div([
+																								html.Label("", id="graphing_adv_label", hidden=True),
+																								html.Label("State Name", id="graphing_adv_state_name_label"),
+																								html.Br(),
+																								dcc.Input(id="graphing_adv_state_name_input"),
+																								html.Br(),
+																								html.Br(),
+																								dbc.Button("Save State", outline=True, color="primary", id="graphing_adv_save_state_button"),
+																							]
+																						),
+																						md=3
+																					),
+																					dbc.Col(
+																						html.Div([
+																								html.Label("Load State"),
+																								dcc.Dropdown(
+																									id="graph_adv_state_dropdown",
+																									options=[]
+																								)
+																							]
+																						),
+																						md=9
+																					)
+																				]
 																			)
 																		],
 																	),
@@ -950,7 +986,7 @@ app.layout = html.Div([
 				dtc.SideBarItem(id="id_1", label="Login", icon="fas fa-sign-in-alt", className="sideBarItem"),
 				dtc.SideBarItem(id="id_2", label="Explore", icon="fas fa-compass", className="sideBarItem"),
 				dtc.SideBarItem(id="id_3", label="Scoring", icon="fas fa-chart-line", className="sideBarItem"),
-				dtc.SideBarItem(id="id_4", label="Custom Graphing", icon="fas fa-chart-line", className="sideBarItem")
+				dtc.SideBarItem(id="id_4", label="Custom Graphing", icon="fas fa-chart-bar", className="sideBarItem")
 			],
 			className="sideBar"
 		),
@@ -993,7 +1029,7 @@ def download_csv():
 def callback_login(clicks, ps_url, ps_username, ps_password):
 	global sd
 	try:
-		sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password)
+		sd = ecosystem_scoring_pdash.ScoringDash(ps_url, ps_username, ps_password, ActiveStates())
 	except Exception as e:
 		print(e)
 		sd = None
@@ -1076,38 +1112,46 @@ def callback_find_button(n_clicks, database, collection, field, projections, lim
 		print(e)
 		return None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
 
+@app.callback(
+	[
+		dash.dependencies.Output("graph_adv_state_dropdown", "options"),
+	],
+	[	
+		dash.dependencies.Input("usecase_dropdown", "value"),
+	],
+	prevent_initial_call=True)
+def callback_adv_graph_state_loading(usecase_name):
+	try:
+		names = []
+		states = sd.get_properties_state(usecase_name, "dashboard.graph.states")
+		for state in states:
+			if "name" in state.keys():
+				names.append(state["name"])
+		return convert_list(names),
+	except Exception as e:
+		print(e)
+		return []
 
 @app.callback(
-	dash.dependencies.Output("usecase_dropdown", "options"),
+	[
+		dash.dependencies.Output("usecase_dropdown", "options"),
+		dash.dependencies.Output("usecase_dropdown2", "options"),
+	],
 	[	
 		dash.dependencies.Input("login_status", "children"),
 		dash.dependencies.Input("usecase_dropdown", "value"),
+		dash.dependencies.Input("usecase_dropdown2", "value"),
 		dash.dependencies.Input("usecase_toast_div", "children")
 	],
 	prevent_initial_call=True)
-def callback_login2(children, value, toast):
+def callback_login2(children, value, value2, toast):
 	try:
 		sd.retrieve_properties()
-		return convert_list(sd.get_use_case_names())
+		cl = convert_list(sd.get_use_case_names())
+		return cl, cl
 	except Exception as e:
 		print(e)
-		return {}
-
-@app.callback(
-	dash.dependencies.Output("usecase_dropdown2", "options"),
-	[	
-		dash.dependencies.Input("login_status", "children"),
-		dash.dependencies.Input("usecase_dropdown", "value"),
-		dash.dependencies.Input("usecase_toast_div", "children")
-	],
-	prevent_initial_call=True)
-def callback_login2_2(children, value, toast):
-	try:
-		sd.retrieve_properties()
-		return convert_list(sd.get_use_case_names())
-	except Exception as e:
-		print(e)
-		return {}
+		return [], []
 
 @app.callback(
 	dash.dependencies.Output("table_div", "children"),
@@ -1140,6 +1184,7 @@ def callback_customer_list(customer_list, usecase):
 					))
 			return dbc.ListGroup(group_items)
 	if trigger_id == "usecase_dropdown":
+		field_data = sd.read_field_from_properties(usecase, "predictor.param.lookup")
 		return []
 
 @app.callback(
@@ -1236,14 +1281,39 @@ def callback_score_button(n_clicks, usecase, score_value):
 	if score_value == "":
 		return None, generate_toast("Error: Could not score: Score Value field is empty.", "Error", "danger")
 	try:
+		acts = sd.get_active_states()
+		acts.score_button_busy = True
+		acts.score_button_busy_changed = True
 		outputs = sd.score_btn_eventhandler(usecase, score_value)
 		global graphing_adv_refresh
 		graphing_adv_refresh = True
+		acts.score_button_busy = False
+		acts.score_button_busy_changed = True
 		return outputs, []
 	except Exception as e:
 		print(e)
 		return None, generate_toast("Error: Could not score: {}".format(e), "Error", "danger")
 
+@app.callback(
+	[
+		dash.dependencies.Output("score_button", "children"),
+		dash.dependencies.Output("score_button", "disabled")
+	],
+	[dash.dependencies.Input("interval", "n_intervals")],
+	prevent_initial_call=True)
+def callback_score_button_busy(intervals):
+	try:
+		acts = sd.get_active_states()
+		if acts.score_button_busy_changed:
+			acts.score_button_busy_changed = False
+			if acts.score_button_busy:
+				return [dbc.Spinner(size="sm"), " Scoring..."], True
+			else:
+				return "Score", False
+		else:
+			return dash.no_update, dash.no_update
+	except:
+		return dash.no_update, dash.no_update
 
 @app.callback(
 	[
@@ -1638,25 +1708,6 @@ def upload_prep_fs(contents, filename):
 def upload_prep_af(contents, filename):
 	return filename
 
-# @app.callback(
-# 	dash.dependencies.Output("graphing_adv_table", "hiddenAttributes"),
-# 	[
-# 		dash.dependencies.Input("graph_adv_dropdown", "value"),
-# 	],
-# 	state=[
-# 		State(component_id="graph_adv_dropdown", component_property="options"),
-# 	],
-# 	prevent_initial_call=True)
-# def tabs_content_graphing4_2(values, options):
-# 	new_options = []
-# 	for entry in options:
-# 		new_options.append(entry["value"])
-# 	for value in values:
-# 		new_options.remove(value)
-# 	# print(new_options)
-# 	return new_options
-
-
 @app.callback(
 	[
 		dash.dependencies.Output("graphing_adv_div", "children"),
@@ -1930,6 +1981,38 @@ def toggle_continuous(dropdown_value):
 		return {"display": "none"}
 
 	return {"height": "650px"}
+
+@app.callback(
+	dash.dependencies.Output("graphing_adv_label", "children"),
+	[
+		dash.dependencies.Input("graphing_adv_save_state_button", "n_clicks")
+	],
+
+	state=[
+		State(component_id="usecase_dropdown", component_property="value"),
+		State(component_id="graphing_adv_state_name_input", component_property="value"),
+		State(component_id="graphing_adv_table", component_property="cols"),
+		State(component_id="graphing_adv_table", component_property="rows"),
+		State(component_id="graphing_adv_table", component_property="rendererName"),
+		State(component_id="graphing_adv_table", component_property="aggregatorName"),
+		State(component_id="graphing_adv_table", component_property="vals"),
+		State(component_id="graphing_adv_table", component_property="hiddenAttributes"),
+	],
+	prevent_initial_call=True
+)
+def graphing_adv_save_state(n_clicks, usecase, name, cols, rows, renderer_name, aggregator_name, vals, hidden_attributes):
+	state_dict = {
+		"name": name,
+		"cols": cols,
+		"rows": rows,
+		"renderer_name": renderer_name,
+		"aggregator_name": aggregator_name,
+		"vals": vals,
+		"hidden_attributes": hidden_attributes
+	}
+	j_state_dict = json.dumps(state_dict)
+	sd.append_properties_state(usecase, "dashboard.graph.states", j_state_dict)
+	return ""
 
 @app.callback(
 	dash.dependencies.Output("graphing_adv_collapse", "is_open"),

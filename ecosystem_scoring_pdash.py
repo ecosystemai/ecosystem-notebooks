@@ -114,13 +114,16 @@ def extract_properties(properties):
 	return predictor, database, table, key
 
 class ScoringDash():
-	def __init__(self, pred_url, pred_username, pred_pass):
+	def __init__(self, pred_url, pred_username, pred_pass, active_states):
 		self.user = pred_username
 		self.p_url = pred_url
 		self.p_auth = jwt_access.Authenticate(pred_url, pred_username, pred_pass)
 		self.data_path = worker_file_service.get_property(self.p_auth, "user.data")
 		self.use_cases = {}
-		# self.to_upload = {}
+		self.active_states = active_states
+
+	def get_active_states(self):
+		return self.active_states
 
 	def get_prediction_databases(self):
 		return data_management_engine.get_document_db_list(self.p_auth, self.p_url)
@@ -151,6 +154,18 @@ class ScoringDash():
 		if pong["pong"] == str(puuid):
 			return True
 		return False
+
+	# def add_field_to_properties(self):
+	def read_field_from_properties(self, usecase_name, field):
+		use_case = self.use_cases[usecase_name]
+		properties = use_case["properties"]
+		lines = properties.split("\n")
+		for line in lines:
+			sections = line.split("=")
+			if sections[0] == field:
+				return "=".join(sections[1:])
+		return None
+
 
 	def upload_use_case_files(self, usecase_name, database, model_path, model_content, fs_path, fs_content, feature_store, ad_path=None, ad_content=None, additional=None):
 		use_case = self.use_cases[usecase_name]
@@ -389,16 +404,54 @@ class ScoringDash():
 			except:
 				continue
 
+	def get_properties_state(self, usecase_name, field):
+		usecase = self.use_cases[usecase_name]
+		properties = usecase["properties"]
+		lines = properties.split("\n")
+		for index, line in enumerate(lines):
+			sections = line.split("=")
+			if sections[0] == field:
+				return json.loads(sections[1])
+		return {}
+
+	def append_properties_state(self, usecase_name, field, value):
+		usecase = self.use_cases[usecase_name]
+		properties = usecase["properties"]
+		lines = properties.split("\n")
+		found = False
+		found_index = 0
+		for index, line in enumerate(lines):
+			sections = line.split("=")
+			if sections[0] == field:
+				found = True
+				found_index = index
+				break
+		if found:
+			line = lines[found_index]
+			sections = line.split("=")
+			l = json.loads(sections[1])
+			l.append(json.loads(value))
+			sections[1] = json.dumps(l)
+			lines[found_index] = "=".join(sections)
+		else:
+			l = [json.loads(value)]
+			newline = "{}={}".format(field, json.dumps(l))
+			lines.append(newline)
+		properties = "\n".join(lines)
+		self.preprocess_properties(usecase_name, usecase["runtime_url"], properties)
+
+
 	def preprocess_properties(self, usecase_name, runtime_url, properties):
 		headers = ["usecase", "runtime_url", "properties"]
 		l = [usecase_name, runtime_url, properties]
 		data = [headers, l]
 		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards", "{}", 1000000, "{}", 0)
 		for entry in data_results:
-			usecase = entry["usecase"]
-			rurl = entry["runtime_url"]
-			prop = entry["properties"]
-			data.append([usecase, rurl, prop])
+			if entry["usecase"] != usecase_name:
+				usecase = entry["usecase"]
+				rurl = entry["runtime_url"]
+				prop = entry["properties"]
+				data.append([usecase, rurl, prop])
 		with open("tmp/properties.csv", "w", newline="") as f:
 			writer = csv.writer(f)
 			writer.writerows(data)
