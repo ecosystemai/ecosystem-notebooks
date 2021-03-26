@@ -1268,20 +1268,10 @@ amcd_component = html.Div([
 											html.Br(),
 											dbc.Row([
 													dbc.Col([
-															html.Label("Start Field"),
+															html.Label("Datetime Field"),
 															html.Br(),
 															dcc.Dropdown(
 																id="amcd_start_field_dropdown",
-																clearable=False,
-															),
-														],
-														md=3
-													),
-													dbc.Col([
-															html.Label("End Field"),
-															html.Br(),
-															dcc.Dropdown(
-																id="amcd_end_field_dropdown",
 																clearable=False,
 															),
 														],
@@ -1292,7 +1282,7 @@ amcd_component = html.Div([
 															html.Br(),
 															dcc.Input(
 																id="amcd_datetime_format_field_input",
-																value="yyyy-MM-dd"
+																value="yyyy-MM-dd HH:mm:ss"
 															),
 														],
 														md=3
@@ -1311,7 +1301,8 @@ amcd_component = html.Div([
 									)
 								]
 							),
-							id="amcd_collapse"
+							id="amcd_collapse",
+							is_open=True
 						)
 					]
 				),
@@ -2607,7 +2598,6 @@ def callback_amcd_database(database):
 		dash.dependencies.Output("amcd_category_field_dropdown", "options"),
 		dash.dependencies.Output("amcd_event_field_dropdown", "options"),
 		dash.dependencies.Output("amcd_start_field_dropdown", "options"),
-		dash.dependencies.Output("amcd_end_field_dropdown", "options"),
 	],
 	[
 		dash.dependencies.Input("amcd_data_prebuffer", "children")
@@ -2627,10 +2617,10 @@ def callback_collection_amcd(data, database, collection, field, projections, ski
 		if "_id" in labels:
 			labels.remove("_id")
 		converted_labels = convert_list(labels)
-		return converted_labels, converted_labels, converted_labels, converted_labels
+		return converted_labels, converted_labels, converted_labels
 	except Exception as e:
 		print(e)
-		return [], [], [], []
+		return [], [], []
 
 @app.callback(
 	[
@@ -2674,34 +2664,41 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 		State(component_id="amcd_event_field_dropdown", component_property="value"),
 		State(component_id="amcd_event_delimiter_input", component_property="value"),
 		State(component_id="amcd_start_field_dropdown", component_property="value"),
-		State(component_id="amcd_end_field_dropdown", component_property="value"),
 
 	],
 	prevent_initial_call=True)
-def callback_generate_button(n_clicks, data, category_field, event_field, event_delimiter, start_field, end_field):
-	try:
-		outputs = json.loads(data)
-		outputs = sorted(outputs, key = lambda i: i[start_field])
-		outputs_end = sorted(outputs, key = lambda i: i[end_field])
-		first = dateutil.parser.parse(outputs[0][start_field])
-		last = dateutil.parser.parse(outputs_end[-1][end_field])
-		last = last - timedelta(days=1)
-		formatted_outputs = []
-		for output in outputs:
-			formatted_document = {
-				"category": "",
-				"text": output[event_field],
-				"start": output[start_field],
-				"end": output[end_field],
-				"icon": "work",
-				"prefix": output[event_field].split(event_delimiter)[0]
-			}
-			print(formatted_document["prefix"])
-			formatted_outputs.append(formatted_document)
-		return json.dumps(formatted_outputs), first, first, last, []
-	except Exception as e:
-		print(e)
-		return None, None, None, None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
+def callback_generate_button(n_clicks, data, category_field, event_field, event_delimiter, start_field):
+	# try:
+	prefix_field = "prefix"
+	injected_end = "end"
+	datetime_field = "start"
+	parsed_datetime = "parsed_datetime"
+	color_field = "color_index"
+	outputs = json.loads(data)
+	for output in outputs:
+		output[parsed_datetime] = dateutil.parser.parse(output[start_field])
+	outputs = sorted(outputs, key = lambda i: i[parsed_datetime])
+	first = outputs[0][parsed_datetime]
+	last = outputs[-1][parsed_datetime]
+	last = last - timedelta(days=1)
+	outputs = ecosystem_scoring_pdash.color_by_hour(outputs, parsed_datetime, color_field)
+	formatted_outputs = []
+	for output in outputs:
+		formatted_document = {
+			"category": "",
+			"text": output[event_field],
+			datetime_field: output[start_field],
+			"icon": "work",
+			prefix_field: output[event_field].split(event_delimiter)[0],
+			color_field: output[color_field]
+		}
+		print(formatted_document["prefix"])
+		formatted_outputs.append(formatted_document)
+	formatted_outputs = ecosystem_scoring_pdash.similar_event_timeline(formatted_outputs, prefix_field, datetime_field, injected_end)
+	return json.dumps(formatted_outputs), first, first, last, []
+	# except Exception as e:
+		# print(e)
+		# return None, None, None, None, generate_toast("Error: Could not generate graph: {}".format(e), "Error", "danger")
 
 # ---- Nav-Bar ----------------------------------------------------------------------------------------------------------
 @app.callback(

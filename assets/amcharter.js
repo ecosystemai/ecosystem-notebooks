@@ -34,8 +34,8 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 					if ("icon" in new_data[i]) {
 						new_data[i]["icon"] = work;
 					}
-					if ("category" in new_data[i]) {
-						new_data[i]["color"] = colorSet.getIndex(i);
+					if ("color_index" in new_data[i]) {
+						new_data[i]["color"] = colorSet.getIndex(new_data[i]["color_index"]);
 					}
 				}
 				chart.data = new_data;

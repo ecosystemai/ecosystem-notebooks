@@ -113,6 +113,26 @@ def extract_properties(properties):
 
 	return predictor, database, table, key
 
+def similar_event_timeline(values, prefix_field, datetime_field, injected_end):
+	for i in range(len(values)-1):
+		a = values[i]
+		b = values[i+1]
+		if a[prefix_field] == b[prefix_field]:
+			a[injected_end] = b[datetime_field]
+		else:
+			a[injected_end] = a[datetime_field]
+	values[-1][injected_end] = values[-1][datetime_field]
+	return values
+
+def color_by_hour(values, datetime_field, color_field):
+	for value in values:
+		hour = value[datetime_field].hour
+		n_hour = hour/23
+		color_index = 15 - int(n_hour * 15)
+		print(color_index)
+		value[color_field] = color_index
+	return values
+
 class ScoringDash():
 	def __init__(self, pred_url, pred_username, pred_pass, active_states):
 		self.user = pred_username
