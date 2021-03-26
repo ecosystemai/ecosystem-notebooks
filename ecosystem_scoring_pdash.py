@@ -166,6 +166,8 @@ class ScoringDash():
 				return "=".join(sections[1:])
 		return None
 
+	def get_collection_labels(self, database, collection, field, projections, skip):
+		return data_management_engine.get_document_db_find_labels(self.p_auth, database, collection, field, projections, skip)
 
 	def upload_use_case_files(self, usecase_name, database, model_path, model_content, fs_path, fs_content, feature_store, ad_path=None, ad_content=None, additional=None):
 		use_case = self.use_cases[usecase_name]
