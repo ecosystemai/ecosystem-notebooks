@@ -805,84 +805,176 @@ batch_scoring_component = html.Div([
 custom_graphing_component = html.Div([
 		navbar,
 		html.Div([
+				dbc.Card([
+						html.Label("", id="cg_find_buffer", style={"display": "none"}),
+						dbc.CardHeader(
+							dbc.Button("Find Options", outline=True, color="link", id="cg_collapse_button", style={"height": "100%", "width": "100%"}),
+						),
+						dbc.Collapse(
+							dbc.CardBody([
+									html.Div([
+											dbc.Row([
+													dbc.Col([
+															html.Label("Database"),
+															dcc.Dropdown(
+																id="cg_database_dropdown",
+																clearable=False,
+															),
+														],
+														md=6
+													),
+													dbc.Col([
+															html.Label("Collection"),
+															dcc.Dropdown(
+																id="cg_collection_dropdown",
+																clearable=False,
+															),
+														],
+														md=6
+													),
+												]
+											),
+											html.Br(),
+											dbc.Row([
+													dbc.Col([
+															html.Label("Field"),
+															html.Br(),
+															dcc.Input(
+																id="cg_field_input",
+																value="{}"
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Projections"),
+															html.Br(),
+															dcc.Input(
+																id="cg_projections_input",
+																value="{}"
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Limit"),
+															html.Br(),
+															dcc.Input(
+																id="cg_limit_input",
+																type="number",
+																value=0
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Skip"),
+															html.Br(),
+															dcc.Input(
+																id="cg_skip_input",
+																type="number",
+																value=0
+															),
+														],
+														md=3
+													)
+												]
+											),
+											html.Br(),
+											dbc.Button("Find Data",
+												outline=True, 
+												color="primary",
+												className="mr-1",
+												id="cg_find_button"
+											)
+										],
+										style={"border": "1px solid #dee2e6", "padding": "5px"}
+									),
+								]
+							),
+							id="cg_collapse",
+							is_open=True
+						)
+					]
+				),
 				dbc.Row(
 					[
-						dbc.Col(
-							html.Div([
-									dbc.Card(
-										dbc.CardBody([
-												html.Label(html.B("Find Details"), style={"margin-bottom": "0rem"}),
-											],
-											style={"padding": "0.75rem"}
-										),
-									),
-									html.Br(),
-									dbc.Card(
-										dbc.CardBody([
-												html.Div([
-														html.Label("Database"),
-														dcc.Dropdown(
-															id="database_dropdown",
-															clearable=False,
-														),
-														html.Br(),
-														html.Label("Collection"),
-														dcc.Dropdown(
-															id="collection_dropdown",
-															clearable=False,
-														),
-														html.Br(),
-														html.Label("Field"),
-														html.Br(),
-														dcc.Input(
-															id="field_input",
-															value="{}"
-														),
-														html.Br(),
-														html.Br(),
-														html.Label("Projections"),
-														html.Br(),
-														dcc.Input(
-															id="projections_input",
-															value="{}"
-														),
-														html.Br(),
-														html.Br(),
-														html.Label("Limit"),
-														html.Br(),
-														dcc.Input(
-															id="limit_input",
-															type="number",
-															value=0
-														),
-														html.Br(),
-														html.Br(),
-														html.Label("Skip"),
-														html.Br(),
-														dcc.Input(
-															id="skip_input",
-															type="number",
-															value=0
-														),
-														html.Br(),
-														html.Br(),
-														html.Label("", id="find_buffer", style={"display": "none"}),
-														dbc.Button("Find",
-															outline=True,
-															color="primary",
-															className="mr-1",
-															id="find_button"
-														),
-													],
-													style={"height": "750px"}
-												)
-											],
-										)
-									)
-								],
-							),
-							md=3
-						),
+						# dbc.Col(
+						# 	html.Div([
+						# 			dbc.Card(
+						# 				dbc.CardBody([
+						# 						html.Label(html.B("Find Details"), style={"margin-bottom": "0rem"}),
+						# 					],
+						# 					style={"padding": "0.75rem"}
+						# 				),
+						# 			),
+						# 			html.Br(),
+						# 			dbc.Card(
+						# 				dbc.CardBody([
+						# 						html.Div([
+						# 								html.Label("Database"),
+						# 								dcc.Dropdown(
+						# 									id="database_dropdown",
+						# 									clearable=False,
+						# 								),
+						# 								html.Br(),
+						# 								html.Label("Collection"),
+						# 								dcc.Dropdown(
+						# 									id="collection_dropdown",
+						# 									clearable=False,
+						# 								),
+						# 								html.Br(),
+						# 								html.Label("Field"),
+						# 								html.Br(),
+						# 								dcc.Input(
+						# 									id="field_input",
+						# 									value="{}"
+						# 								),
+						# 								html.Br(),
+						# 								html.Br(),
+						# 								html.Label("Projections"),
+						# 								html.Br(),
+						# 								dcc.Input(
+						# 									id="projections_input",
+						# 									value="{}"
+						# 								),
+						# 								html.Br(),
+						# 								html.Br(),
+						# 								html.Label("Limit"),
+						# 								html.Br(),
+						# 								dcc.Input(
+						# 									id="limit_input",
+						# 									type="number",
+						# 									value=0
+						# 								),
+						# 								html.Br(),
+						# 								html.Br(),
+						# 								html.Label("Skip"),
+						# 								html.Br(),
+						# 								dcc.Input(
+						# 									id="skip_input",
+						# 									type="number",
+						# 									value=0
+						# 								),
+						# 								html.Br(),
+						# 								html.Br(),
+						# 								html.Label("", id="find_buffer", style={"display": "none"}),
+						# 								dbc.Button("Find",
+						# 									outline=True,
+						# 									color="primary",
+						# 									className="mr-1",
+						# 									id="find_button"
+						# 								),
+						# 							],
+						# 							style={"height": "750px"}
+						# 						)
+						# 					],
+						# 				)
+						# 			)
+						# 		],
+						# 	),
+						# 	md=3
+						# ),
 						dbc.Col(
 							html.Div(
 								[
@@ -937,7 +1029,7 @@ custom_graphing_component = html.Div([
 																			),
 																			html.Div([],
 																				id="custom_graphing_adv_div",
-																				style= {"width": "100%", "height": "650px"}
+																				# style= {"width": "100%", "height": "650px"}
 																			)
 																		],
 																	),
@@ -950,14 +1042,14 @@ custom_graphing_component = html.Div([
 														)
 													],
 													id="custom_graphing_tab_div",
-													style={"height": "750px"}
+													# style={"height": "750px"}
 												)
 											]
 										)
 									)
 								],
 							),
-							md=9
+							md=12
 						),
 					],
 				),
@@ -1363,7 +1455,7 @@ app.layout = html.Div([
 				html.Div([], id="score_toast_div2"),
 				html.Div([], id="filter_toast_div"),
 				html.Div([], id="filter_toast_div2"),
-				html.Div([], id="find_toast_div"),
+				html.Div([], id="cg_find_toast_div"),
 				html.Div([], id="amcs_toast_div"),
 				html.Div([], id="amcd_toast_div"),
 				html.Div([], id="amcd_toast_div2"),
@@ -1410,72 +1502,6 @@ def callback_login3(children):
 	if children[:5] == "Error":
 		return generate_toast("Error: Could not log in.", "Error", "danger")
 	return generate_toast("Successfully logged in.", "Success", "success")
-
-@app.callback(
-	dash.dependencies.Output("database_dropdown", "options"),
-	[	
-		dash.dependencies.Input("login_status", "children")
-	],
-	prevent_initial_call=True)
-def callback_login3(children):
-	try:
-		databases = sd.get_prediction_databases()
-		new_databases = []
-		for entry in databases["databases"]:
-			new_databases.append(entry["name"])
-		return convert_list(new_databases)
-	except Exception as e:
-		print(e)
-		return []
-
-@app.callback(
-	[
-		dash.dependencies.Output("collection_dropdown", "options"),
-		dash.dependencies.Output("collection_dropdown", "value"),
-	],
-	[	
-		dash.dependencies.Input("database_dropdown", "value")
-	],
-	prevent_initial_call=True)
-def callback_database(database):
-	try:
-		collections = sd.get_prediction_collections(database)
-		new_collections = []
-		for entry in collections["collection"]:
-			new_collections.append(entry["name"])
-		return convert_list(new_collections), None
-	except Exception as e:
-		print(e)
-		return [], None
-
-@app.callback(
-	[
-		dash.dependencies.Output("find_buffer", "children"),
-		dash.dependencies.Output("find_toast_div", "children")
-	],
-	[dash.dependencies.Input("find_button", "n_clicks")],
-	state=[
-		State(component_id="database_dropdown", component_property="value"),
-		State(component_id="collection_dropdown", component_property="value"),
-		State(component_id="field_input", component_property="value"),
-		State(component_id="projections_input", component_property="value"),
-		State(component_id="limit_input", component_property="value"),
-		State(component_id="skip_input", component_property="value"),
-	],
-	prevent_initial_call=True)
-def callback_find_button(n_clicks, database, collection, field, projections, limit, skip):
-	if database == "" or database == None:
-		return None, generate_toast("Error: Could not find: Database not selected.", "Error", "danger")
-	if collection == "" or collection == None:
-		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
-	try:
-		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
-		global custom_graphing_adv_refresh
-		custom_graphing_adv_refresh = True
-		return json.dumps(outputs), []
-	except Exception as e:
-		print(e)
-		return None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
 
 @app.callback(
 	[
@@ -1726,21 +1752,6 @@ def callback_score_buffer(score_b):
 		return None
 
 @app.callback(
-	dash.dependencies.Output("custom_graphing_text_area", "value"),
-	[
-		dash.dependencies.Input("find_buffer", "children")
-	],
-	prevent_initial_call=True)
-def callback_find_buffer(find_b):
-	try:
-		j = json.loads(find_b)
-		pj = json.dumps(j, indent=4, sort_keys=True)
-		return pj
-	except Exception as e:
-		print(e)
-		return None
-
-@app.callback(
 	dash.dependencies.Output("score_value_input", "value"),
 	[
 		dash.dependencies.Input("batch_score_picker", "contents"),
@@ -1844,7 +1855,7 @@ def tabs_content_graphing(tab):
 	prevent_initial_call=True)
 def tabs_content_custom_graphing(tab):
 	if tab == "custom_graph_adv":
-		style = {"width": "98%", "height": "380px", "display": "block"}
+		style = {"width": "98%", "display": "block"}
 	else:
 		return {"display": "none"}
 
@@ -2134,66 +2145,6 @@ def tabs_content_graphing4(interval, dropdown_values, scoring_results, children)
 			return dash.no_update, dash.no_update
 
 @app.callback(
-	[
-		dash.dependencies.Output("custom_graphing_adv_div", "children"),
-		dash.dependencies.Output("custom_graph_adv_dropdown", "options"),
-	],
-	[
-		dash.dependencies.Input("interval", "n_intervals"),
-		dash.dependencies.Input("custom_graph_adv_dropdown", "value"),
-	],
-	state=[
-		State(component_id="find_buffer", component_property="children"),
-		State(component_id="custom_graphing_adv_div", component_property="children"),
-	],
-	prevent_initial_call=True)
-def tabs_content_custom_graphing4(interval, dropdown_values, find_results, children):
-	global custom_graphing_adv_refresh
-	if custom_graphing_adv_refresh:
-		custom_graphing_adv_refresh = False
-		return "Loading", []
-	ctx = dash.callback_context
-	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-	if dropdown_values == None:
-		dropdown_values = []
-	if trigger_id == "custom_graph_adv_dropdown":
-		custom_graphing_adv_refresh = True
-		return dash.no_update, dash.no_update
-	if trigger_id == "interval":
-		try:
-			if children == "Loading":
-				jstr = json.loads(find_results)
-				data_points = []
-				for value in jstr:
-					flat = json_flatten(value, "")
-					data_points.append(flat)
-				df = pd.DataFrame(data_points)
-				columns = list(df.columns)
-				# odd_header = columns[0]
-				# if odd_header == "customer":
-				# 	odd_header = columns[1]
-				l = [columns]
-				l.extend(df.values.tolist())
-				return dash_pivottable.PivotTable(
-							id="custom_graphing_adv_table",
-							data=l,
-							# cols=["customer"],
-							colOrder="key_a_to_z",
-							rows=[],
-							rowOrder="key_a_to_z",
-							rendererName="Line Chart",
-							aggregatorName="List Unique Values",
-							# vals=[odd_header],
-							unusedOrientationCutoff="Infinity",
-							hiddenAttributes=dropdown_values
-
-				), convert_list(columns)
-			return dash.no_update, dash.no_update
-		except Exception as e:
-			print(e)
-			return dash.no_update, dash.no_update
-
-@app.callback(
 	dash.dependencies.Output("files_toast_div", "children"),
 	[dash.dependencies.Input("files_button", "n_clicks")],
 	state=[
@@ -2244,23 +2195,6 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 	[dash.dependencies.Input("score_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_scoring_tab(children):
-	try:
-		jstr = json.loads(children)
-		data_points = []
-		for value in jstr:
-			flat = json_flatten(value, "")
-			data_points.append(flat)
-		df = pd.DataFrame(data_points)
-		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
-	except Exception as e:
-		print(e)
-		return None
-
-@app.callback(
-	dash.dependencies.Output("custom_graphing_results_div", "children"),
-	[dash.dependencies.Input("find_buffer", "children")],
-	prevent_initial_call=True)
-def tabs_content_results_tab(children):
 	try:
 		jstr = json.loads(children)
 		data_points = []
@@ -2411,8 +2345,185 @@ def custom_graphing_adv_toggle_collapse(n_clicks, is_open):
 
 
 
+# ---- custom graphing ------------------------------------------------------------------------------------------------
+
+@app.callback(
+	[
+		dash.dependencies.Output("cg_collection_dropdown", "options"),
+		dash.dependencies.Output("cg_collection_dropdown", "value"),
+	],
+	[	
+		dash.dependencies.Input("cg_database_dropdown", "value")
+	],
+	prevent_initial_call=True)
+def callback_database(database):
+	try:
+		collections = sd.get_prediction_collections(database)
+		new_collections = []
+		for entry in collections["collection"]:
+			new_collections.append(entry["name"])
+		return convert_list(new_collections), None
+	except Exception as e:
+		print(e)
+		return [], None
+
+@app.callback(
+	dash.dependencies.Output("cg_database_dropdown", "options"),
+	[	
+		dash.dependencies.Input("login_status", "children")
+	],
+	prevent_initial_call=True)
+def callback_login3(children):
+	try:
+		databases = sd.get_prediction_databases()
+		new_databases = []
+		for entry in databases["databases"]:
+			new_databases.append(entry["name"])
+		return convert_list(new_databases)
+	except Exception as e:
+		print(e)
+		return []
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_text_area", "value"),
+	[
+		dash.dependencies.Input("cg_find_buffer", "children")
+	],
+	prevent_initial_call=True)
+def callback_find_buffer(find_b):
+	try:
+		j = json.loads(find_b)
+		pj = json.dumps(j, indent=4, sort_keys=True)
+		return pj
+	except Exception as e:
+		print(e)
+		return None
+
+
+@app.callback(
+	dash.dependencies.Output("custom_graphing_results_div", "children"),
+	[dash.dependencies.Input("cg_find_buffer", "children")],
+	prevent_initial_call=True)
+def tabs_content_results_tab(children):
+	try:
+		jstr = json.loads(children)
+		data_points = []
+		for value in jstr:
+			flat = json_flatten(value, "")
+			data_points.append(flat)
+		df = pd.DataFrame(data_points)
+		return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True)
+	except Exception as e:
+		print(e)
+		return None
+
+
+@app.callback(
+	[
+		dash.dependencies.Output("cg_find_buffer", "children"),
+		dash.dependencies.Output("cg_find_toast_div", "children")
+	],
+	[dash.dependencies.Input("cg_find_button", "n_clicks")],
+	state=[
+		State(component_id="cg_database_dropdown", component_property="value"),
+		State(component_id="cg_collection_dropdown", component_property="value"),
+		State(component_id="cg_field_input", component_property="value"),
+		State(component_id="cg_projections_input", component_property="value"),
+		State(component_id="cg_limit_input", component_property="value"),
+		State(component_id="cg_skip_input", component_property="value"),
+	],
+	prevent_initial_call=True)
+def callback_find_button(n_clicks, database, collection, field, projections, limit, skip):
+	if database == "" or database == None:
+		return None, generate_toast("Error: Could not find: Database not selected.", "Error", "danger")
+	if collection == "" or collection == None:
+		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
+	try:
+		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
+		global custom_graphing_adv_refresh
+		custom_graphing_adv_refresh = True
+		return json.dumps(outputs), []
+	except Exception as e:
+		print(e)
+		return None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
+
+@app.callback(
+	[
+		dash.dependencies.Output("custom_graphing_adv_div", "children"),
+		dash.dependencies.Output("custom_graph_adv_dropdown", "options"),
+	],
+	[
+		dash.dependencies.Input("interval", "n_intervals"),
+		dash.dependencies.Input("custom_graph_adv_dropdown", "value"),
+	],
+	state=[
+		State(component_id="cg_find_buffer", component_property="children"),
+		State(component_id="custom_graphing_adv_div", component_property="children"),
+	],
+	prevent_initial_call=True)
+def tabs_content_custom_graphing4(interval, dropdown_values, find_results, children):
+	global custom_graphing_adv_refresh
+	if custom_graphing_adv_refresh:
+		custom_graphing_adv_refresh = False
+		return "Loading", []
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if dropdown_values == None:
+		dropdown_values = []
+	if trigger_id == "custom_graph_adv_dropdown":
+		custom_graphing_adv_refresh = True
+		return dash.no_update, dash.no_update
+	if trigger_id == "interval":
+		try:
+			if children == "Loading":
+				jstr = json.loads(find_results)
+				data_points = []
+				for value in jstr:
+					flat = json_flatten(value, "")
+					data_points.append(flat)
+				df = pd.DataFrame(data_points)
+				columns = list(df.columns)
+				# odd_header = columns[0]
+				# if odd_header == "customer":
+				# 	odd_header = columns[1]
+				l = [columns]
+				l.extend(df.values.tolist())
+				return dash_pivottable.PivotTable(
+							id="custom_graphing_adv_table",
+							data=l,
+							# cols=["customer"],
+							colOrder="key_a_to_z",
+							rows=[],
+							rowOrder="key_a_to_z",
+							rendererName="Line Chart",
+							aggregatorName="List Unique Values",
+							# vals=[odd_header],
+							unusedOrientationCutoff="Infinity",
+							hiddenAttributes=dropdown_values
+
+				), convert_list(columns)
+			return dash.no_update, dash.no_update
+		except Exception as e:
+			print(e)
+			return dash.no_update, dash.no_update
 
 # ---- amcs -----------------------------------------------------------------------------------------------------------
+@app.callback(
+	dash.dependencies.Output("cg_collapse", "is_open"),
+	[
+		dash.dependencies.Input("cg_collapse_button", "n_clicks")
+	],
+	state=[
+		State(component_id="cg_collapse", component_property="is_open"),
+	],
+	prevent_initial_call=True
+)
+def cg_toggle_collapse(n_clicks, is_open):
+	if is_open:
+		return False
+	return True
+
+
 app.clientside_callback(
 	dash.dependencies.ClientsideFunction(
 		namespace="clientside",
@@ -2668,37 +2779,37 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 	],
 	prevent_initial_call=True)
 def callback_generate_button(n_clicks, data, category_field, event_field, event_delimiter, start_field):
-	# try:
-	prefix_field = "prefix"
-	injected_end = "end"
-	datetime_field = "start"
-	parsed_datetime = "parsed_datetime"
-	color_field = "color_index"
-	outputs = json.loads(data)
-	for output in outputs:
-		output[parsed_datetime] = dateutil.parser.parse(output[start_field])
-	outputs = sorted(outputs, key = lambda i: i[parsed_datetime])
-	first = outputs[0][parsed_datetime]
-	last = outputs[-1][parsed_datetime]
-	last = last - timedelta(days=1)
-	outputs = ecosystem_scoring_pdash.color_by_hour(outputs, parsed_datetime, color_field)
-	formatted_outputs = []
-	for output in outputs:
-		formatted_document = {
-			"category": "",
-			"text": output[event_field],
-			datetime_field: output[start_field],
-			"icon": "work",
-			prefix_field: output[event_field].split(event_delimiter)[0],
-			color_field: output[color_field]
-		}
-		print(formatted_document["prefix"])
-		formatted_outputs.append(formatted_document)
-	formatted_outputs = ecosystem_scoring_pdash.similar_event_timeline(formatted_outputs, prefix_field, datetime_field, injected_end)
-	return json.dumps(formatted_outputs), first, first, last, []
-	# except Exception as e:
-		# print(e)
-		# return None, None, None, None, generate_toast("Error: Could not generate graph: {}".format(e), "Error", "danger")
+	try:
+		prefix_field = "prefix"
+		injected_end = "end"
+		datetime_field = "start"
+		parsed_datetime = "parsed_datetime"
+		color_field = "color_index"
+		outputs = json.loads(data)
+		for output in outputs:
+			output[parsed_datetime] = dateutil.parser.parse(output[start_field])
+		outputs = sorted(outputs, key = lambda i: i[parsed_datetime])
+		first = outputs[0][parsed_datetime]
+		last = outputs[-1][parsed_datetime]
+		last = last - timedelta(days=1)
+		outputs = ecosystem_scoring_pdash.color_by_hour(outputs, parsed_datetime, color_field)
+		formatted_outputs = []
+		for output in outputs:
+			formatted_document = {
+				"category": "",
+				"text": output[event_field],
+				datetime_field: output[start_field],
+				"icon": "work",
+				prefix_field: output[event_field].split(event_delimiter)[0],
+				color_field: output[color_field]
+			}
+			print(formatted_document["prefix"])
+			formatted_outputs.append(formatted_document)
+		formatted_outputs = ecosystem_scoring_pdash.similar_event_timeline(formatted_outputs, prefix_field, datetime_field, injected_end)
+		return json.dumps(formatted_outputs), first, first, last, []
+	except Exception as e:
+		print(e)
+		return None, None, None, None, generate_toast("Error: Could not generate graph: {}".format(e), "Error", "danger")
 
 # ---- Nav-Bar ----------------------------------------------------------------------------------------------------------
 @app.callback(
