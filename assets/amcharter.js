@@ -354,6 +354,29 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 				chart.scrollbarX.align = "center"
 				chart.scrollbarX.width = am4core.percent(85);
 
+				var eventSeries = chart.series.push(new am4plugins_timeline.CurveLineSeries());
+				eventSeries.dataFields.dateX = "start";
+				eventSeries.dataFields.categoryY = "category";
+				eventSeries.data = new_data
+				// [
+				// 	{ category: "Module #4", eventDate: "2019-01-15", letter: "As always", description: "Something happened here", color: colorSet.getIndex(15)},
+				// 	{ category: "Module #1", eventDate: "2019-01-23", letter: "B", description: "Something happened here" },
+				// 	{ category: "", eventDate: "2019-02-10", letter: "C", description: "Something happened here" },
+				// 	{ category: "", eventDate: "2019-02-29", letter: "D", description: "Something happened here" },
+				// 	{ category: "", eventDate: "2019-03-06", letter: "E", description: "Something happened here" },
+				// 	{ category: "", eventDate: "2019-03-12", letter: "F", description: "Something happened here" },
+				// 	{ category: "", eventDate: "2019-03-22", letter: "G", description: "Something happened here" }];
+				// new_data[i]["color"] = colorSet.getIndex(colorindex);
+
+				eventSeries.strokeOpacity = 0;
+
+				var flagBullet = eventSeries.bullets.push(new am4plugins_bullets.FlagBullet())
+				flagBullet.label.propertyFields.text = "task";
+				flagBullet.locationX = 0;
+				flagBullet.propertyFields.fill = "color";
+				flagBullet.propertyFields.stroke = "color";
+				flagBullet.tooltipText = "{task}: [bold]{start}[/] - [bold]{end}[/]";
+
 				var cursor = new am4plugins_timeline.CurveCursor();
 				chart.cursor = cursor;
 				cursor.xAxis = dateAxis;

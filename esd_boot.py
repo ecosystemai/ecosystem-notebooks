@@ -1207,7 +1207,8 @@ amcs_component = html.Div([
 									)
 								]
 							),
-							id="amcs_collapse"
+							id="amcs_collapse",
+							is_open=True
 						)
 					]
 				),
