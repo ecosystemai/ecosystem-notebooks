@@ -1066,6 +1066,7 @@ amcs_component = html.Div([
 		navbar,
 		html.Div([
 				html.Label("", id="amcs_data_buffer", hidden=True),
+				html.Label("", id="amcs_data_prebuffer", hidden=True),
 				html.Label("", id="amcs_output_div", hidden=True),
 				html.Label("amcs_canvas_div", id="amcs_div_buffer", hidden=True),
 
@@ -1076,16 +1077,26 @@ amcs_component = html.Div([
 						dbc.Collapse(
 							dbc.CardBody([
 									html.Div([
-											html.Label("Database"),
-											dcc.Dropdown(
-												id="amcs_database_dropdown",
-												clearable=False,
-											),
-											html.Br(),
-											html.Label("Collection"),
-											dcc.Dropdown(
-												id="amcs_collection_dropdown",
-												clearable=False,
+											dbc.Row([
+													dbc.Col([
+															html.Label("Database"),
+															dcc.Dropdown(
+																id="amcs_database_dropdown",
+																clearable=False,
+															),
+														],
+														md=6
+													),
+													dbc.Col([
+															html.Label("Collection"),
+															dcc.Dropdown(
+																id="amcs_collection_dropdown",
+																clearable=False,
+															),
+														],
+														md=6
+													),
+												]
 											),
 											html.Br(),
 											dbc.Row([
@@ -1133,6 +1144,13 @@ amcs_component = html.Div([
 													)
 												]
 											),
+											html.Br(),
+											dbc.Button("Filter Data",
+												outline=True, 
+												color="primary",
+												className="mr-1",
+												id="amcs_filter_button"
+											)
 										],
 										style={"border": "1px solid #dee2e6", "padding": "5px"}
 									),
@@ -1142,8 +1160,8 @@ amcs_component = html.Div([
 													dbc.Col([
 															html.Label("Category Field"),
 															html.Br(),
-															dcc.Input(
-																id="amcs_category_field_input",
+															dcc.Dropdown(
+																id="amcs_category_field_dropdown",
 																value=""
 															),
 														],
@@ -1152,8 +1170,8 @@ amcs_component = html.Div([
 													dbc.Col([
 															html.Label("Event Field"),
 															html.Br(),
-															dcc.Input(
-																id="amcs_event_field_input",
+															dcc.Dropdown(
+																id="amcs_event_field_dropdown",
 																value=""
 															),
 														],
@@ -1166,8 +1184,8 @@ amcs_component = html.Div([
 													dbc.Col([
 															html.Label("Start Field"),
 															html.Br(),
-															dcc.Input(
-																id="amcs_start_field_input",
+															dcc.Dropdown(
+																id="amcs_start_field_dropdown",
 																value=""
 															),
 														],
@@ -1176,8 +1194,8 @@ amcs_component = html.Div([
 													dbc.Col([
 															html.Label("End Field"),
 															html.Br(),
-															dcc.Input(
-																id="amcs_end_field_input",
+															dcc.Dropdown(
+																id="amcs_end_field_dropdown",
 																value=""
 															),
 														],
@@ -1458,6 +1476,7 @@ app.layout = html.Div([
 				html.Div([], id="filter_toast_div2"),
 				html.Div([], id="cg_find_toast_div"),
 				html.Div([], id="amcs_toast_div"),
+				html.Div([], id="amcs_toast_div2"),
 				html.Div([], id="amcd_toast_div"),
 				html.Div([], id="amcd_toast_div2"),
 			],
@@ -2595,10 +2614,40 @@ def callback_amcs_database(database):
 
 @app.callback(
 	[
-		dash.dependencies.Output("amcs_data_buffer", "children"),
+		dash.dependencies.Output("amcs_category_field_dropdown", "options"),
+		dash.dependencies.Output("amcs_event_field_dropdown", "options"),
+		dash.dependencies.Output("amcs_start_field_dropdown", "options"),
+		dash.dependencies.Output("amcs_end_field_dropdown", "options"),
+	],
+	[
+		dash.dependencies.Input("amcs_data_prebuffer", "children")
+	],
+	state=[
+		State(component_id="amcs_database_dropdown", component_property="value"),
+		State(component_id="amcs_collection_dropdown", component_property="value"),
+		State(component_id="amcs_field_input", component_property="value"),
+		State(component_id="amcs_projections_input", component_property="value"),
+		State(component_id="amcs_skip_input", component_property="value"),
+	],
+	prevent_initial_call=True)
+def callback_collection_amcd(data, database, collection, field, projections, skip):
+	try:
+		results = sd.get_collection_labels(database, collection, field, projections, skip)
+		labels = results["labels"][0]
+		if "_id" in labels:
+			labels.remove("_id")
+		converted_labels = convert_list(labels)
+		return converted_labels, converted_labels, converted_labels, converted_labels
+	except Exception as e:
+		print(e)
+		return [], [], [], []
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcs_data_prebuffer", "children"),
 		dash.dependencies.Output("amcs_toast_div", "children")
 	],
-	[dash.dependencies.Input("amcs_generate_button", "n_clicks")],
+	[dash.dependencies.Input("amcs_filter_button", "n_clicks")],
 	state=[
 		State(component_id="amcs_database_dropdown", component_property="value"),
 		State(component_id="amcs_collection_dropdown", component_property="value"),
@@ -2606,19 +2655,37 @@ def callback_amcs_database(database):
 		State(component_id="amcs_projections_input", component_property="value"),
 		State(component_id="amcs_limit_input", component_property="value"),
 		State(component_id="amcs_skip_input", component_property="value"),
-		State(component_id="amcs_category_field_input", component_property="value"),
-		State(component_id="amcs_event_field_input", component_property="value"),
-		State(component_id="amcs_start_field_input", component_property="value"),
-		State(component_id="amcs_end_field_input", component_property="value"),
 	],
 	prevent_initial_call=True)
-def callback_find_button(n_clicks, database, collection, field, projections, limit, skip, category_field, event_field, start_field, end_field):
+def callback_filter_button(n_clicks, database, collection, field, projections, limit, skip):
 	if database == "" or database == None:
 		return None, generate_toast("Error: Could not find: Database not selected.", "Error", "danger")
 	if collection == "" or collection == None:
 		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
 	try:
 		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
+		return json.dumps(outputs), []
+	except Exception as e:
+		print(e)
+		return None, generate_toast("Error: Could not filter data: {}".format(e), "Error", "danger")
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcs_data_buffer", "children"),
+		dash.dependencies.Output("amcs_toast_div2", "children")
+	],
+	[dash.dependencies.Input("amcs_generate_button", "n_clicks")],
+	state=[
+		State(component_id="amcs_data_prebuffer", component_property="children"),
+		State(component_id="amcs_category_field_dropdown", component_property="value"),
+		State(component_id="amcs_event_field_dropdown", component_property="value"),
+		State(component_id="amcs_start_field_dropdown", component_property="value"),
+		State(component_id="amcs_end_field_dropdown", component_property="value"),
+	],
+	prevent_initial_call=True)
+def callback_find_button(n_clicks, data, category_field, event_field, start_field, end_field):
+	try:
+		outputs = json.loads(data)
 		formatted_outputs = []
 		for output in outputs:
 			formatted_document = {
