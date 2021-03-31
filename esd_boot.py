@@ -34,10 +34,24 @@ export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
 	os.mkdir(tmp_dir)
 
+
+class ButtonBusyState():
+	def __init__(self):
+		self.busy = False
+		self.busy_changed = False
+
 class ActiveStates():
 	def __init__(self):
-		self.score_button_busy = False
-		self.score_button_busy_changed = False
+		# exp
+		self.exp_score_button = ButtonBusyState()
+		# scr
+		# cg
+		# amcs
+		self.amcs_filter_button = ButtonBusyState()
+		self.amcs_generate_button = ButtonBusyState()
+		# amcd
+		self.amcd_filter_button = ButtonBusyState()
+		self.amcd_generate_button = ButtonBusyState()
 
 def generate_toast(message, header, icon):
 	return dbc.Toast(
@@ -816,10 +830,26 @@ custom_graphing_component = html.Div([
 											dbc.Row([
 													dbc.Col([
 															html.Label("Database"),
-															dcc.Dropdown(
-																id="cg_database_dropdown",
-																clearable=False,
-															),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="cg_database_dropdown",
+																			clearable=False,
+																		),
+																		style={"width": "90%", "display": "inline-block"}
+																	),
+																	html.Div(
+																		dbc.Button(
+																			html.I(className="fas fa-sync"), 
+																			outline=True, 
+																			color="primary", 
+																			id="cg_database_refresh_button", 
+																			style={"height": "36px"}
+																		),
+																		style={"display": "inline-block", "vertical-align": "top"}
+																	),
+																],
+															)
 														],
 														md=6
 													),
@@ -837,24 +867,26 @@ custom_graphing_component = html.Div([
 											html.Br(),
 											dbc.Row([
 													dbc.Col([
-															html.Label("Field"),
+															html.Label("Find"),
 															html.Br(),
 															dcc.Input(
 																id="cg_field_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Projections"),
 															html.Br(),
 															dcc.Input(
 																id="cg_projections_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Limit"),
@@ -862,10 +894,11 @@ custom_graphing_component = html.Div([
 															dcc.Input(
 																id="cg_limit_input",
 																type="number",
-																value=0
+																value=100,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													),
 													dbc.Col([
 															html.Label("Skip"),
@@ -873,10 +906,11 @@ custom_graphing_component = html.Div([
 															dcc.Input(
 																id="cg_skip_input",
 																type="number",
-																value=0
+																value=0,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													)
 												]
 											),
@@ -899,82 +933,6 @@ custom_graphing_component = html.Div([
 				),
 				dbc.Row(
 					[
-						# dbc.Col(
-						# 	html.Div([
-						# 			dbc.Card(
-						# 				dbc.CardBody([
-						# 						html.Label(html.B("Find Details"), style={"margin-bottom": "0rem"}),
-						# 					],
-						# 					style={"padding": "0.75rem"}
-						# 				),
-						# 			),
-						# 			html.Br(),
-						# 			dbc.Card(
-						# 				dbc.CardBody([
-						# 						html.Div([
-						# 								html.Label("Database"),
-						# 								dcc.Dropdown(
-						# 									id="database_dropdown",
-						# 									clearable=False,
-						# 								),
-						# 								html.Br(),
-						# 								html.Label("Collection"),
-						# 								dcc.Dropdown(
-						# 									id="collection_dropdown",
-						# 									clearable=False,
-						# 								),
-						# 								html.Br(),
-						# 								html.Label("Field"),
-						# 								html.Br(),
-						# 								dcc.Input(
-						# 									id="field_input",
-						# 									value="{}"
-						# 								),
-						# 								html.Br(),
-						# 								html.Br(),
-						# 								html.Label("Projections"),
-						# 								html.Br(),
-						# 								dcc.Input(
-						# 									id="projections_input",
-						# 									value="{}"
-						# 								),
-						# 								html.Br(),
-						# 								html.Br(),
-						# 								html.Label("Limit"),
-						# 								html.Br(),
-						# 								dcc.Input(
-						# 									id="limit_input",
-						# 									type="number",
-						# 									value=0
-						# 								),
-						# 								html.Br(),
-						# 								html.Br(),
-						# 								html.Label("Skip"),
-						# 								html.Br(),
-						# 								dcc.Input(
-						# 									id="skip_input",
-						# 									type="number",
-						# 									value=0
-						# 								),
-						# 								html.Br(),
-						# 								html.Br(),
-						# 								html.Label("", id="find_buffer", style={"display": "none"}),
-						# 								dbc.Button("Find",
-						# 									outline=True,
-						# 									color="primary",
-						# 									className="mr-1",
-						# 									id="find_button"
-						# 								),
-						# 							],
-						# 							style={"height": "750px"}
-						# 						)
-						# 					],
-						# 				)
-						# 			)
-						# 		],
-						# 	),
-						# 	md=3
-						# ),
 						dbc.Col(
 							html.Div(
 								[
@@ -999,7 +957,6 @@ custom_graphing_component = html.Div([
 																	tab_id="custom_graphing_table"
 																),
 																dbc.Tab(
-																	# html.Div([],
 																	dbc.Textarea(
 																		id = "custom_graphing_text_area",
 																		# className="tree",
@@ -1080,10 +1037,26 @@ amcs_component = html.Div([
 											dbc.Row([
 													dbc.Col([
 															html.Label("Database"),
-															dcc.Dropdown(
-																id="amcs_database_dropdown",
-																clearable=False,
-															),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcs_database_dropdown",
+																			clearable=False,
+																		),
+																		style={"width": "90%", "display": "inline-block"}
+																	),
+																	html.Div(
+																		dbc.Button(
+																			html.I(className="fas fa-sync"), 
+																			outline=True, 
+																			color="primary", 
+																			id="amcs_database_refresh_button", 
+																			style={"height": "36px"}
+																		),
+																		style={"display": "inline-block", "vertical-align": "top"}
+																	),
+																],
+															)
 														],
 														md=6
 													),
@@ -1101,24 +1074,26 @@ amcs_component = html.Div([
 											html.Br(),
 											dbc.Row([
 													dbc.Col([
-															html.Label("Field"),
+															html.Label("Find"),
 															html.Br(),
 															dcc.Input(
 																id="amcs_field_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Projections"),
 															html.Br(),
 															dcc.Input(
 																id="amcs_projections_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Limit"),
@@ -1126,10 +1101,11 @@ amcs_component = html.Div([
 															dcc.Input(
 																id="amcs_limit_input",
 																type="number",
-																value=0
+																value=100,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													),
 													dbc.Col([
 															html.Label("Skip"),
@@ -1137,10 +1113,11 @@ amcs_component = html.Div([
 															dcc.Input(
 																id="amcs_skip_input",
 																type="number",
-																value=0
+																value=0,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													)
 												]
 											),
@@ -1263,10 +1240,26 @@ amcd_component = html.Div([
 											dbc.Row([
 													dbc.Col([
 															html.Label("Database"),
-															dcc.Dropdown(
-																id="amcd_database_dropdown",
-																clearable=False,
-															),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcd_database_dropdown",
+																			clearable=False,
+																		),
+																		style={"width": "90%", "display": "inline-block"}
+																	),
+																	html.Div(
+																		dbc.Button(
+																			html.I(className="fas fa-sync"), 
+																			outline=True, 
+																			color="primary", 
+																			id="amcd_database_refresh_button", 
+																			style={"height": "36px"}
+																		),
+																		style={"display": "inline-block", "vertical-align": "top"}
+																	),
+																],
+															)
 														],
 														md=6
 													),
@@ -1284,24 +1277,26 @@ amcd_component = html.Div([
 											html.Br(),
 											dbc.Row([
 													dbc.Col([
-															html.Label("Field"),
+															html.Label("Find"),
 															html.Br(),
 															dcc.Input(
 																id="amcd_field_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Projections"),
 															html.Br(),
 															dcc.Input(
 																id="amcd_projections_input",
-																value="{}"
+																value="{}",
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=4
 													),
 													dbc.Col([
 															html.Label("Limit"),
@@ -1309,10 +1304,11 @@ amcd_component = html.Div([
 															dcc.Input(
 																id="amcd_limit_input",
 																type="number",
-																value=0
+																value=100,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													),
 													dbc.Col([
 															html.Label("Skip"),
@@ -1320,10 +1316,11 @@ amcd_component = html.Div([
 															dcc.Input(
 																id="amcd_skip_input",
 																type="number",
-																value=0
+																value=0,
+																style={"width": "100%"}
 															),
 														],
-														md=3
+														md=2
 													)
 												]
 											),
@@ -1693,13 +1690,13 @@ def callback_score_button(n_clicks, usecase, score_value):
 		return None, generate_toast("Error: Could not score: Score Value field is empty.", "Error", "danger")
 	try:
 		acts = sd.get_active_states()
-		acts.score_button_busy = True
-		acts.score_button_busy_changed = True
+		acts.exp_score_button_busy = True
+		acts.exp_score_button_busy_changed = True
 		outputs = sd.score_btn_eventhandler(usecase, score_value)
 		global graphing_adv_refresh
 		graphing_adv_refresh = True
-		acts.score_button_busy = False
-		acts.score_button_busy_changed = True
+		acts.exp_score_button_busy = False
+		acts.exp_score_button_busy_changed = True
 		return outputs, []
 	except Exception as e:
 		print(e)
@@ -1715,8 +1712,8 @@ def callback_score_button(n_clicks, usecase, score_value):
 def callback_score_button_busy(intervals):
 	try:
 		acts = sd.get_active_states()
-		if acts.score_button_busy_changed:
-			acts.score_button_busy_changed = False
+		if acts.exp_score_button_busy_changed:
+			acts.exp_score_button_busy_changed = False
 			if acts.score_button_busy:
 				return [dbc.Spinner(size="sm"), " Scoring..."], True
 			else:
@@ -2265,7 +2262,6 @@ def tabs_content_scoring_tab2(children):
 )
 def toggle_continuous(dropdown_value):
 	predictor = sd.get_predictor_type(dropdown_value)
-	print("wellness: {}".format(predictor))
 	if predictor == "wellness_score":
 		return {"height": "650px"}
 	return {"display": "none"}
@@ -2279,7 +2275,6 @@ def toggle_continuous(dropdown_value):
 )
 def toggle_continuous(dropdown_value):
 	predictor = sd.get_predictor_type(dropdown_value)
-	print("spend: {}".format(predictor))
 	if predictor == "spending_personality":
 		return {"height": "650px"}
 	return {"display": "none"}
@@ -2293,7 +2288,6 @@ def toggle_continuous(dropdown_value):
 )
 def toggle_continuous(dropdown_value):
 	predictor = sd.get_predictor_type(dropdown_value)
-	print("spend: {}".format(predictor))
 	if predictor == "wellness_score":
 		return {"display": "none"}
 	if predictor == "spending_personality":
@@ -2366,6 +2360,20 @@ def custom_graphing_adv_toggle_collapse(n_clicks, is_open):
 
 
 # ---- custom graphing ------------------------------------------------------------------------------------------------
+@app.callback(
+	dash.dependencies.Output("cg_collapse", "is_open"),
+	[
+		dash.dependencies.Input("cg_collapse_button", "n_clicks")
+	],
+	state=[
+		State(component_id="cg_collapse", component_property="is_open"),
+	],
+	prevent_initial_call=True
+)
+def cg_toggle_collapse(n_clicks, is_open):
+	if is_open:
+		return False
+	return True
 
 @app.callback(
 	[
@@ -2378,6 +2386,8 @@ def custom_graphing_adv_toggle_collapse(n_clicks, is_open):
 	prevent_initial_call=True)
 def callback_database(database):
 	try:
+		if database == "":
+			return [], None
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
@@ -2387,22 +2397,28 @@ def callback_database(database):
 		print(e)
 		return [], None
 
+
 @app.callback(
-	dash.dependencies.Output("cg_database_dropdown", "options"),
+	[
+		dash.dependencies.Output("cg_database_dropdown", "options"),
+		dash.dependencies.Output("cg_database_dropdown", "value"),
+	],
 	[	
-		dash.dependencies.Input("login_status", "children")
+		dash.dependencies.Input("login_status", "children"),
+		dash.dependencies.Input("cg_database_refresh_button", "n_clicks")
 	],
 	prevent_initial_call=True)
-def callback_login3(children):
+def callback_login_cg(children, n_clicks):
 	try:
 		databases = sd.get_prediction_databases()
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases)
+		return convert_list(new_databases), ""
 	except Exception as e:
 		print(e)
-		return []
+		return [], ""
+
 
 @app.callback(
 	dash.dependencies.Output("custom_graphing_text_area", "value"),
@@ -2528,20 +2544,7 @@ def tabs_content_custom_graphing4(interval, dropdown_values, find_results, child
 			return dash.no_update, dash.no_update
 
 # ---- amcs -----------------------------------------------------------------------------------------------------------
-@app.callback(
-	dash.dependencies.Output("cg_collapse", "is_open"),
-	[
-		dash.dependencies.Input("cg_collapse_button", "n_clicks")
-	],
-	state=[
-		State(component_id="cg_collapse", component_property="is_open"),
-	],
-	prevent_initial_call=True
-)
-def cg_toggle_collapse(n_clicks, is_open):
-	if is_open:
-		return False
-	return True
+
 
 
 app.clientside_callback(
@@ -2576,21 +2579,27 @@ def amcs_toggle_collapse(n_clicks, is_open):
 
 
 @app.callback(
-	dash.dependencies.Output("amcs_database_dropdown", "options"),
+	[
+		dash.dependencies.Output("amcs_database_dropdown", "options"),
+		dash.dependencies.Output("amcs_database_dropdown", "value"),
+	],
 	[	
-		dash.dependencies.Input("login_status", "children")
+		dash.dependencies.Input("login_status", "children"),
+		dash.dependencies.Input("amcs_database_refresh_button", "n_clicks")
 	],
 	prevent_initial_call=True)
-def callback_login_amcs(children):
+def callback_login_amcs(children, n_clicks):
 	try:
 		databases = sd.get_prediction_databases()
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases)
+		return convert_list(new_databases), ""
 	except Exception as e:
 		print(e)
-		return []
+		return [], ""
+
+
 
 @app.callback(
 	[
@@ -2603,6 +2612,8 @@ def callback_login_amcs(children):
 	prevent_initial_call=True)
 def callback_amcs_database(database):
 	try:
+		if database == "":
+			return [], None
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
@@ -2663,11 +2674,38 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 	if collection == "" or collection == None:
 		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
 	try:
+		acts = sd.get_active_states()
+		acts.amcs_filter_button.busy = True
+		acts.amcs_filter_button.busy_changed = True
 		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
-		return json.dumps(outputs), []
+		j_outputs = json.dumps(outputs)
+		acts.amcs_filter_button.busy = False
+		acts.amcs_filter_button.busy_changed = True
+		return j_outputs, []
 	except Exception as e:
 		print(e)
 		return None, generate_toast("Error: Could not filter data: {}".format(e), "Error", "danger")
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcs_filter_button", "children"),
+		dash.dependencies.Output("amcs_filter_button", "disabled")
+	],
+	[dash.dependencies.Input("interval", "n_intervals")],
+	prevent_initial_call=True)
+def callback_filter_button_busy(intervals):
+	try:
+		acts = sd.get_active_states()
+		if acts.amcs_filter_button.busy_changed:
+			acts.amcs_filter_button.busy_changed = False
+			if acts.amcs_filter_button.busy:
+				return [dbc.Spinner(size="sm"), " Filtering..."], True
+			else:
+				return "Filter Data", False
+		else:
+			return dash.no_update, dash.no_update
+	except:
+		return dash.no_update, dash.no_update
 
 @app.callback(
 	[
@@ -2685,6 +2723,9 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 	prevent_initial_call=True)
 def callback_find_button(n_clicks, data, category_field, event_field, start_field, end_field):
 	try:
+		acts = sd.get_active_states()
+		acts.amcs_generate_button.busy = True
+		acts.amcs_generate_button.busy_changed = True
 		outputs = json.loads(data)
 		formatted_outputs = []
 		for output in outputs:
@@ -2695,11 +2736,34 @@ def callback_find_button(n_clicks, data, category_field, event_field, start_fiel
 				"end": output[end_field]
 			}
 			formatted_outputs.append(formatted_document)
-		return json.dumps(formatted_outputs), []
+		j_formatted_outputs = json.dumps(formatted_outputs)
+		acts.amcs_generate_button.busy = False
+		acts.amcs_generate_button.busy_changed = True
+		return j_formatted_outputs, []
 	except Exception as e:
 		print(e)
 		return None, generate_toast("Error: Could not find: {}".format(e), "Error", "danger")
 
+@app.callback(
+	[
+		dash.dependencies.Output("amcs_generate_button", "children"),
+		dash.dependencies.Output("amcs_generate_button", "disabled")
+	],
+	[dash.dependencies.Input("interval", "n_intervals")],
+	prevent_initial_call=True)
+def callback_filter_button_busy(intervals):
+	try:
+		acts = sd.get_active_states()
+		if acts.amcs_generate_button.busy_changed:
+			acts.amcs_generate_button.busy_changed = False
+			if acts.amcs_generate_button.busy_busy:
+				return [dbc.Spinner(size="sm"), " Generating..."], True
+			else:
+				return "Generate Graph", False
+		else:
+			return dash.no_update, dash.no_update
+	except:
+		return dash.no_update, dash.no_update
 
 
 # ---- amcd -----------------------------------------------------------------------------------------------------------
@@ -2734,23 +2798,27 @@ def amcd_toggle_collapse(n_clicks, is_open):
 		return False
 	return True
 
-
 @app.callback(
-	dash.dependencies.Output("amcd_database_dropdown", "options"),
+	[
+		dash.dependencies.Output("amcd_database_dropdown", "options"),
+		dash.dependencies.Output("amcd_database_dropdown", "value"),
+	],
 	[	
-		dash.dependencies.Input("login_status", "children")
+		dash.dependencies.Input("login_status", "children"),
+		dash.dependencies.Input("amcd_database_refresh_button", "n_clicks")
 	],
 	prevent_initial_call=True)
-def callback_login_amcd(children):
+def callback_login_amcd(children, n_clicks):
 	try:
 		databases = sd.get_prediction_databases()
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases)
+		return convert_list(new_databases), ""
 	except Exception as e:
 		print(e)
-		return []
+		return [], ""
+
 
 @app.callback(
 	[
@@ -2763,6 +2831,8 @@ def callback_login_amcd(children):
 	prevent_initial_call=True)
 def callback_amcd_database(database):
 	try:
+		if database == "":
+			return [], None
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
@@ -2822,11 +2892,40 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 	if collection == "" or collection == None:
 		return None, generate_toast("Error: Could not find: Collection not selected.", "Error", "danger")
 	try:
+		acts = sd.get_active_states()
+		acts.amcd_filter_button.busy = True
+		acts.amcd_filter_button.busy_changed = True
 		outputs = sd.get_documents(database, collection, field, projections, limit, skip)
-		return json.dumps(outputs), []
+		j_outputs = json.dumps(outputs)
+		acts.amcd_filter_button.busy = False
+		acts.amcd_filter_button.busy_changed = True
+		return j_outputs, []
 	except Exception as e:
 		print(e)
 		return None, generate_toast("Error: Could not filter data: {}".format(e), "Error", "danger")
+
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcd_filter_button", "children"),
+		dash.dependencies.Output("amcd_filter_button", "disabled")
+	],
+	[dash.dependencies.Input("interval", "n_intervals")],
+	prevent_initial_call=True)
+def callback_filter_button_busy(intervals):
+	try:
+		acts = sd.get_active_states()
+		if acts.amcd_filter_button.busy_changed:
+			acts.amcd_filter_button.busy_changed = False
+			if acts.amcd_filter_button.busy:
+				return [dbc.Spinner(size="sm"), " Filtering..."], True
+			else:
+				return "Filter Data", False
+		else:
+			return dash.no_update, dash.no_update
+	except:
+		return dash.no_update, dash.no_update
+
 
 @app.callback(
 	[
@@ -2848,6 +2947,9 @@ def callback_filter_button(n_clicks, database, collection, field, projections, l
 	prevent_initial_call=True)
 def callback_generate_button(n_clicks, data, category_field, event_field, event_delimiter, start_field):
 	try:
+		acts = sd.get_active_states()
+		acts.amcd_generate_button.busy = True
+		acts.amcd_generate_button.busy_changed = True
 		prefix_field = "prefix"
 		injected_end = "end"
 		datetime_field = "start"
@@ -2871,13 +2973,37 @@ def callback_generate_button(n_clicks, data, category_field, event_field, event_
 				prefix_field: output[event_field].split(event_delimiter)[0],
 				color_field: output[color_field]
 			}
-			print(formatted_document["prefix"])
 			formatted_outputs.append(formatted_document)
 		formatted_outputs = ecosystem_scoring_pdash.similar_event_timeline(formatted_outputs, prefix_field, datetime_field, injected_end)
-		return json.dumps(formatted_outputs), first, first, last, []
+		j_formatted_outputs = json.dumps(formatted_outputs)
+		acts.amcd_generate_button.busy = False
+		acts.amcd_generate_button.busy_changed = True
+		return j_formatted_outputs, first, first, last, []
 	except Exception as e:
 		print(e)
 		return None, None, None, None, generate_toast("Error: Could not generate graph: {}".format(e), "Error", "danger")
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcd_generate_button", "children"),
+		dash.dependencies.Output("amcd_generate_button", "disabled")
+	],
+	[dash.dependencies.Input("interval", "n_intervals")],
+	prevent_initial_call=True)
+def callback_filter_button_busy(intervals):
+	try:
+		acts = sd.get_active_states()
+		if acts.amcd_generate_button.busy_changed:
+			acts.amcd_generate_button.busy_changed = False
+			if acts.amcd_generate_button.busy_busy:
+				return [dbc.Spinner(size="sm"), " Generating..."], True
+			else:
+				return "Generate Graph", False
+		else:
+			return dash.no_update, dash.no_update
+	except:
+		return dash.no_update, dash.no_update
+
 
 # ---- Nav-Bar ----------------------------------------------------------------------------------------------------------
 @app.callback(

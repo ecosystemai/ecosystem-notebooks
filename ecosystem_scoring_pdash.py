@@ -129,7 +129,6 @@ def color_by_hour(values, datetime_field, color_field):
 		hour = value[datetime_field].hour
 		n_hour = hour/23
 		color_index = 15 - int(n_hour * 15)
-		print(color_index)
 		value[color_field] = color_index
 	return values
 
