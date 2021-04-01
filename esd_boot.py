@@ -1239,6 +1239,49 @@ amcd_component = html.Div([
 									html.Div([
 											dbc.Row([
 													dbc.Col([
+															html.Label("Analysis ID"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcd_analysis_dropdown",
+																			clearable=False,
+																		),
+																	),
+																],
+															),
+														],
+														md=4
+													),
+													dbc.Col([
+															html.Label("New Analysis ID"),
+															dbc.InputGroup([
+																	dbc.Input(
+																		id="amcd_analysis_input",
+																		value="",
+																	),
+																	dbc.InputGroupAddon(
+																		dbc.Button(
+																			"Save", 
+																			outline=True, 
+																			color="primary",
+																			id="amcd_analysis_save_button", 
+																		),
+																		addon_type="append"
+																	)
+																],
+															),
+														],
+														md=4
+													),
+												]
+											),
+										],
+										style={"border": "1px solid #dee2e6", "padding": "5px"}
+									),
+									html.Br(),
+									html.Div([
+											dbc.Row([
+													dbc.Col([
 															html.Label("Database"),
 															html.Div([
 																	html.Div(
@@ -1476,6 +1519,8 @@ app.layout = html.Div([
 				html.Div([], id="amcs_toast_div2"),
 				html.Div([], id="amcd_toast_div"),
 				html.Div([], id="amcd_toast_div2"),
+				html.Div([], id="amcd_save_toast_div"),
+
 			],
 			id="toast_div"
 		),
@@ -2767,6 +2812,7 @@ def callback_filter_button_busy(intervals):
 
 
 # ---- amcd -----------------------------------------------------------------------------------------------------------
+
 app.clientside_callback(
 	dash.dependencies.ClientsideFunction(
 		namespace="clientside",
@@ -2800,8 +2846,84 @@ def amcd_toggle_collapse(n_clicks, is_open):
 
 @app.callback(
 	[
-		dash.dependencies.Output("amcd_database_dropdown", "options"),
+		dash.dependencies.Output("amcd_analysis_dropdown", "options"),
+		dash.dependencies.Output("amcd_analysis_dropdown", "value"),
+		dash.dependencies.Output("amcd_save_toast_div", "children"),
+	],
+	[
+		dash.dependencies.Input("amcd_analysis_save_button", "n_clicks"),
+		dash.dependencies.Input("login_status", "children"),		
+	],
+	state=[
+		State(component_id="amcd_analysis_input", component_property="value"),
+		State(component_id="amcd_database_dropdown", component_property="value"),
+		State(component_id="amcd_collection_dropdown", component_property="value"),
+		State(component_id="amcd_field_input", component_property="value"),
+		State(component_id="amcd_projections_input", component_property="value"),
+		State(component_id="amcd_limit_input", component_property="value"),
+		State(component_id="amcd_skip_input", component_property="value"),
+		State(component_id="amcd_category_field_dropdown", component_property="value"),
+		State(component_id="amcd_event_field_dropdown", component_property="value"),
+		State(component_id="amcd_event_delimiter_input", component_property="value"),
+		State(component_id="amcd_start_field_dropdown", component_property="value"),
+		State(component_id="amcd_datetime_format_field_input", component_property="value"),
+	],
+	prevent_initial_call=True
+)
+def amcd_save_analysis(n_clicks, login_status, name, database, collection, field, projections, limit, skip, category, event, event_delimiter, datetime, datetime_format):
+	global sd
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "amcd_analysis_save_button":
+		state = {
+			"database": database,
+			"collection": collection,
+			"field": field,
+			"projections": projections,
+			"limit": limit,
+			"skip": skip,
+			"category": category,
+			"event": event,
+			"event_delimiter": event_delimiter,
+			"datetime": datetime,
+			"datetime_format": datetime_format,
+		}
+		a_type = "timeline_daily"
+		sd.append_graphing_state(name, a_type, state)
+		names = sd.get_graphing_state_names("timeline_daily")
+		return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
+	names = sd.get_graphing_state_names("timeline_daily")
+	return convert_list(names), dash.no_update, []
+
+@app.callback(
+	[
 		dash.dependencies.Output("amcd_database_dropdown", "value"),
+		dash.dependencies.Output("amcd_collection_dropdown", "value"),
+		dash.dependencies.Output("amcd_field_input", "value"),
+		dash.dependencies.Output("amcd_projections_input", "value"),
+		dash.dependencies.Output("amcd_limit_input", "value"),
+		dash.dependencies.Output("amcd_skip_input", "value"),
+		dash.dependencies.Output("amcd_category_field_dropdown", "value"),
+		dash.dependencies.Output("amcd_event_field_dropdown", "value"),
+		dash.dependencies.Output("amcd_event_delimiter_input", "value"),
+		dash.dependencies.Output("amcd_start_field_dropdown", "value"),
+		dash.dependencies.Output("amcd_datetime_format_field_input", "value"),
+	],
+	[
+		dash.dependencies.Input("amcd_analysis_dropdown", "value")
+	],
+	prevent_initial_call=True
+)
+def amcd_load_analysis(name):
+	global sd
+	a_type = "timeline_daily"
+	gstate = sd.get_graphing_state(name, a_type)
+	return gstate["database"], gstate["collection"], gstate["field"], gstate["projections"], gstate["limit"], gstate["skip"], gstate["category"], gstate["event"], gstate["event_delimiter"], gstate["datetime"], gstate["datetime_format"]
+
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcd_database_dropdown", "options"),
 	],
 	[	
 		dash.dependencies.Input("login_status", "children"),
@@ -2814,16 +2936,15 @@ def callback_login_amcd(children, n_clicks):
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases), ""
+		return [convert_list(new_databases)]
 	except Exception as e:
 		print(e)
-		return [], ""
+		return []
 
 
 @app.callback(
 	[
 		dash.dependencies.Output("amcd_collection_dropdown", "options"),
-		dash.dependencies.Output("amcd_collection_dropdown", "value"),
 	],
 	[	
 		dash.dependencies.Input("amcd_database_dropdown", "value")
@@ -2837,10 +2958,10 @@ def callback_amcd_database(database):
 		new_collections = []
 		for entry in collections["collection"]:
 			new_collections.append(entry["name"])
-		return convert_list(new_collections), None
+		return [convert_list(new_collections)]
 	except Exception as e:
 		print(e)
-		return [], None
+		return []
 
 @app.callback(
 	[

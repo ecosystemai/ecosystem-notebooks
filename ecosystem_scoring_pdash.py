@@ -425,6 +425,37 @@ class ScoringDash():
 			except:
 				continue
 
+	def append_graphing_state(self, a_id, a_type, state):
+		headers = ["analysis_id", "analysis_type", "state"]
+		l = [a_id, a_type, json.dumps(state)]
+		data = [headers, l]
+		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards_gs", "{}", 1000000, "{}", 0)
+		for entry in data_results:
+			if entry["analysis_id"] != a_id or entry["analysis_type"] != a_type:
+				analysis_id = entry["analysis_id"]
+				analysis_type = entry["analysis_type"]
+				a_state = entry["state"]
+				data.append([analysis_id, analysis_type, a_state])
+		with open("tmp/graphing_states.csv", "w", newline="") as f:
+			writer = csv.writer(f)
+			writer.writerows(data)
+		data_management_engine.drop_document_collection(self.p_auth, "profilesMaster", "dashboards_gs")
+		upload_import_pred(self.p_auth, self.data_path, "tmp/graphing_states.csv", "profilesMaster", "dashboards_gs", "graphing_states.csv")
+
+	def get_graphing_state_names(self, a_type):
+		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards_gs", '{{"analysis_type":"{}"}}'.format(a_type), 1000000, "{}", 0)
+		names = []
+		for entry in data_results:
+			names.append(entry["analysis_id"])
+		return names
+
+	def get_graphing_state(self, a_id, a_type):
+		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards_gs", '{{"analysis_id":"{}","analysis_type":"{}"}}'.format(a_id, a_type), 1000000, "{}", 0)
+		state = {}
+		for entry in data_results:
+			state = json.loads(entry["state"])
+		return state
+
 	def get_properties_state(self, usecase_name, field):
 		usecase = self.use_cases[usecase_name]
 		properties = usecase["properties"]
