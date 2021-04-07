@@ -1036,6 +1036,49 @@ amcs_component = html.Div([
 									html.Div([
 											dbc.Row([
 													dbc.Col([
+															html.Label("Analysis ID"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcs_analysis_dropdown",
+																			clearable=False,
+																		),
+																	),
+																],
+															),
+														],
+														md=4
+													),
+													dbc.Col([
+															html.Label("New Analysis ID"),
+															dbc.InputGroup([
+																	dbc.Input(
+																		id="amcs_analysis_input",
+																		value="",
+																	),
+																	dbc.InputGroupAddon(
+																		dbc.Button(
+																			"Save", 
+																			outline=True, 
+																			color="primary",
+																			id="amcs_analysis_save_button", 
+																		),
+																		addon_type="append"
+																	)
+																],
+															),
+														],
+														md=4
+													),
+												]
+											),
+										],
+										style={"border": "1px solid #dee2e6", "padding": "5px"}
+									),
+									html.Br(),
+									html.Div([
+											dbc.Row([
+													dbc.Col([
 															html.Label("Database"),
 															html.Div([
 																	html.Div(
@@ -1520,7 +1563,7 @@ app.layout = html.Div([
 				html.Div([], id="amcd_toast_div"),
 				html.Div([], id="amcd_toast_div2"),
 				html.Div([], id="amcd_save_toast_div"),
-
+				html.Div([], id="amcs_save_toast_div"),
 			],
 			id="toast_div"
 		),
@@ -2625,8 +2668,85 @@ def amcs_toggle_collapse(n_clicks, is_open):
 
 @app.callback(
 	[
-		dash.dependencies.Output("amcs_database_dropdown", "options"),
+		dash.dependencies.Output("amcs_analysis_dropdown", "options"),
+		dash.dependencies.Output("amcs_analysis_dropdown", "value"),
+		dash.dependencies.Output("amcs_save_toast_div", "children"),
+	],
+	[
+		dash.dependencies.Input("amcs_analysis_save_button", "n_clicks"),
+		dash.dependencies.Input("login_status", "children"),		
+	],
+	state=[
+		State(component_id="amcs_analysis_input", component_property="value"),
+		State(component_id="amcs_database_dropdown", component_property="value"),
+		State(component_id="amcs_collection_dropdown", component_property="value"),
+		State(component_id="amcs_field_input", component_property="value"),
+		State(component_id="amcs_projections_input", component_property="value"),
+		State(component_id="amcs_limit_input", component_property="value"),
+		State(component_id="amcs_skip_input", component_property="value"),
+		State(component_id="amcs_category_field_dropdown", component_property="value"),
+		State(component_id="amcs_event_field_dropdown", component_property="value"),
+		State(component_id="amcs_start_field_dropdown", component_property="value"),
+		State(component_id="amcs_end_field_dropdown", component_property="value"),
+		State(component_id="amcs_datetime_format_field_input", component_property="value"),
+	],
+	prevent_initial_call=True
+)
+def amcs_save_analysis(n_clicks, login_status, name, database, collection, field, projections, limit, skip, category, event, starttime, endtime, datetime_format):
+	global sd
+	a_type = "timeline"
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "amcs_analysis_save_button":
+		state = {
+			"database": database,
+			"collection": collection,
+			"field": field,
+			"projections": projections,
+			"limit": limit,
+			"skip": skip,
+			"category": category,
+			"event": event,
+			"starttime": starttime,
+			"endtime": endtime,
+			"datetime_format": datetime_format,
+		}
+		sd.append_graphing_state(name, a_type, state)
+		names = sd.get_graphing_state_names(a_type)
+		return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
+	names = sd.get_graphing_state_names(a_type)
+	return convert_list(names), dash.no_update, []
+
+@app.callback(
+	[
 		dash.dependencies.Output("amcs_database_dropdown", "value"),
+		dash.dependencies.Output("amcs_collection_dropdown", "value"),
+		dash.dependencies.Output("amcs_field_input", "value"),
+		dash.dependencies.Output("amcs_projections_input", "value"),
+		dash.dependencies.Output("amcs_limit_input", "value"),
+		dash.dependencies.Output("amcs_skip_input", "value"),
+		dash.dependencies.Output("amcs_category_field_dropdown", "value"),
+		dash.dependencies.Output("amcs_event_field_dropdown", "value"),
+		dash.dependencies.Output("amcs_start_field_dropdown", "value"),
+		dash.dependencies.Output("amcs_end_field_dropdown", "value"),
+		dash.dependencies.Output("amcs_datetime_format_field_input", "value"),
+	],
+	[
+		dash.dependencies.Input("amcs_analysis_dropdown", "value")
+	],
+	prevent_initial_call=True
+)
+def amcd_load_analysis(name):
+	global sd
+	a_type = "timeline"
+	gstate = sd.get_graphing_state(name, a_type)
+	return gstate["database"], gstate["collection"], gstate["field"], gstate["projections"], gstate["limit"], gstate["skip"], gstate["category"], gstate["event"], gstate["starttime"], gstate["endtime"],gstate["datetime_format"]
+
+
+
+@app.callback(
+	[
+		dash.dependencies.Output("amcs_database_dropdown", "options"),
 	],
 	[	
 		dash.dependencies.Input("login_status", "children"),
@@ -2639,17 +2759,16 @@ def callback_login_amcs(children, n_clicks):
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases), ""
+		return [convert_list(new_databases)]
 	except Exception as e:
 		print(e)
-		return [], ""
+		return []
 
 
 
 @app.callback(
 	[
 		dash.dependencies.Output("amcs_collection_dropdown", "options"),
-		dash.dependencies.Output("amcs_collection_dropdown", "value"),
 	],
 	[	
 		dash.dependencies.Input("amcs_database_dropdown", "value")
@@ -2663,10 +2782,10 @@ def callback_amcs_database(database):
 		new_collections = []
 		for entry in collections["collection"]:
 			new_collections.append(entry["name"])
-		return convert_list(new_collections), None
+		return [convert_list(new_collections)]
 	except Exception as e:
 		print(e)
-		return [], None
+		return []
 
 @app.callback(
 	[
@@ -2872,6 +2991,7 @@ def amcd_toggle_collapse(n_clicks, is_open):
 )
 def amcd_save_analysis(n_clicks, login_status, name, database, collection, field, projections, limit, skip, category, event, event_delimiter, datetime, datetime_format):
 	global sd
+	a_type = "timeline_daily"
 	ctx = dash.callback_context
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "amcd_analysis_save_button":
@@ -2888,11 +3008,10 @@ def amcd_save_analysis(n_clicks, login_status, name, database, collection, field
 			"datetime": datetime,
 			"datetime_format": datetime_format,
 		}
-		a_type = "timeline_daily"
 		sd.append_graphing_state(name, a_type, state)
-		names = sd.get_graphing_state_names("timeline_daily")
+		names = sd.get_graphing_state_names(a_type)
 		return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
-	names = sd.get_graphing_state_names("timeline_daily")
+	names = sd.get_graphing_state_names(a_type)
 	return convert_list(names), dash.no_update, []
 
 @app.callback(
