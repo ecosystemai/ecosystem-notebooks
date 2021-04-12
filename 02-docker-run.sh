@@ -1,1 +1,2 @@
-docker run -d -p 5000:5000 ecosystemai/ecosystem-notebooks
+# docker run -d -p 5000:5000 ecosystemai/ecosystem-notebooks
+docker run -it -p 5000:5000 ecosystemai/ecosystem-notebooks
