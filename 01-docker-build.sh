@@ -1,2 +1,2 @@
-docker build -t ecosystemai/ecosystem-dashboards .
-docker push ecosystemai/ecosystem-dashboards:latest
+docker build -t ecosystemai/ecosystem-notebooks .
+docker push ecosystemai/ecosystem-notebooks:latest

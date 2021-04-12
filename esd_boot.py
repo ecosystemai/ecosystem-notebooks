@@ -8,7 +8,6 @@ import plotly.graph_objects as go
 from datetime import date
 from datetime import timedelta
 import flask
-import ecosystem_scoring_pdash
 import json
 import base64
 import os
@@ -19,6 +18,8 @@ import dash_pivottable
 import logging
 import dateutil
 
+import ecosystem_scoring_pdash
+
 logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
 ECO_LOGO = "./assets/favicon.ico"
@@ -28,7 +29,7 @@ VERSION = "0.5.9780"
 graphing_adv_refresh = False
 custom_graphing_adv_refresh = False
 sd = None
-export_target="export_wow.csv"
+export_target=""
 tmp_dir = "tmp/"
 export_tmp = tmp_dir + "dashboard_export.csv"
 if not os.path.exists(tmp_dir):
@@ -285,7 +286,7 @@ login_component = html.Div([
 	style={"display": "none"}
 )
 
-scoring_component = html.Div([
+explore_component = html.Div([
 		html.Div([
 				dbc.Row(
 					[
@@ -624,42 +625,13 @@ scoring_component = html.Div([
 																				options=[],
 																				multi=True
 																			),
-																			html.Br(),
-																			dbc.Row(
-																				[
-																					dbc.Col(
-																						html.Div([
-																								html.Label("", id="graphing_adv_label", hidden=True),
-																								html.Label("State Name", id="graphing_adv_state_name_label"),
-																								html.Br(),
-																								dcc.Input(id="graphing_adv_state_name_input"),
-																								html.Br(),
-																								html.Br(),
-																								dbc.Button("Save State", outline=True, color="primary", id="graphing_adv_save_state_button"),
-																							]
-																						),
-																						md=3
-																					),
-																					dbc.Col(
-																						html.Div([
-																								html.Label("Load State"),
-																								dcc.Dropdown(
-																									id="graph_adv_state_dropdown",
-																									options=[]
-																								)
-																							]
-																						),
-																						md=9
-																					)
-																				]
-																			)
 																		],
 																	),
 																	id="graphing_adv_collapse"
 																),
 																html.Div([],
 																	id="graphing_adv_div",
-																	style= {"width": "100%", "height": "580px"}
+																	style= {"width": "100%"}
 																)
 															],
 														),
@@ -683,11 +655,11 @@ scoring_component = html.Div([
 			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
 		)
 	],
-	id="scoring_component",
+	id="explore_component",
 	style={"display": "none"}
 )
 
-batch_scoring_component = html.Div([
+scoring_component = html.Div([
 		html.Div([
 				dbc.Row(
 					[
@@ -813,7 +785,7 @@ batch_scoring_component = html.Div([
 			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
 		)
 	],
-	id="batch_scoring_component",
+	id="scoring_component",
 	style={"display": "none"}
 )
 
@@ -822,10 +794,67 @@ custom_graphing_component = html.Div([
 				dbc.Card([
 						html.Label("", id="cg_find_buffer", style={"display": "none"}),
 						dbc.CardHeader(
-							dbc.Button("Find Options", outline=True, color="link", id="cg_collapse_button", style={"height": "100%", "width": "100%"}),
+							dbc.Button("Options", outline=True, color="link", id="cg_collapse_button", style={"height": "100%", "width": "100%"}),
 						),
 						dbc.Collapse(
 							dbc.CardBody([
+									html.Label("Analysis ID"),
+									html.Div([
+											html.Div(
+												dcc.Dropdown(
+													id="cg_analysis_dropdown",
+													clearable=False,
+													style={"width": "30%"}
+												),
+											),
+										],
+									),
+									html.Br(),
+									html.Label("Create New Analysis"),
+									html.Div([
+											dbc.Row([
+													dbc.Col([
+															html.Label("Description"),
+															html.Div([
+																	html.Div(
+																		dbc.Input(
+																			id="cg_description_input",
+																			value="",
+																		),
+																	),
+																],
+															),
+														],
+														md=4
+													),
+													dbc.Col([
+															html.Label("Analysis ID"),
+															dbc.InputGroup([
+																	dbc.Input(
+																		id="cg_analysis_input",
+																		value="",
+																	),
+																	dbc.InputGroupAddon(
+																		dbc.Button(
+																			"Save", 
+																			outline=True, 
+																			color="primary",
+																			id="cg_analysis_save_button", 
+																		),
+																		addon_type="append"
+																	)
+																],
+															),
+														],
+														md=4
+													),
+												]
+											),
+										],
+										style={"border": "1px solid #dee2e6", "padding": "5px"}
+									),
+									html.Br(),
+									html.Label("Find"),
 									html.Div([
 											dbc.Row([
 													dbc.Col([
@@ -924,6 +953,26 @@ custom_graphing_component = html.Div([
 										],
 										style={"border": "1px solid #dee2e6", "padding": "5px"}
 									),
+									html.Br(),
+									html.Label("Selector"),
+									html.Div([
+											dbc.Row([
+													dbc.Col([
+															html.Label("Value"),
+															html.Br(),
+															dcc.Input(
+																id="cg_adv_graph_value_input",
+																value="",
+																style={"width": "100%"}
+															),
+														],
+														md=4
+													),
+												]
+											),
+										],
+										style={"border": "1px solid #dee2e6", "padding": "5px"}
+									),
 								]
 							),
 							id="cg_collapse",
@@ -931,83 +980,120 @@ custom_graphing_component = html.Div([
 						)
 					]
 				),
-				dbc.Row(
+				html.Div(
 					[
-						dbc.Col(
-							html.Div(
-								[
-									dbc.Card(
-										dbc.CardBody([
-												html.Label(html.B("Data Details"), style={"margin-bottom": "0rem"}),
-											],
-											style={"padding": "0.75rem"}
-										),
-									),
-									html.Br(),
-									dbc.Card(
-										dbc.CardBody([
-												html.Div([
-														dbc.Tabs([
-																dbc.Tab(
-																	html.Div(
-																		id="custom_graphing_results_div",
-																		style={"overflow-y": "scroll", "max-height": "700px"}
-																	),
-																	label="Results",
-																	tab_id="custom_graphing_table"
-																),
-																dbc.Tab(
-																	dbc.Textarea(
-																		id = "custom_graphing_text_area",
-																		# className="tree",
-																		style= {"width": "100%", "height": "700px"}
+						dbc.Card(
+							dbc.CardBody([
+									html.Div([
+											dbc.Tabs([
+													dbc.Tab(
+														html.Div(
+															id="cg_results_div",
+															style={"overflow-y": "scroll", "max-height": "700px"}
+														),
+														label="Results",
+														tab_id="cg_table"
+													),
+													dbc.Tab(
+														dbc.Textarea(
+															id = "cg_text_area",
+															# className="tree",
+															style= {"width": "100%", "height": "700px"}
 
-																	),
-																	label="Raw Results",
-																	tab_id="custom_graphing_raw"
+														),
+														label="Raw Results",
+														tab_id="cg_raw"
+													),
+													dbc.Tab(
+														html.Div([
+																dbc.Card(
+																	dbc.CardHeader(
+																		dbc.Button("Advanced Options", outline=True, color="link", id="cg_adv_collapse_button", style={"height": "100%", "width": "100%"}),
+																	)
 																),
-																dbc.Tab(
+																dbc.Collapse(
 																	html.Div([
-																			dbc.Card(
-																				dbc.CardHeader(
-																					dbc.Button("Advanced Options", outline=True, color="link", id="custom_graphing_adv_collapse_button", style={"height": "100%", "width": "100%"}),
-																				)
-																			),
-																			dbc.Collapse(
-																				html.Div([
-																						dcc.Dropdown(
-																							id="custom_graph_adv_dropdown",
-																							options=[],
-																							multi=True
-																						)
-																					],
-																				),
-																				id="custom_graphing_adv_collapse"
-																			),
-																			html.Div([],
-																				id="custom_graphing_adv_div",
-																				# style= {"width": "100%", "height": "650px"}
+																			dcc.Dropdown(
+																				id="cg_graph_adv_dropdown",
+																				options=[],
+																				multi=True
 																			)
 																		],
 																	),
-																	label="Advanced Graph",
-																	tab_id="custom_graph_adv"
+																	id="cg_adv_collapse"
+																),
+																html.Div([
+																		dbc.Row([
+																				dbc.Col([
+																						html.Div([
+																								dash_pivottable.PivotTable(
+																									id="cg_adv_table_metadata",
+																									data=[],
+																									cols=[],
+																									colOrder="key_a_to_z",
+																									rows=[],
+																									rowOrder="key_a_to_z",
+																									rendererName="Line Chart",
+																									aggregatorName="List Unique Values",
+																									vals=[],
+																									unusedOrientationCutoff="Infinity",
+																									hiddenAttributes=[],
+																								)
+																							],
+																							hidden=True,
+																						),
+																						html.Div([
+																								dash_pivottable.PivotTable(
+																									id="cg_adv_table",
+																									data=[],
+																									cols=[],
+																									colOrder="key_a_to_z",
+																									rows=[],
+																									rowOrder="key_a_to_z",
+																									rendererName="Line Chart",
+																									aggregatorName="List Unique Values",
+																									vals=[],
+																									unusedOrientationCutoff="Infinity",
+																									hiddenAttributes=[],
+																								)
+																							],
+																							id="cg_adv_div",
+																							style={"width": "100%"}
+																						),
+																					],
+																					# style={"height": "675px"},
+																					md=10
+																				),
+																				dbc.Col([
+																						dbc.Textarea(
+																							id="cg_notes_textarea",
+																							className="mb-3",
+																							placeholder="Notes...",
+																							style={"height": "675px"}
+																						)
+																					],
+																					md=2
+																				)
+																			]
+																		)
+																	],
 																),
 															],
-															id="custom_graphing_tabs",
-															active_tab="custom_graphing_table",
-														)
-													],
-													id="custom_graphing_tab_div",
-													# style={"height": "750px"}
-												)
-											]
-										)
+														),
+														label="Advanced Graph",
+														tab_id="cg_adv"
+													),
+												],
+												id="cg_tabs",
+												active_tab="cg_table",
+											)
+										],
+										id="cg_tab_div",
+										# style={"height": "750px"}
 									)
-								],
-							),
-							md=12
-						),
+								]
+							)
+						)
 					],
 				),
 			],
@@ -1683,16 +1769,18 @@ app.layout = html.Div([
 				html.Div([], id="filter_toast_div"),
 				html.Div([], id="filter_toast_div2"),
 				html.Div([], id="cg_find_toast_div"),
+				html.Div([], id="cg_save_toast_div"),
 				html.Div([], id="amcs_toast_div"),
 				html.Div([], id="amcs_toast_div2"),
 				html.Div([], id="amcd_toast_div"),
 				html.Div([], id="amcd_toast_div2"),
 				html.Div([], id="amcd_save_toast_div"),
 				html.Div([], id="amcs_save_toast_div"),
+
 			],
 			id="toast_div"
 		),
-		html.Div([navbar, login_component, scoring_component, batch_scoring_component, custom_graphing_component, amcs_component, amcd_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
+		html.Div([navbar, login_component, explore_component, scoring_component, custom_graphing_component, amcs_component, amcd_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
 	], 
 	style={"position": "relative"}
 )
@@ -1735,26 +1823,6 @@ def callback_login3(children):
 
 @app.callback(
 	[
-		dash.dependencies.Output("graph_adv_state_dropdown", "options"),
-	],
-	[	
-		dash.dependencies.Input("usecase_dropdown", "value"),
-	],
-	prevent_initial_call=True)
-def callback_adv_graph_state_loading(usecase_name):
-	try:
-		names = []
-		states = sd.get_properties_state(usecase_name, "dashboard.graph.states")
-		for state in states:
-			if "name" in state.keys():
-				names.append(state["name"])
-		return convert_list(names),
-	except Exception as e:
-		print(e)
-		return []
-
-@app.callback(
-	[
 		dash.dependencies.Output("usecase_dropdown", "options"),
 		dash.dependencies.Output("usecase_dropdown2", "options"),
 	],
@@ -1786,7 +1854,7 @@ def callback_customer_list(customer_list, usecase):
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "customer_list":
 		if len(customer_list) < 1:
-			return []
+			return [[]]
 		customer = customer_list[-1]
 		data = sd.dropdown_customer_eventhandler(customer, usecase)
 		if len(data) > 1:
@@ -1806,7 +1874,7 @@ def callback_customer_list(customer_list, usecase):
 			return dbc.ListGroup(group_items)
 	if trigger_id == "usecase_dropdown":
 		field_data = sd.read_field_from_properties(usecase, "predictor.param.lookup")
-		return []
+		return [[]]
 
 @app.callback(
 	dash.dependencies.Output("find_filter_input", "value"),
@@ -1826,7 +1894,6 @@ def clear_find_filter(usecase):
 def clear_find_filter2(usecase):
 	global export_target
 	export_target = "{}_export.csv".format(usecase)
-	print(export_target)
 	return "{}"
 
 # Buttons
@@ -2065,7 +2132,7 @@ def batch_uploader2(contents, customer_list, n_clicks, usecase, input_contents, 
 	prevent_initial_call=True)
 def tabs_content_graphing(tab):
 	if tab == "graph":
-		style = {"width": "98%", "height": "380px", "display": "block"}
+		return {"width": "98%", "height": "380px", "display": "block"}
 	else:
 		return {"display": "none"}
 
@@ -2075,17 +2142,17 @@ def tabs_content_graphing(tab):
 	prevent_initial_call=True)
 def tabs_content_graphing(tab):
 	if tab == "graph_adv":
-		style = {"width": "98%", "height": "380px", "display": "block"}
+		return {"width": "100%", "display": "block"}
 	else:
 		return {"display": "none"}
 
 @app.callback(
-	dash.dependencies.Output("custom_graphing_adv_div", "style"),
-	[dash.dependencies.Input("custom_graphing_tabs", "active_tab")],
+	dash.dependencies.Output("cg_adv_div", "style"),
+	[dash.dependencies.Input("cg_tabs", "active_tab")],
 	prevent_initial_call=True)
 def tabs_content_custom_graphing(tab):
-	if tab == "custom_graph_adv":
-		style = {"width": "98%", "display": "block"}
+	if tab == "cg_adv":
+		return {"width": "100%", "display": "block"}
 	else:
 		return {"display": "none"}
 
@@ -2350,9 +2417,6 @@ def tabs_content_graphing4(interval, dropdown_values, scoring_results, children)
 					data_points.append(flat)
 				df = pd.DataFrame(data_points)
 				columns = list(df.columns)
-				odd_header = columns[0]
-				if odd_header == "customer":
-					odd_header = columns[1]
 				l = [columns]
 				l.extend(df.values.tolist())
 				return dash_pivottable.PivotTable(
@@ -2364,7 +2428,7 @@ def tabs_content_graphing4(interval, dropdown_values, scoring_results, children)
 							rowOrder="key_a_to_z",
 							rendererName="Line Chart",
 							aggregatorName="List Unique Values",
-							vals=[odd_header],
+							vals=[],
 							unusedOrientationCutoff="Infinity",
 							hiddenAttributes=dropdown_values
 
@@ -2509,38 +2573,6 @@ def toggle_continuous(dropdown_value):
 	return {"height": "650px"}
 
 @app.callback(
-	dash.dependencies.Output("graphing_adv_label", "children"),
-	[
-		dash.dependencies.Input("graphing_adv_save_state_button", "n_clicks")
-	],
-
-	state=[
-		State(component_id="usecase_dropdown", component_property="value"),
-		State(component_id="graphing_adv_state_name_input", component_property="value"),
-		State(component_id="graphing_adv_table", component_property="cols"),
-		State(component_id="graphing_adv_table", component_property="rows"),
-		State(component_id="graphing_adv_table", component_property="rendererName"),
-		State(component_id="graphing_adv_table", component_property="aggregatorName"),
-		State(component_id="graphing_adv_table", component_property="vals"),
-		State(component_id="graphing_adv_table", component_property="hiddenAttributes"),
-	],
-	prevent_initial_call=True
-)
-def graphing_adv_save_state(n_clicks, usecase, name, cols, rows, renderer_name, aggregator_name, vals, hidden_attributes):
-	state_dict = {
-		"name": name,
-		"cols": cols,
-		"rows": rows,
-		"renderer_name": renderer_name,
-		"aggregator_name": aggregator_name,
-		"vals": vals,
-		"hidden_attributes": hidden_attributes
-	}
-	j_state_dict = json.dumps(state_dict)
-	sd.append_properties_state(usecase, "dashboard.graph.states", j_state_dict)
-	return ""
-
-@app.callback(
 	dash.dependencies.Output("graphing_adv_collapse", "is_open"),
 	[
 		dash.dependencies.Input("graphing_adv_collapse_button", "n_clicks")
@@ -2556,12 +2588,12 @@ def graphing_adv_toggle_collapse(n_clicks, is_open):
 	return True
 
 @app.callback(
-	dash.dependencies.Output("custom_graphing_adv_collapse", "is_open"),
+	dash.dependencies.Output("cg_adv_collapse", "is_open"),
 	[
-		dash.dependencies.Input("custom_graphing_adv_collapse_button", "n_clicks")
+		dash.dependencies.Input("cg_adv_collapse_button", "n_clicks")
 	],
 	state=[
-		State(component_id="custom_graphing_adv_collapse", component_property="is_open"),
+		State(component_id="cg_adv_collapse", component_property="is_open"),
 	],
 	prevent_initial_call=True
 )
@@ -2573,6 +2605,118 @@ def custom_graphing_adv_toggle_collapse(n_clicks, is_open):
 
 
 # ---- custom graphing ------------------------------------------------------------------------------------------------
+@app.callback(
+	[
+		dash.dependencies.Output("cg_analysis_dropdown", "options"),
+		dash.dependencies.Output("cg_analysis_dropdown", "value"),
+		dash.dependencies.Output("cg_save_toast_div", "children"),
+	],
+	[
+		dash.dependencies.Input("cg_analysis_save_button", "n_clicks"),
+		dash.dependencies.Input("login_status", "children"),		
+	],
+	state=[
+		State(component_id="cg_analysis_input", component_property="value"),
+		State(component_id="cg_description_input", component_property="value"),
+		State(component_id="cg_database_dropdown", component_property="value"),
+		State(component_id="cg_collection_dropdown", component_property="value"),
+		State(component_id="cg_field_input", component_property="value"),
+		State(component_id="cg_projections_input", component_property="value"),
+		State(component_id="cg_limit_input", component_property="value"),
+		State(component_id="cg_skip_input", component_property="value"),
+		State(component_id="cg_notes_textarea", component_property="value"),
+		State(component_id="cg_adv_table_metadata", component_property="cols"),
+		State(component_id="cg_adv_table_metadata", component_property="rows"),
+		State(component_id="cg_adv_table_metadata", component_property="rendererName"),
+		State(component_id="cg_adv_table_metadata", component_property="aggregatorName"),
+		State(component_id="cg_adv_table_metadata", component_property="vals"),
+		State(component_id="cg_adv_table_metadata", component_property="hiddenAttributes"),
+		State(component_id="cg_adv_graph_value_input", component_property="value"),
+	],
+	prevent_initial_call=True
+)
+
+def cg_save_analysis(n_clicks, login_status, name, description, database, collection, field, projections, limit, skip, notes, cols, rows, rendererName, aggregatorName, vals, hiddenAttributes, value):
+	try:
+		global sd
+		a_type = "advanced_graphing"
+		ctx = dash.callback_context
+		trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+		if trigger_id == "cg_analysis_save_button":
+			state = {
+				"description": description,
+				"database": database,
+				"collection": collection,
+				"field": field,
+				"projections": projections,
+				"limit": limit,
+				"skip": skip,
+				"notes": notes,
+				"cols": cols,
+				"rows": rows,
+				"rendererName": rendererName,
+				"aggregatorName": aggregatorName,
+				"vals": [value],
+				"hiddenAttributes": hiddenAttributes,
+			}
+			sd.append_graphing_state(name, a_type, state)
+			names = sd.get_graphing_state_names(a_type)
+			return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
+		names = sd.get_graphing_state_names(a_type)
+		return convert_list(names), dash.no_update, []
+	except Exception as e:
+		print(e)
+		return dash.no_update, dash.no_update, dash.no_update
+
+@app.callback(
+	[
+		dash.dependencies.Output("cg_analysis_input", "value"),
+		dash.dependencies.Output("cg_description_input", "value"),
+		dash.dependencies.Output("cg_database_dropdown", "value"),
+		dash.dependencies.Output("cg_collection_dropdown", "value"),
+		dash.dependencies.Output("cg_field_input", "value"),
+		dash.dependencies.Output("cg_projections_input", "value"),
+		dash.dependencies.Output("cg_limit_input", "value"),
+		dash.dependencies.Output("cg_skip_input", "value"),
+		dash.dependencies.Output("cg_notes_textarea", "value"),
+		dash.dependencies.Output("cg_adv_graph_value_input", "value"),
+		dash.dependencies.Output("cg_adv_table_metadata", "cols"),
+		dash.dependencies.Output("cg_adv_table_metadata", "rows"),
+		dash.dependencies.Output("cg_adv_table_metadata", "rendererName"),
+		dash.dependencies.Output("cg_adv_table_metadata", "aggregatorName"),
+		dash.dependencies.Output("cg_adv_table_metadata", "vals"),
+		dash.dependencies.Output("cg_adv_table_metadata", "hiddenAttributes"),
+	],
+	[
+		dash.dependencies.Input("cg_analysis_dropdown", "value"),
+		dash.dependencies.Input("cg_adv_table", "cols"),
+		dash.dependencies.Input("cg_adv_table", "rows"),
+		dash.dependencies.Input("cg_adv_table", "rendererName"),
+		dash.dependencies.Input("cg_adv_table", "aggregatorName"),
+		# dash.dependencies.Input("cg_adv_table", "vals"),
+		dash.dependencies.Input("cg_adv_table", "hiddenAttributes"),
+		# dash.dependencies.Input("cg_adv_table", "valueFilter"),
+		dash.dependencies.Input("cg_adv_table", "colOrder"),
+		dash.dependencies.Input("cg_adv_table", "rowOrder"),
+
+	],
+	state=[
+		State(component_id="cg_adv_table", component_property="vals"),
+		State(component_id="cg_adv_table", component_property="valueFilter"),
+	],
+	prevent_initial_call=True
+)
+def cg_load_analysis(name, cols, rows, rendererName, aggregatorName, hiddenAttributes, colOrder, rowOrder, vals, valueFilter):
+	ctx = dash.callback_context
+	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+	if trigger_id == "cg_analysis_dropdown":
+		global sd
+		a_type = "advanced_graphing"
+		gstate = sd.get_graphing_state(name, a_type)
+		return name, gstate["description"], gstate["database"], gstate["collection"], gstate["field"], gstate["projections"], gstate["limit"], gstate["skip"], gstate["notes"], gstate["vals"][0], gstate["cols"], gstate["rows"], gstate["rendererName"], gstate["aggregatorName"], gstate["vals"], gstate["hiddenAttributes"]
+	else:
+		return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, cols, rows, rendererName, aggregatorName, vals, hiddenAttributes
+
 @app.callback(
 	dash.dependencies.Output("cg_collapse", "is_open"),
 	[
@@ -2591,7 +2735,6 @@ def cg_toggle_collapse(n_clicks, is_open):
 @app.callback(
 	[
 		dash.dependencies.Output("cg_collection_dropdown", "options"),
-		dash.dependencies.Output("cg_collection_dropdown", "value"),
 	],
 	[	
 		dash.dependencies.Input("cg_database_dropdown", "value")
@@ -2600,21 +2743,20 @@ def cg_toggle_collapse(n_clicks, is_open):
 def callback_database(database):
 	try:
 		if database == "":
-			return [], None
+			return [[]]
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
 			new_collections.append(entry["name"])
-		return convert_list(new_collections), None
+		return [convert_list(new_collections)]
 	except Exception as e:
 		print(e)
-		return [], None
+		return [[]]
 
 
 @app.callback(
 	[
 		dash.dependencies.Output("cg_database_dropdown", "options"),
-		dash.dependencies.Output("cg_database_dropdown", "value"),
 	],
 	[	
 		dash.dependencies.Input("login_status", "children"),
@@ -2627,14 +2769,14 @@ def callback_login_cg(children, n_clicks):
 		new_databases = []
 		for entry in databases["databases"]:
 			new_databases.append(entry["name"])
-		return convert_list(new_databases), ""
+		return [convert_list(new_databases)]
 	except Exception as e:
 		print(e)
-		return [], ""
+		return [[]]
 
 
 @app.callback(
-	dash.dependencies.Output("custom_graphing_text_area", "value"),
+	dash.dependencies.Output("cg_text_area", "value"),
 	[
 		dash.dependencies.Input("cg_find_buffer", "children")
 	],
@@ -2650,7 +2792,7 @@ def callback_find_buffer(find_b):
 
 
 @app.callback(
-	dash.dependencies.Output("custom_graphing_results_div", "children"),
+	dash.dependencies.Output("cg_results_div", "children"),
 	[dash.dependencies.Input("cg_find_buffer", "children")],
 	prevent_initial_call=True)
 def tabs_content_results_tab(children):
@@ -2698,19 +2840,25 @@ def callback_find_button(n_clicks, database, collection, field, projections, lim
 
 @app.callback(
 	[
-		dash.dependencies.Output("custom_graphing_adv_div", "children"),
-		dash.dependencies.Output("custom_graph_adv_dropdown", "options"),
+		dash.dependencies.Output("cg_adv_div", "children"),
+		dash.dependencies.Output("cg_graph_adv_dropdown", "options"),
 	],
 	[
 		dash.dependencies.Input("interval", "n_intervals"),
-		dash.dependencies.Input("custom_graph_adv_dropdown", "value"),
+		dash.dependencies.Input("cg_graph_adv_dropdown", "value"),
 	],
 	state=[
 		State(component_id="cg_find_buffer", component_property="children"),
-		State(component_id="custom_graphing_adv_div", component_property="children"),
+		State(component_id="cg_adv_div", component_property="children"),
+		State(component_id="cg_adv_table_metadata", component_property="cols"),
+		State(component_id="cg_adv_table_metadata", component_property="rows"),
+		State(component_id="cg_adv_table_metadata", component_property="rendererName"),
+		State(component_id="cg_adv_table_metadata", component_property="aggregatorName"),
+		State(component_id="cg_adv_table_metadata", component_property="vals"),
+		State(component_id="cg_adv_table_metadata", component_property="hiddenAttributes"),
 	],
 	prevent_initial_call=True)
-def tabs_content_custom_graphing4(interval, dropdown_values, find_results, children):
+def tabs_content_custom_graphing4(interval, dropdown_values, find_results, children, cols, rows, rendererName, aggregatorName, vals, hiddenAttributes):
 	global custom_graphing_adv_refresh
 	if custom_graphing_adv_refresh:
 		custom_graphing_adv_refresh = False
@@ -2719,7 +2867,7 @@ def tabs_content_custom_graphing4(interval, dropdown_values, find_results, child
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if dropdown_values == None:
 		dropdown_values = []
-	if trigger_id == "custom_graph_adv_dropdown":
+	if trigger_id == "cg_graph_adv_dropdown":
 		custom_graphing_adv_refresh = True
 		return dash.no_update, dash.no_update
 	if trigger_id == "interval":
@@ -2732,29 +2880,27 @@ def tabs_content_custom_graphing4(interval, dropdown_values, find_results, child
 					data_points.append(flat)
 				df = pd.DataFrame(data_points)
 				columns = list(df.columns)
-				# odd_header = columns[0]
-				# if odd_header == "customer":
-				# 	odd_header = columns[1]
 				l = [columns]
 				l.extend(df.values.tolist())
 				return dash_pivottable.PivotTable(
-							id="custom_graphing_adv_table",
+							id="cg_adv_table",
 							data=l,
-							# cols=["customer"],
+							cols=cols,
 							colOrder="key_a_to_z",
-							rows=[],
+							rows=rows,
 							rowOrder="key_a_to_z",
-							rendererName="Line Chart",
-							aggregatorName="List Unique Values",
-							# vals=[odd_header],
+							rendererName=rendererName,
+							aggregatorName=aggregatorName,
+							vals=vals,
 							unusedOrientationCutoff="Infinity",
-							hiddenAttributes=dropdown_values
+							hiddenAttributes=hiddenAttributes
 
 				), convert_list(columns)
 			return dash.no_update, dash.no_update
 		except Exception as e:
 			print(e)
 			return dash.no_update, dash.no_update
+
 
 # ---- amcs -----------------------------------------------------------------------------------------------------------
 @app.callback(
@@ -2853,31 +2999,35 @@ def amcs_toggle_collapse(n_clicks, is_open):
 	prevent_initial_call=True
 )
 def amcs_save_analysis(n_clicks, login_status, name, description, database, collection, field, projections, limit, skip, category, event, starttime, endtime, datetime_format, notes):
-	global sd
-	a_type = "timeline"
-	ctx = dash.callback_context
-	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-	if trigger_id == "amcs_analysis_save_button":
-		state = {
-			"description": description,
-			"database": database,
-			"collection": collection,
-			"field": field,
-			"projections": projections,
-			"limit": limit,
-			"skip": skip,
-			"category": category,
-			"event": event,
-			"starttime": starttime,
-			"endtime": endtime,
-			"datetime_format": datetime_format,
-			"notes": notes,
-		}
-		sd.append_graphing_state(name, a_type, state)
+	try:
+		global sd
+		a_type = "timeline"
+		ctx = dash.callback_context
+		trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+		if trigger_id == "amcs_analysis_save_button":
+			state = {
+				"description": description,
+				"database": database,
+				"collection": collection,
+				"field": field,
+				"projections": projections,
+				"limit": limit,
+				"skip": skip,
+				"category": category,
+				"event": event,
+				"starttime": starttime,
+				"endtime": endtime,
+				"datetime_format": datetime_format,
+				"notes": notes,
+			}
+			sd.append_graphing_state(name, a_type, state)
+			names = sd.get_graphing_state_names(a_type)
+			return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
 		names = sd.get_graphing_state_names(a_type)
-		return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
-	names = sd.get_graphing_state_names(a_type)
-	return convert_list(names), dash.no_update, []
+		return convert_list(names), dash.no_update, []
+	except Exception as e:
+		print(e)
+		return dash.no_update, dash.no_update, dash.no_update
 
 @app.callback(
 	[
@@ -2926,7 +3076,7 @@ def callback_login_amcs(children, n_clicks):
 		return [convert_list(new_databases)]
 	except Exception as e:
 		print(e)
-		return []
+		return [[]]
 
 
 
@@ -2941,7 +3091,7 @@ def callback_login_amcs(children, n_clicks):
 def callback_amcs_database(database):
 	try:
 		if database == "":
-			return [], None
+			return [[]]
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
@@ -2949,7 +3099,7 @@ def callback_amcs_database(database):
 		return [convert_list(new_collections)]
 	except Exception as e:
 		print(e)
-		return []
+		return [[]]
 
 @app.callback(
 	[
@@ -3190,31 +3340,35 @@ def amcd_toggle_collapse(n_clicks, is_open):
 	prevent_initial_call=True
 )
 def amcd_save_analysis(n_clicks, login_status, name, description, database, collection, field, projections, limit, skip, category, event, event_delimiter, datetime, datetime_format, notes):
-	global sd
-	a_type = "timeline_daily"
-	ctx = dash.callback_context
-	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
-	if trigger_id == "amcd_analysis_save_button":
-		state = {
-			"description": description,
-			"database": database,
-			"collection": collection,
-			"field": field,
-			"projections": projections,
-			"limit": limit,
-			"skip": skip,
-			"category": category,
-			"event": event,
-			"event_delimiter": event_delimiter,
-			"datetime": datetime,
-			"datetime_format": datetime_format,
-			"notes": notes,
-		}
-		sd.append_graphing_state(name, a_type, state)
+	try:
+		global sd
+		a_type = "timeline_daily"
+		ctx = dash.callback_context
+		trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+		if trigger_id == "amcd_analysis_save_button":
+			state = {
+				"description": description,
+				"database": database,
+				"collection": collection,
+				"field": field,
+				"projections": projections,
+				"limit": limit,
+				"skip": skip,
+				"category": category,
+				"event": event,
+				"event_delimiter": event_delimiter,
+				"datetime": datetime,
+				"datetime_format": datetime_format,
+				"notes": notes,
+			}
+			sd.append_graphing_state(name, a_type, state)
+			names = sd.get_graphing_state_names(a_type)
+			return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
 		names = sd.get_graphing_state_names(a_type)
-		return convert_list(names), name, generate_toast("Success: Saved analysis '{}'.".format(name), "Success", "success")
-	names = sd.get_graphing_state_names(a_type)
-	return convert_list(names), dash.no_update, []
+		return convert_list(names), dash.no_update, []
+	except Exception as e:
+		print(e)
+		return dash.no_update, dash.no_update, dash.no_update
 
 @app.callback(
 	[
@@ -3263,8 +3417,7 @@ def callback_login_amcd(children, n_clicks):
 		return [convert_list(new_databases)]
 	except Exception as e:
 		print(e)
-		return []
-
+		return [[]]
 
 @app.callback(
 	[
@@ -3277,7 +3430,7 @@ def callback_login_amcd(children, n_clicks):
 def callback_amcd_database(database):
 	try:
 		if database == "":
-			return [], None
+			return [[]]
 		collections = sd.get_prediction_collections(database)
 		new_collections = []
 		for entry in collections["collection"]:
@@ -3285,7 +3438,7 @@ def callback_amcd_database(database):
 		return [convert_list(new_collections)]
 	except Exception as e:
 		print(e)
-		return []
+		return [[]]
 
 @app.callback(
 	[
@@ -3456,12 +3609,17 @@ def callback_filter_button_busy(intervals):
 		dash.dependencies.Output("navbar_title", "children"),
 	],
 	[
-		dash.dependencies.Input("navbar_pretitle", "value"),
+		dash.dependencies.Input("navbar_pretitle", "children"),
+		dash.dependencies.Input("cg_analysis_dropdown", "value"),
 		dash.dependencies.Input("amcs_analysis_dropdown", "value"),
 		dash.dependencies.Input("amcd_analysis_dropdown", "value"),
 	],
 	prevent_initial_call=True)
-def update_navbar_title(pretitle, amcs, amcd):
+def update_navbar_title(pretitle, cg, amcs, amcd):
+	if pretitle == "Custom Graphing":
+		if cg == "" or cg == None:
+			return [pretitle]
+		return ["{} - {}".format(pretitle, cg)]
 	if pretitle == "Timeline":
 		if amcs == "" or amcs == None:
 			return [pretitle]
@@ -3474,10 +3632,10 @@ def update_navbar_title(pretitle, amcs, amcd):
 
 @app.callback(
 	[
-		dash.dependencies.Output("navbar_pretitle", "value"),
+		dash.dependencies.Output("navbar_pretitle", "children"),
 		dash.dependencies.Output("login_component", "style"),
+		dash.dependencies.Output("explore_component", "style"),
 		dash.dependencies.Output("scoring_component", "style"),
-		dash.dependencies.Output("batch_scoring_component", "style"),
 		dash.dependencies.Output("custom_graphing_component", "style"),
 		dash.dependencies.Output("amcs_component", "style"),
 		dash.dependencies.Output("amcd_component", "style"),
@@ -3499,7 +3657,6 @@ def toggle_collapse(input1, input2, input3, input4, input5, input6, login_status
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "login_status":
 		if login_status[:5] == "Error":			
-			return {"background-color": "#edf1f7", "min-height": "90vh"}
 			return "Dashboard",y,n,n,n,n,n
 		else:
 			return "Explore",n,y,n,n,n,n

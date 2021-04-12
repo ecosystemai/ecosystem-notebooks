@@ -5,9 +5,6 @@ import base64
 from runtime import access
 from runtime.apis import worker_utilities
 from runtime.apis import runtime_engine
-from IPython.display import HTML, display
-import tabulate
-import ipywidgets as widgets
 from prediction import jwt_access
 from prediction.apis import worker_file_service
 from prediction.apis import data_management_engine
@@ -426,8 +423,10 @@ class ScoringDash():
 				continue
 
 	def append_graphing_state(self, a_id, a_type, state):
-		headers = ["analysis_id", "analysis_type", "state"]
-		l = [a_id, a_type, json.dumps(state)]
+		headers = ["analysis_id", "analysis_type", "created_by", "created", "state"]
+		user = self.user
+		dt = datetime.datetime.now()
+		l = [a_id, a_type, user, str(dt), json.dumps(state)]
 		data = [headers, l]
 		data_results = data_management_engine.get_data(self.p_auth, "profilesMaster", "dashboards_gs", "{}", 1000000, "{}", 0)
 		for entry in data_results:

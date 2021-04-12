@@ -1,5 +1,5 @@
-# docker build -t ecosystem-dashboards:latest .
-# docker run -d -p 5000:5000 ecosystem-dashboards
+# docker build -t ecosystem-notebooks:latest .
+# docker run -d -p 5000:5000 ecosystem-notebooks
 
 FROM ubuntu:18.04
 
@@ -19,4 +19,4 @@ RUN pip3 install -r requirements.txt
 
 COPY . /app
 
-CMD ["gunicorn", "-w 1", "-b 0.0.0.0:5000", "dashboards:server", "--timeout 600", "--keep-alive 600"]
+CMD ["gunicorn", "-w 1", "-b 0.0.0.0:5000", "esd_boot:server", "--timeout 600", "--keep-alive 600"]
