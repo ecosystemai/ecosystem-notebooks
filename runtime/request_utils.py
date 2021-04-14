@@ -25,6 +25,7 @@ class ApiError(IOError):
 def auto_format_params(d):
 	s = ""
 	for key in d:
+		d[key] = str(d[key])
 		s += "{key}={{{key}}}&".format(key=key)
 	return s.format(**d)
 
@@ -54,25 +55,38 @@ def create_only_auth(auth, endpoint, **kwargs):
 		raise ApiError(error_message, response=resp)
 	return resp
 
-def create(auth, endpoint, json=None, params=None, ep_arg=None):
+def create_only_auth_no_error(auth, endpoint, **kwargs):
+	url_endpoint = auth.get_server() + endpoint["endpoint"]
+	resp = None
+	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
+	print(call_message)
+	resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), verify=False, **kwargs)
+	return resp
+
+def create(auth, endpoint, json=None, data=None, params=None, ep_arg=None, info=True):
 	url_endpoint = auth.get_server() + endpoint["endpoint"]
 	if ep_arg != None:
 		url_endpoint = url_endpoint + ep_arg
 	resp = None
 	call_message = endpoint["call_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"])
-	if json == None and params == None:
-		print(call_message)
+	if json == None and data == None and params == None:
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), verify=False)
-	elif json == None:
-		print(call_message + "?" + auto_format_params(params))
+	elif json == None and data == None:
+		call_message = call_message + "?" + auto_format_params(params)
 		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), params=params, verify=False)
 	elif params == None:
-		print(call_message)
-		resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json, verify=False)
+		if json == None:
+			resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), data=data, verify=False)
+		else:
+			resp = get_type(endpoint["type"])(url_endpoint, headers=auth.get_auth_headers(), json=json, verify=False)
 	else:
-		raise Exception("Error: Unsupported state: Both json and params parameters passed to create() function.")
+		raise Exception("Error: Unsupported state: Both json and params parameters passed.")
 	if resp.status_code != 200:
 		error_message = endpoint["error_message"].format(type=endpoint["type"], endpoint=endpoint["endpoint"], response_code=resp.status_code)
 		print(error_message)
 		raise ApiError(error_message, response=resp)
+	if info:
+		print(call_message)
+		if json != None:
+			print("\t{}".format(json))
 	return resp

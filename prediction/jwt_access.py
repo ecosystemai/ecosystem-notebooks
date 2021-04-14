@@ -30,10 +30,7 @@ class Authenticate:
 		self.access_token = token["access_token"]
 		self.refresh_token = token["refresh_token"]
 		self.expires_in = self.__format_time(token["expires_in"])
-		# Testing for expiration
-		# self.access_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGVjb3N5c3RlbS5haSIsImZ1bGxOYW1lIjoiVXNlciBVc2VyIiwicm9sZSI6WyJVU0VSIl0sImlhdCI6MTU5NjY3NzY1MSwiZXhwIjoxNTk2NjgxMjUxfQ.RGWQbDgiVEgUNFGlytiaNfMoXffO2Is1Sg_yD2MgkIY"
-		# self.refresh_token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyQGVjb3N5c3RlbS5haSIsImZ1bGxOYW1lIjoiVXNlciBVc2VyIiwicm9sZSI6WyJVU0VSIl0sImlhdCI6MTU5NjY3NzY1MSwiZXhwIjoxNTk5MjY5NjUxfQ.MRBJW_5MZMGfVaFuM7r1J-ysK4B_uZItN9kI-hNlwyI"
-		# self.expires_in = self.__format_time(1596681251748)
+
 		self.auth_headers = {
 			"Accept": "*/*",
 			"Authorization": "Bearer {}".format(self.access_token)
@@ -57,7 +54,6 @@ class Authenticate:
 		token = r.json()["token"]
 		print("Login Successful.")
 		return token
-
 
 	def __format_time(self, t):
 		# unix time in jwt authentication process seems to be oddly formated.

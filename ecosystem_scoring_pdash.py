@@ -5,6 +5,7 @@ import base64
 from runtime import access
 from runtime.apis import worker_utilities
 from runtime.apis import runtime_engine
+from runtime.apis import data_management_engine as r_dme
 from prediction import jwt_access
 from prediction.apis import worker_file_service
 from prediction.apis import data_management_engine
@@ -146,6 +147,19 @@ class ScoringDash():
 
 	def get_prediction_collections(self, database):
 		return data_management_engine.get_document_db_collections(self.p_auth, database)
+
+	def get_runtime_databases(self):
+		databases = {}
+		for use_case_name in self.use_cases.keys():
+			use_case = self.use_cases[use_case_name]
+			url = use_case["runtime_url"]
+			auth = use_case["auth"]
+			db_list = r_dme.get_document_db_list(auth, url)
+			databases[use_case_name] = db_list
+		return databases
+
+	def get_runtime_collections(self, auth, database):
+		return r_dme.get_document_db_collections(auth, database)
 
 	def get_runtime_url(self, usecase_name):
 		use_case = self.use_cases[usecase_name]
