@@ -1071,7 +1071,7 @@ custom_graphing_component = html.Div([
 																						),
 																					],
 																					# style={"height": "675px"},
-																					md=10
+																					md=11
 																				),
 																				dbc.Col([
 																						dbc.Textarea(
@@ -1081,7 +1081,7 @@ custom_graphing_component = html.Div([
 																							style={"height": "675px"}
 																						)
 																					],
-																					md=2
+																					md=1
 																				)
 																			]
 																		)
