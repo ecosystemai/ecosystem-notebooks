@@ -3585,11 +3585,14 @@ def callback_generate_button(n_clicks, data, category_field, event_field, event_
 		outputs = ecosystem_scoring_pdash.color_by_hour(outputs, parsed_datetime, color_field)
 		formatted_outputs = []
 		for output in outputs:
+			icon = "work"
+			if "success" in output[event_field]:
+				icon = "dance"
 			formatted_document = {
 				"category": "",
 				"text": output[event_field],
 				datetime_field: output[start_field],
-				"icon": "work",
+				"icon": icon,
 				prefix_field: output[event_field].split(event_delimiter)[0],
 				color_field: output[color_field]
 			}
