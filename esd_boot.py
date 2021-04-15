@@ -235,7 +235,7 @@ login_component = html.Div([
 															id="ps_url",
 															type="text",
 															# value="http://demo.ecosystem.ai:3001/api"
-															value="http://127.0.0.1:3001/api"
+															# value="http://127.0.0.1:3001/api"
 														),
 													]
 												),
@@ -246,7 +246,7 @@ login_component = html.Div([
 															# placeholder="Enter Prediction Server Username", 
 															id="ps_username",
 															type="text",
-															value="user@ecosystem.ai"
+															# value="user@ecosystem.ai"
 														),
 													]
 												),
@@ -257,7 +257,7 @@ login_component = html.Div([
 															# placeholder="Enter Prediction Server Password", 
 															id="ps_password",
 															type="password",
-															value="password"
+															# value="password"
 														),
 													]
 												),
@@ -798,21 +798,35 @@ custom_graphing_component = html.Div([
 						),
 						dbc.Collapse(
 							dbc.CardBody([
-									html.Label("Analysis ID"),
-									html.Div([
-											html.Div(
-												dcc.Dropdown(
-													id="cg_analysis_dropdown",
-													clearable=False,
-													style={"width": "30%"}
-												),
-											),
-										],
-									),
-									html.Br(),
-									html.Label("Create New Analysis"),
+									html.Label("Analysis"),
 									html.Div([
 											dbc.Row([
+													dbc.Col([
+															html.Label("Select Analysis ID"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="cg_analysis_dropdown",
+																			clearable=False,
+																		),
+																	),
+																],
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Analysis ID"),
+															html.Div([
+																	dbc.Input(
+																		id="cg_analysis_input",
+																		value="",
+																	),
+																],
+															),
+														],
+														md=3
+													),
 													dbc.Col([
 															html.Label("Description"),
 															html.Div([
@@ -828,25 +842,20 @@ custom_graphing_component = html.Div([
 														md=4
 													),
 													dbc.Col([
-															html.Label("Analysis ID"),
-															dbc.InputGroup([
-																	dbc.Input(
-																		id="cg_analysis_input",
-																		value="",
+															html.Br(),
+															html.Div([
+																	dbc.Button(
+																		"Save", 
+																		outline=True, 
+																		color="primary",
+																		id="cg_analysis_save_button",
+																		style={"width": "100px"}
 																	),
-																	dbc.InputGroupAddon(
-																		dbc.Button(
-																			"Save", 
-																			outline=True, 
-																			color="primary",
-																			id="cg_analysis_save_button", 
-																		),
-																		addon_type="append"
-																	)
 																],
-															),
+																style={"padding-top": "7px"}
+															)
 														],
-														md=4
+														md=2
 													),
 												]
 											),
@@ -1118,21 +1127,35 @@ amcs_component = html.Div([
 						),
 						dbc.Collapse(
 							dbc.CardBody([
-									html.Label("Analysis ID"),
-									html.Div([
-											html.Div(
-												dcc.Dropdown(
-													id="amcs_analysis_dropdown",
-													clearable=False,
-													style={"width": "30%"}
-												),
-											),
-										],
-									),
-									html.Br(),
-									html.Label("Create New Analysis"),
+									html.Label("Analysis"),
 									html.Div([
 											dbc.Row([
+													dbc.Col([
+															html.Label("Select Analysis ID"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcs_analysis_dropdown",
+																			clearable=False,
+																		),
+																	),
+																],
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Analysis ID"),
+															html.Div([
+																	dbc.Input(
+																		id="amcs_analysis_input",
+																		value="",
+																	),
+																],
+															),
+														],
+														md=3
+													),
 													dbc.Col([
 															html.Label("Description"),
 															html.Div([
@@ -1148,25 +1171,20 @@ amcs_component = html.Div([
 														md=4
 													),
 													dbc.Col([
-															html.Label("Analysis ID"),
-															dbc.InputGroup([
-																	dbc.Input(
-																		id="amcs_analysis_input",
-																		value="",
+															html.Br(),
+															html.Div([
+																	dbc.Button(
+																		"Save", 
+																		outline=True, 
+																		color="primary",
+																		id="amcs_analysis_save_button",
+																		style={"width": "100px"}
 																	),
-																	dbc.InputGroupAddon(
-																		dbc.Button(
-																			"Save", 
-																			outline=True, 
-																			color="primary",
-																			id="amcs_analysis_save_button", 
-																		),
-																		addon_type="append"
-																	)
 																],
-															),
+																style={"padding-top": "7px"}
+															)
 														],
-														md=4
+														md=2
 													),
 												]
 											),
@@ -1426,21 +1444,35 @@ amcd_component = html.Div([
 						),
 						dbc.Collapse(
 							dbc.CardBody([
-									html.Label("Analysis ID"),
-									html.Div([
-											html.Div(
-												dcc.Dropdown(
-													id="amcd_analysis_dropdown",
-													clearable=False,
-													style={"width": "30%"}
-												),
-											),
-										],
-									),
-									html.Br(),
-									html.Label("Create New Analysis"),
+									html.Label("Analysis"),
 									html.Div([
 											dbc.Row([
+													dbc.Col([
+															html.Label("Select Analysis ID"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="amcd_analysis_dropdown",
+																			clearable=False,
+																		),
+																	),
+																],
+															),
+														],
+														md=3
+													),
+													dbc.Col([
+															html.Label("Analysis ID"),
+															html.Div([
+																	dbc.Input(
+																		id="amcd_analysis_input",
+																		value="",
+																	),
+																],
+															),
+														],
+														md=3
+													),
 													dbc.Col([
 															html.Label("Description"),
 															html.Div([
@@ -1456,25 +1488,20 @@ amcd_component = html.Div([
 														md=4
 													),
 													dbc.Col([
-															html.Label("Analysis ID"),
-															dbc.InputGroup([
-																	dbc.Input(
-																		id="amcd_analysis_input",
-																		value="",
+															html.Br(),
+															html.Div([
+																	dbc.Button(
+																		"Save", 
+																		outline=True, 
+																		color="primary",
+																		id="amcd_analysis_save_button",
+																		style={"width": "100px"}
 																	),
-																	dbc.InputGroupAddon(
-																		dbc.Button(
-																			"Save", 
-																			outline=True, 
-																			color="primary",
-																			id="amcd_analysis_save_button", 
-																		),
-																		addon_type="append"
-																	)
 																],
-															),
+																style={"padding-top": "7px"}
+															)
 														],
-														md=4
+														md=2
 													),
 												]
 											),

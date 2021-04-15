@@ -447,8 +447,10 @@ class ScoringDash():
 			if entry["analysis_id"] != a_id or entry["analysis_type"] != a_type:
 				analysis_id = entry["analysis_id"]
 				analysis_type = entry["analysis_type"]
+				analysis_user = entry["created_by"]
+				analysis_time = entry["created"]
 				a_state = entry["state"]
-				data.append([analysis_id, analysis_type, a_state])
+				data.append([analysis_id, analysis_type, analysis_user, analysis_time, a_state])
 		with open("tmp/graphing_states.csv", "w", newline="") as f:
 			writer = csv.writer(f)
 			writer.writerows(data)
