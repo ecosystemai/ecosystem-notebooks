@@ -2486,29 +2486,24 @@ def upload_files(n_clicks, usecase, database, target_fs, target_ad, model_name, 
 		return generate_toast("Error: Could not upload files: Use case is not selected.", "Error", "danger")
 	if database == None or database == "":
 		return generate_toast("Error: Could not upload files: Database field is empty.", "Error", "danger")
-	if model_name == None or model_name == "":
-		return generate_toast("Error: Could not upload files: Model field is empty.", "Error", "danger")
-	if target_fs == None or target_fs == "":
-		return generate_toast("Error: Could not upload files: Target Feature Store field is empty.", "Error", "danger")
-	if fs_name == None or fs_name == "":
+	if (target_fs == None or target_fs == "") and (fs_name != None and fs_name != ""):
 		return generate_toast("Error: Could not upload files: Feature Store field is empty.", "Error", "danger")
-	model_path = tmp_dir + model_name
-	fs_path = tmp_dir + fs_name
-	if ad_name == "" or ad_name == None or ad_content == "" or ad_content == None:
-		try:
-			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs)
-			return generate_toast("Successfully uploaded files.", "Success", "success")
-		except Exception as e:
-			print(e)
-			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
-	else:
-		ad_path = tmp_dir + ad_name
-		try:
-			sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs, ad_path=ad_path, ad_content=ad_content, additional=target_ad)
-			return generate_toast("Successfully uploaded files.", "Success", "success")
-		except Exception as e:
-			print(e)
-			return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
+	if (target_fs != None and target_fs != "") and (fs_name == None or fs_name == ""):
+		return generate_toast("Error: Could not upload files: Target Feature Store field is empty.", "Error", "danger")
+	if (target_ad == None or target_ad == "") and (ad_name != None and ad_name != ""):
+		return generate_toast("Error: Could not upload files: Additional File field is empty.", "Error", "danger")
+	if (target_ad != None and target_ad != "") and (ad_name == None or ad_name == ""):
+		return generate_toast("Error: Could not upload files: Target Additional File field is empty.", "Error", "danger")
+
+	model_path = tmp_dir + str(model_name)
+	fs_path = tmp_dir + str(fs_name)
+	ad_path = tmp_dir + str(ad_name)
+	try:
+		sd.upload_use_case_files(usecase, database, model_path, model_content, fs_path, fs_content, target_fs, ad_path=ad_path, ad_content=ad_content, additional=target_ad)
+		return generate_toast("Successfully uploaded files.", "Success", "success")
+	except Exception as e:
+		print(e)
+		return generate_toast("Error: Could not upload files. {}".format(e), "Error", "danger")
 
 
 @app.callback(
