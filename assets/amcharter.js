@@ -24,7 +24,8 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 
 				chart.dateFormatter.inputDateFormat = datetime_format;
 				// chart.dateFormatter.inputDateFormat = "yyyy-MM-dd HH:mm";
-				chart.dateFormatter.dateFormat = "HH";
+				chart.dateFormatter.inputDateFormat = datetime_format;
+				// chart.dateFormatter.dateFormat = "HH";
 
 				new_data = JSON.parse(data_buffer);
 				new_data.sort(function(first, second) {
@@ -60,7 +61,7 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 				dateAxis.renderer.autoScale = false;
 				dateAxis.renderer.autoCenter = false;
 				dateAxis.renderer.minGridDistance = 70;
-				dateAxis.baseInterval = { count: 5, timeUnit: "minute" };
+				dateAxis.baseInterval = { count: 5, timeUnit: "seconds" };
 				dateAxis.renderer.tooltipLocation = 0;
 				dateAxis.renderer.line.strokeDasharray = "1,4";
 				dateAxis.renderer.line.strokeOpacity = 0.5;
@@ -309,7 +310,8 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 
 				var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
 				dateAxis.renderer.minGridDistance = 70;
-				dateAxis.baseInterval = { count: 1, timeUnit: "day" };
+				// dateAxis.baseInterval = { count: 1, timeUnit: "day" };
+				dateAxis.baseInterval = { count: 5, timeUnit: "seconds" };
 				dateAxis.renderer.tooltipLocation = 0;
 				dateAxis.startLocation = -0.5;
 				dateAxis.renderer.line.strokeDasharray = "1,4";
