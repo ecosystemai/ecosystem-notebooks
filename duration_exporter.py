@@ -63,7 +63,7 @@ class Duration():
 
 ds = Durations()
 
-with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331.csv") as csv_file:
+with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_sampler_actions_9-20.csv") as csv_file:
 	csv_reader = csv.DictReader(csv_file, delimiter=",")
 	# row_count = 0
 	for row in csv_reader:
@@ -80,7 +80,7 @@ print(len(output))
 
 
 keys = output[0].keys()
-with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_duration_format.csv", "w", newline="") as csv_file:
+with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_sampler_actions_9-20_duration.csv", "w", newline="") as csv_file:
 	dict_writer = csv.DictWriter(csv_file, keys)
 	dict_writer.writeheader()
 	dict_writer.writerows(output)

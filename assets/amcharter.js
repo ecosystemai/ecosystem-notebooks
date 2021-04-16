@@ -296,12 +296,25 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 						
 					}
 				}
+				const keys = Object.keys(new_data[0]);
+				var new_keys = {};
+				for (i = 0; i < keys.length; i++) {
+					if (keys[i].startsWith("data_")) {
+						new_keys[keys[i]] = keys[i].substring(5,keys[i].length);
+					}
+				}
+				const n_keys = Object.keys(new_keys);
+				var tooltip_text = "{task}: [bold]{openDateX}[/] - [bold]{dateX}[/]";
+				tooltip_text = tooltip_text + "\n---------------------------------------------------";
+				for (i = 0; i < n_keys.length; i++){
+					tooltip_text = tooltip_text + "\n    [bold]" + new_keys[n_keys[i]] + "[/]: {" + n_keys[i]+ "}";
+				}
 				chart.data = new_data;
-
 
 				chart.dateFormatter.dateFormat = datetime_format;
 				chart.dateFormatter.inputDateFormat = datetime_format;
 				chart.fontSize = 11;
+				chart.tooltipContainer.fontSize = 11;
 
 				var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
 				categoryAxis.dataFields.category = "category";
@@ -333,7 +346,9 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 
 				var series = chart.series.push(new am4plugins_timeline.CurveColumnSeries());
 				series.columns.template.height = am4core.percent(20);
-				series.columns.template.tooltipText = "{task}: [bold]{openDateX}[/] - [bold]{dateX}[/]";
+				// series.columns.template.tooltipText = "{task}: [bold]{openDateX}[/] - [bold]{dateX}[/]";
+				series.columns.template.tooltipText = tooltip_text;
+
 
 				series.dataFields.openDateX = "start";
 				series.dataFields.dateX = "end";
@@ -380,7 +395,8 @@ window.dash_clientside = Object.assign({}, window.dash_clientside, {
 				flagBullet.locationX = 0;
 				flagBullet.propertyFields.fill = "color";
 				flagBullet.propertyFields.stroke = "color";
-				flagBullet.tooltipText = "{task}: [bold]{start}[/] - [bold]{end}[/]";
+				// flagBullet.tooltipText = "{task}: [bold]{start}[/] - [bold]{end}[/]\n";
+				flagBullet.tooltipText = tooltip_text;
 
 				var cursor = new am4plugins_timeline.CurveCursor();
 				chart.cursor = cursor;

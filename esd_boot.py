@@ -3233,8 +3233,11 @@ def callback_find_button(n_clicks, data, category_field, event_field, start_fiel
 				"category": output[category_field],
 				"task": output[event_field],
 				"start": output[start_field],
-				"end": output[end_field]
+				"end": output[end_field],
 			}
+			for field in output.keys():
+				new_key = "data_{}".format(field)
+				formatted_document[new_key] = output[field]
 			formatted_outputs.append(formatted_document)
 		j_formatted_outputs = json.dumps(formatted_outputs)
 		acts.amcs_generate_button.busy = False
