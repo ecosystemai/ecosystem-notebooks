@@ -9,12 +9,12 @@ class Durations():
 	def __init__(self):
 		self.mvn = {}
 
-	def addTime(self, time, msisdn, visit_num):
+	def addTime(self, time, msisdn, visit_num, event_page):
 		if msisdn not in self.mvn:
 			self.mvn[msisdn] = {}
 		if visit_num not in self.mvn[msisdn]:
 			self.mvn[msisdn][visit_num] = Duration(msisdn, visit_num)
-		self.mvn[msisdn][visit_num].addTime(time)
+		self.mvn[msisdn][visit_num].addTime(time, event_page)
 
 	def getOutput(self):
 		new_list = []
@@ -27,17 +27,29 @@ class Durations():
 				new_dict["datetime_min"] = dur.min
 				new_dict["datetime_max"] = dur.max
 				new_dict["duration"] = dur.getDuration()
+				new_dict["action_count"] = dur.action_count
+				dpa = "N/A"
+				if new_dict["action_count"] > 0:
+					dpa = new_dict["duration"]/new_dict["action_count"]
+				new_dict["dpa"] = dpa
 				new_list.append(new_dict)
 		return new_list
+
+success_words = [
+	"success",
+	"SUCCESS",
+	"thank you"
+]
 
 class Duration():
 	def __init__(self, msisdn, visit_num):
 		self.msisdn = msisdn
 		self.visit_num = visit_num
+		self.action_count = 0
 		self.min = None
 		self.max = None
 
-	def addTime(self, time):
+	def addTime(self, time, event_page):
 		dt = None
 		try:
 			format = "%Y-%m-%d %H:%M:%S"
@@ -57,20 +69,26 @@ class Duration():
 		if dt > self.max:
 			self.max = dt
 
+		for sw in success_words:
+			if sw in event_page:
+				self.action_count += 1
+				break		
+
 	def getDuration(self):
 		return (self.max - self.min).total_seconds()
 
 
 ds = Durations()
 
-with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_sampler_actions_9-20.csv") as csv_file:
+with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331.csv") as csv_file:
 	csv_reader = csv.DictReader(csv_file, delimiter=",")
 	# row_count = 0
 	for row in csv_reader:
 		msisdn = row["msisdn"]
 		visit_num = row["visit_num"]
 		event_timestamp = row["event_timestamp"]
-		ds.addTime(event_timestamp, msisdn, visit_num)
+		event_page = row["event_page"]
+		ds.addTime(event_timestamp, msisdn, visit_num, event_page)
 		# row_count += 1
 		# if row_count >= 10:
 		# 	break
@@ -80,7 +98,7 @@ print(len(output))
 
 
 keys = output[0].keys()
-with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_sampler_actions_9-20_duration.csv", "w", newline="") as csv_file:
+with open("C:/Users/Ramsay/Documents/GitHub/data/query-impala-376379-non-null-0331_duration.csv", "w", newline="") as csv_file:
 	dict_writer = csv.DictWriter(csv_file, keys)
 	dict_writer.writeheader()
 	dict_writer.writerows(output)
