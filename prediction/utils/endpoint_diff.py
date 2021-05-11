@@ -31,6 +31,17 @@ def create_endpoint(endpoint, method):
 	}
 	return d
 
+def endpoints_equal(eps, epw):
+	if eps == epw:
+		return True
+	if epw[-1] == "/":
+		index1 = eps.find("{")
+		index2 = eps.find("}")
+		new_eps = eps[:index1] + eps[index2+1:]
+		if new_eps == epw:
+			return True
+	return False
+
 def compare_endpoints(server_endpoints, wrapper_endpoints):
 	both = []
 	server = []
@@ -42,7 +53,7 @@ def compare_endpoints(server_endpoints, wrapper_endpoints):
 		for d2 in wrapper_endpoints:
 			we = d2["endpoint"]
 			wm = d2["method"]
-			if se == we and wm.lower() in sm.lower():
+			if endpoints_equal(se, we) and wm.lower() in sm.lower():
 				both.append([d, d2])
 				found = True
 				break
@@ -55,7 +66,7 @@ def compare_endpoints(server_endpoints, wrapper_endpoints):
 		for d in server_endpoints:
 			se = d["endpoint"]
 			sm = d["method"]
-			if se == we and wm.lower() in sm.lower():
+			if endpoints_equal(se, we) and wm.lower() in sm.lower():
 				found = True
 				break
 		if not found:
