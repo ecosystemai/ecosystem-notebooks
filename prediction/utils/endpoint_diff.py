@@ -2,14 +2,18 @@ from os import listdir
 from os.path import isfile, join
 import sys
 import json
+import os
+from glob import glob
 
-runtime_server_path = "C:/Users/Ramsay/Documents/GitHub/ecosystem-runtime/"
-runtime_fp = runtime_server_path + "src/main/java/com/ecosystem/runtime/"
-files = [f for f in listdir(runtime_fp) if isfile(join(runtime_fp, f))]
+prediction_server_path = "C:/Users/Ramsay/Documents/GitHub/ecosystem-server/"
+prediction_fp = prediction_server_path + "src/main/java/com/ecosystem/"
+# files = [f for f in listdir(prediction_fp) if isfile(join(prediction_fp, f))]
+files = [y for x in os.walk(prediction_fp) for y in glob(os.path.join(x[0], "*.java"))]
 
 server_endpoints = []
 api_request = "@RequestMapping"
 api_post_request = "@PostMapping"
+api_get_request = "@GetMapping"
 
 def stripping(parameter):
 	if parameter[0] == "=":
@@ -18,10 +22,6 @@ def stripping(parameter):
 	parameter = parameter.replace('"', "")
 	if parameter[0] == ":":
 		parameter = parameter[1:]
-	# if parameter[0] == '"' or parameter[0] == "'":
-	# 	parameter = parameter[1:]
-	# if parameter[-1] == '"' or parameter[-1] == "'":	
-	# 	parameter = parameter[:-1]
 	return parameter
 
 def create_endpoint(endpoint, method):
@@ -102,9 +102,9 @@ def compare_endpoints(server_endpoints, wrapper_endpoints):
 		print("".join(word.ljust(col_width) for word in row))
 	print("Count:{}".format(len(wrapper)))
 
-for f_n in files:
-	file_path = runtime_fp + f_n
+for file_path in files:
 	f = open(file_path, "r")
+	endpoint_prefix = ""
 	for line in f:
 		if api_request in line:
 			index = line.find(api_request)
@@ -116,29 +116,46 @@ for f_n in files:
 				value = ""
 				method = ""
 				parameters = line[index+len(api_request):]
+				endpoint_prefix = parameters[2:-3]
 				parameters = parameters.split(",")
 				for parameter in parameters:
 					parameter = "".join(parameter.split())
-					if parameter[0] == "(":
-						parameter = parameter[1:]
-					if parameter[-1] == ")":
-						parameter = parameter[:-1]
 					if "value" in parameter:
+						if parameter[0] == "(":
+							parameter = parameter[1:]
+						if parameter[-1] == ")":
+							parameter = parameter[:-1]
 						index = parameter.find("value")
 						parameter = parameter[index+len("value"):]
 						value = stripping(parameter)
 
 					elif "method" in parameter:
+						if parameter[0] == "(":
+							parameter = parameter[1:]
+						if parameter[-1] == ")":
+							parameter = parameter[:-1]
 						index = parameter.find("method")
 						parameter = parameter[index+len("method"):]
 						method = stripping(parameter)
-						
-				server_endpoints.append(create_endpoint(value, method))
+				if value != "" and method != "":
+					server_endpoints.append(create_endpoint(value, method))
 		if api_post_request in line:
 			index = line.find(api_post_request)
 			line = line[index+len(api_post_request):]
 			line = line[2:-3]
-			server_endpoints.append(create_endpoint(line, "POST"))
+			if endpoint_prefix[0] == "/":
+				server_endpoints.append(create_endpoint(endpoint_prefix + line, "POST"))
+			else:
+				server_endpoints.append(create_endpoint(line, "POST"))
+		if api_get_request in line:
+			index = line.find(api_get_request)
+			line = line[index+len(api_get_request):]
+			line = line[2:-3]
+			if endpoint_prefix[0] == "/":
+				server_endpoints.append(create_endpoint(endpoint_prefix + line, "GET"))
+			else:
+				server_endpoints.append(create_endpoint(line, "GET"))
+			
 
 
 # for se in server_endpoints:
@@ -174,7 +191,8 @@ for f_n in files:
 				open_count += 1
 			if open_count == close_count:
 				s = data[index: index+i+1]
-				j_str = json.loads(s)
+				j_str = eval(s)
+				# j_str = json.loads(s)
 				wrapper_endpoints.append(create_endpoint(j_str["endpoint"], j_str["type"]))
 				data = data[index+i:]
 				break
