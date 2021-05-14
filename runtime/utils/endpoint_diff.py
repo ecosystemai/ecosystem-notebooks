@@ -174,7 +174,8 @@ for f_n in files:
 				open_count += 1
 			if open_count == close_count:
 				s = data[index: index+i+1]
-				j_str = json.loads(s)
+				j_str = eval(s)
+				# j_str = json.loads(s)
 				wrapper_endpoints.append(create_endpoint(j_str["endpoint"], j_str["type"]))
 				data = data[index+i:]
 				break

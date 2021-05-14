@@ -18,25 +18,7 @@ GET_FILE = {
 }
 GET_IP = {
 	"type": "get",
-	"endpoint": "/getModelList",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GET_MODEL_LIST = {
-	"type": "get",
-	"endpoint": "/getModelList",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GET_PROPERTIES_MOJO_LIST = {
-	"type": "get",
-	"endpoint": "/getPropertiesMojoList",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-GET_PROPERTIES_PREDICT_PARAM = {
-	"type": "get",
-	"endpoint": "/getPropertiesPredictParam",
+	"endpoint": "/getIP",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
@@ -61,24 +43,6 @@ MATRIX_TO_LIST = {
 PULL_KAFKA_TOPIC = {
 	"type": "get",
 	"endpoint": "/pullKafkaTopic",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-PUSH_KAFKA_TOPIC = {
-	"type": "get",
-	"endpoint": "/pushKafkaTopic",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-UPDATE_MOJO_LIST = {
-	"type": "get",
-	"endpoint": "/updateMojoList",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
-UPDATE_PREDICT_PARAM = {
-	"type": "get",
-	"endpoint": "/updatePredictParam",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
@@ -128,6 +92,34 @@ GET_SPEND_PERSONALITY = {
 GET_FINANCIAL_WELLNESS = {
 	"type": "get",
 	"endpoint": "/getFinancialWellnessScore",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+CLOSE_CASSANDRA = {
+	"type": "get",
+	"endpoint": "/closeCassandra",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+TEST_KAFKA_KERBEROS = {
+	"type": "get",
+	"endpoint": "/testKafkaKerberos",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+ESTORE_RECOMMENDATIONS = {
+	"type": "get",
+	"endpoint": "/estoreRecommendations",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_ESTORE_RECOMMENDATIONS = {
+	"type": "put",
+	"endpoint": "/estoreRecommendations",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
