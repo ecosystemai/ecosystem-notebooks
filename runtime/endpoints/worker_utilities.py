@@ -16,6 +16,12 @@ GET_FILE = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+GET_FILE_LIST = {
+	"type": "get",
+	"endpoint": "/getFileList",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
 GET_IP = {
 	"type": "get",
 	"endpoint": "/getIP",
@@ -74,6 +80,13 @@ UPDATE_PROPERTIES = {
 	"error_message": "{type} {endpoint} {response_code}"
 }
 
+UPDATE_PROPERTIES_KEY = {
+	"type": "get",
+	"endpoint": "/updatePropertiesKey",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
 REFRESH = {
 	"type": "get",
 	"endpoint": "/refresh",
@@ -92,6 +105,20 @@ GET_SPEND_PERSONALITY = {
 GET_FINANCIAL_WELLNESS = {
 	"type": "get",
 	"endpoint": "/getFinancialWellnessScore",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_FINANCIAL_WELLNESS = {
+	"type": "put",
+	"endpoint": "/getFinancialWellnessScore",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+SQL_CASSANDRA = {
+	"type": "get",
+	"endpoint": "/sqlCassandra",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
@@ -120,6 +147,69 @@ ESTORE_RECOMMENDATIONS = {
 PUT_ESTORE_RECOMMENDATIONS = {
 	"type": "put",
 	"endpoint": "/estoreRecommendations",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+CONNECT_U = {
+	"type": "get",
+	"endpoint": "/connectU",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_CONNECT_U = {
+	"type": "put",
+	"endpoint": "/connectU",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+JUST_FOR_YOU = {
+	"type": "get",
+	"endpoint": "/justforyou",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_JUST_FOR_YOU = {
+	"type": "put",
+	"endpoint": "/justforyou",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+ESTORE_RECOMMENDER_NON_GSM = {
+	"type": "get",
+	"endpoint": "/estoreRecommenderNonGSM",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_ESTORE_RECOMMENDER_NON_GSM = {
+	"type": "put",
+	"endpoint": "/estoreRecommenderNonGSM",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+GIFT_RECOMMENDATIONS_FREE = {
+	"type": "get",
+	"endpoint": "/giftRecommendationsFree",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+GIFT_RECOMMENDATIONS_PURCHASED = {
+	"type": "get",
+	"endpoint": "/giftRecommendationsPurchased",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+GIFT_RECOMMENDATIONS = {
+	"type": "put",
+	"endpoint": "/giftRecommendations",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }

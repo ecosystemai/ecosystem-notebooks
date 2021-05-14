@@ -158,8 +158,13 @@ if "__init__.py" in files:
 for f_n in files:
 	file_path = wrapper_fp + f_n
 	f = open(file_path, "r")
-	data = f.read()
-	data = "".join(data.split())
+	new_data = []
+	for line in f:
+		line = "".join(line.split())
+		if len(line) > 0:
+			if line[0] != "#":
+				new_data.append(line)
+	data = "".join(new_data)
 	while True:
 		index = data.find("{")
 		if index == -1:
