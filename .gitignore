@@ -1,4 +1,5 @@
 .DS_Store
+/airflow/logs/*
 /presto-server-0.250/*
 /dest/*
 /amcharts_4.10.17/*
