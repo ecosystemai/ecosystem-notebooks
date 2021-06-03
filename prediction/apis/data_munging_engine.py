@@ -70,7 +70,7 @@ def enum_convert(auth, database, collection, attribute):
     return meta
 
 def fill_zeros(auth, database, collection, attribute):
-    ep = endpoints.FILL_ZEROES
+    ep = endpoints.FILL_ZEROS
     param_dict = {
         "mongodb": database, 
         "collection": collection,
@@ -79,6 +79,20 @@ def fill_zeros(auth, database, collection, attribute):
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta
+
+def fill_values(auth, database, collection, find, attribute, value):
+    ep = endpoints.FILL_VALUES
+    param_dict = {
+        "mongodb": database, 
+        "collection": collection,
+        "find": find,
+        "attribute": attribute,
+        "value": value
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
 
 def foreign_key_aggregator(auth, database, collection, attribute, search, mongodbf, collectionf, attributef, fields):
     ep = endpoints.FOREIGN_KEY_AGGREGATOR
@@ -288,7 +302,7 @@ def generate_time_series_features(auth, categoryfield, collection, database, dat
     meta = resp.json()
     return meta
 
-def generate_time_series_features(auth, category, collection, collectionOut, database, find, groupby):
+def personality_enrich(auth, category, collection, collectionOut, database, find, groupby):
     ep = endpoints.PERSONALITY_ENRICH
     param_dict = {
         "category": category,

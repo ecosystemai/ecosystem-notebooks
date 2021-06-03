@@ -35,9 +35,15 @@ ENUM_CONVERT = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+FILL_ZEROS = {
+	"type": "get",
+	"endpoint": "/fillZeros",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
 FILL_ZEROES = {
 	"type": "get",
-	"endpoint": "/fillZeroes",
+	"endpoint": "/fillValues",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
