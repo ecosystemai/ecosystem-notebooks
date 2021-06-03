@@ -56,3 +56,51 @@ def process_directed_graph(auth, graphMeta, graphParam):
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta
+
+
+def generate_forecast(auth, attribute, collection, collectionOut, database, dateattribute, find, historicsteps, steps):
+    ep = endpoints.GENERATE_FORECAST
+    param_dict = {
+        "attribute": attribute,
+        "collection": collection,
+        "collectionOut": collectionOut,
+        "database": database,
+        "dateattribute": dateattribute,
+        "find": find,
+        "historicsteps": historicsteps,
+        "steps": steps
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def process_apriori(auth, colItem, collection, collectionOut, custField, database, dbItem, find, itemField, supportCount):
+    ep = endpoints.PROCESS_APRIORI
+    param_dict = {
+        "colItem": colItem,
+        "collection": collection,
+        "collectionOut": collectionOut,
+        "custField": custField,
+        "database": database,
+        "dbItem": dbItem,
+        "find": find,
+        "itemField": itemField,
+        "supportCount": supportCount
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def process_ecogenetic_network(auth, collection, collectionOut, database, find, graphMeta, graphParam):
+    ep = endpoints.PROCESS_ECOGENETIC_NETWORK
+    param_dict = {
+        "collection": collection,
+        "collectionOut": collectionOut,
+        "database": database,
+        "find": find,
+        "graphMeta": graphMeta,
+        "graphParam": graphParam
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta

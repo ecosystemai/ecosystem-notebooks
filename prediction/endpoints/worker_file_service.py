@@ -25,3 +25,10 @@ GET_PROPERTY = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+
+GET_FILES = {
+	"type": "get",
+	"endpoint": "/getFiles",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"	
+}

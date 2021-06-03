@@ -125,15 +125,29 @@ PREDICTION_ENRICH_FAST_GET = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
-PREDICTION_ENRICH_FAST_POST = {
-	"type": "post",
-	"endpoint": "/predictionEnrichFast",
-	"call_message": "{type} {endpoint}",
-	"error_message": "{type} {endpoint} {response_code}"
-}
 SIC_ENRICH = {
 	"type": "get",
 	"endpoint": "/sicEnrich",
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+PROCESS_CLIENT_PULSE_RELIABILITY = {
+	"type": "get",
+	"endpoint": "/processClientPulseReliability",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+GENERATE_TIME_SERIES_FEATURES = {
+	"type": "get",
+	"endpoint": "/generateTimeSeriesFeatures",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PERSONALITY_ENRICH = {
+	"type": "get",
+	"endpoint": "/personalityEnrich",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"	
+}
+

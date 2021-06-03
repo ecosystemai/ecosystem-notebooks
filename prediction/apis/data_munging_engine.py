@@ -1,6 +1,6 @@
 from prediction.endpoints import data_munging_engine as endpoints
 from prediction import request_utils
-from prediction.apis import quickflat as qf
+# from prediction.apis import quickflat as qf
 
 def concat_columns2(auth, database, collection, attribute, separator):
     ep = endpoints.CONCAT_COLUMNS2
@@ -208,8 +208,7 @@ def munge_transactions_aggregate(auth, munging_step, project_id):
     meta = resp.json()
     return meta
 
-# TODO: Should Add regular and Post of fast endpoints.
-def enrich_predictor(auth, database, collection, search, sort, predictor, predictor_label, attributes, skip, limit):
+def prediction_enrich_fast(auth, database, collection, search, sort, predictor, predictor_label, attributes, skip, limit):
     ep = endpoints.PREDICTION_ENRICH_FAST_GET
     param_dict = {
         "mongodb": database, 
@@ -221,6 +220,20 @@ def enrich_predictor(auth, database, collection, search, sort, predictor, predic
         "attributes": attributes,
         "skip": skip,
         "limit": limit
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def predicition_enrich(auth, database, collection, search, sort, predictor, predictor_label, attributes):
+    ep = endpoints.PREDICTION_ENRICH
+    param_dict = {
+        "mongodb": database, 
+        "collection": collection,
+        "search": search,
+        "predictor": predictor,
+        "predictor_label": predictor_label,
+        "attributes": attributes,
     }
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
@@ -238,6 +251,53 @@ def enrich_sic(auth, database, collection, attribute, find):
     meta = resp.json()
     return meta
 
-def quickflat(config):
-	quick_flat = qf.QuickFlat(config)
-	quick_flat.flatten()
+# def quickflat(config):
+# 	quick_flat = qf.QuickFlat(config)
+# 	quick_flat.flatten()
+
+def process_client_pulse_reliability(auth, collection, collectionOut, database, find, groupby, mongoAttribute, typeName):
+    ep = endpoints.PROCESS_CLIENT_PULSE_RELIABILITY
+    param_dict = {
+        "collection": collection,
+        "collectionOut": collectionOut,
+        "database": database,
+        "find": find,
+        "groupby": groupby,
+        "mongoAttribute": mongoAttribute,
+        "type": typeName
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def generate_time_series_features(auth, categoryfield, collection, database, datefield, featureset, find, groupby, numfield, startdate=None, windowsize=1):
+    ep = endpoints.GENERATE_TIME_SERIES_FEATURES
+    param_dict = {
+        "categoryfield": categoryfield,
+        "collection": collection,
+        "database": database,
+        "datefield": datefield,
+        "featureset": featureset,
+        "find": find,
+        "groupby": groupby,
+        "numfield": numfield,
+        "startdate": startdate,
+        "windowsize": windowsize
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def generate_time_series_features(auth, category, collection, collectionOut, database, find, groupby):
+    ep = endpoints.PERSONALITY_ENRICH
+    param_dict = {
+        "category": category,
+        "collection": collection,
+        "collectionOut": collectionOut,
+        "database": database,
+        "find": find,
+        "groupby": groupby        
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta

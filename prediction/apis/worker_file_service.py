@@ -40,3 +40,13 @@ def get_property(auth, property_key):
 	resp = request_utils.create_only_auth(auth, ep, params=param_dict)
 	data = resp.content.decode("utf-8")
 	return data
+
+def get_files(auth, path="./", user=""):
+	ep = endpoints.GET_FILES
+	param_dict = {
+		"path": path,
+		"user": user
+	}
+	resp = request_utils.create(auth, ep, params=param_dict)
+	result = resp.json()
+	return result
