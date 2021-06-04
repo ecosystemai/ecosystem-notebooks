@@ -213,3 +213,20 @@ GIFT_RECOMMENDATIONS = {
 	"call_message": "{type} {endpoint}",
 	"error_message": "{type} {endpoint} {response_code}"
 }
+
+BEHAVIOR_RECOMMENDER = {
+	"type": "get",
+	"endpoint": "/behaviorRecommender",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+PUT_BEHAVIOR_RECOMMENDER = {
+	"type": "put",
+	"endpoint": "/behaviorRecommender",
+	"call_message": "{type} {endpoint}",
+	"error_message": "{type} {endpoint} {response_code}"
+}
+
+
+		

@@ -350,3 +350,24 @@ def put_gift_recommendations(auth, document):
     resp = request_utils.create(auth, ep, params=param_dict)
     meta = resp.json()
     return meta
+
+def behavior_recommender(auth, campaign, subcampaign, customer, channel, userid, params):
+    ep = endpoints.GIFT_RECOMMENDATIONS_PURCHASED
+    param_dict = {"campaign": campaign, 
+                  "subcampaign":subcampaign, 
+                  "customer":customer, 
+                  "channel":channel, 
+                  "userid":userid, 
+                  "params":params}
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
+
+def put_behavior_recommender(auth, document):
+    ep = endpoints.PUT_BEHAVIOR_RECOMMENDER
+    param_dict = {
+        "document": document,
+    }
+    resp = request_utils.create(auth, ep, params=param_dict)
+    meta = resp.json()
+    return meta
