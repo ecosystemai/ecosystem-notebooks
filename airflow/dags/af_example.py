@@ -46,6 +46,13 @@ with DAG(
 		"password": "password"
 	},
 ) as dag:
+	process_list_dbs = PythonOperator(dag=dag,
+		task_id='list_dbs',
+		python_callable=af_example.list_dbs,
+		op_args=[],
+		provide_context=True
+		# op_kwargs={'keyword_argument':'which will be passed to function'}
+	)
 	process_list_collections = PythonOperator(dag=dag,
 		task_id='list_collections',
 		python_callable=af_example.list_collections,
@@ -62,3 +69,4 @@ with DAG(
 	)
 
 	process_list_collections >> [process_read_data]
+	process_list_dbs >> [process_read_data]

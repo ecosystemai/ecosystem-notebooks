@@ -10,6 +10,11 @@ def list_collections(**kwargs):
 	output = data_management_engine.get_document_db_collections(p_auth, database)
 	print(output)
 
+def list_dbs(**kwargs):
+	p_auth = authenticate.prediction_login(**kwargs)
+	output = data_management_engine.get_document_db_list(p_auth)
+	print(output)
+
 def read_data(**kwargs):
 	p_auth = authenticate.prediction_login(**kwargs)
 	database = "nlp_examples"
