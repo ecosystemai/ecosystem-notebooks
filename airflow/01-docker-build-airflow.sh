@@ -1,3 +1,4 @@
 cd ..
-docker build -t airflow-notebooks:latest -f airflow/Dockerfile .
+docker build -t ecosystemai/ecosystem-airflow:latest -f airflow/Dockerfile .
+docker push ecosystemai/ecosystem-airflow:latest
 cd airflow

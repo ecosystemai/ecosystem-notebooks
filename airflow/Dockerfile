@@ -1,5 +1,5 @@
-# docker build -t airflow-notebooks:latest .
-# docker run -d -p 8080:8080 airflow-notebooks
+# docker build -t ecosystemai/ecosystem-airflow:latest .
+# docker run -d -p 8080:8080 ecosystemai/ecosystem-airflow
 
 FROM apache/airflow:2.0.2
 
