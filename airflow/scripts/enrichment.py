@@ -163,11 +163,3 @@ def read_files(auth):
 	print("Files:")
 	for name in names:
 		print("\t{}".format(name))
-
-if __name__ == "__main__":
-	url = "http://demo.ecosystem.ai:3001/api"
-	username = "user@ecosystem.ai"
-	password = "cd486be3-9955-4364-8ccc-a9ab3ffbc168"
-	p_auth = jwt_access.Authenticate(url, username, password)
-	read_dbs(p_auth)
-	read_files(p_auth)
