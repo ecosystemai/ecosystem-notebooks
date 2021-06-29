@@ -352,7 +352,7 @@ def put_gift_recommendations(auth, document):
     return meta
 
 def behavior_recommender(auth, campaign, subcampaign, customer, channel, userid, params):
-    ep = endpoints.GIFT_RECOMMENDATIONS_PURCHASED
+    ep = endpoints.BEHAVIOR_RECOMMENDER
     param_dict = {"campaign": campaign, 
                   "subcampaign":subcampaign, 
                   "customer":customer, 
