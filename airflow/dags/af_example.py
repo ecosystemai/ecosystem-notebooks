@@ -24,7 +24,7 @@ default_args = {
 	# 'priority_weight': 10,
 	# 'end_date': datetime(2016, 1, 1),
 	# 'wait_for_downstream': False,
-	# 'dag': dag,
+	# 'dag': dag
 	# 'sla': timedelta(hours=2),
 	# 'execution_timeout': timedelta(seconds=300),
 	# 'on_failure_callback': some_function,
@@ -43,7 +43,10 @@ with DAG(
 	params={
 		"url": "http://demo.ecosystem.ai:3001/api",
 		"username": "user@ecosystem.ai",
-		"password": "password"
+		"password": "cd486be3-9955-4364-8ccc-a9ab3ffbc168",
+		"enrich_db": "",
+		"enrich_col": "",
+		"enrich_col_out": ""
 	},
 ) as dag:
 	process_list_dbs = PythonOperator(dag=dag,

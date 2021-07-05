@@ -339,6 +339,35 @@ class ScoringDash():
 					result[key] = str(value)
 		return results
 
+	# def direct_read_data(self, database, collection, model, start_date, end_date):
+	def direct_read_data(self, database, collection, model):
+		print('{{models:"{}""}}'.format(model))
+		find = '{{models:"{}"}}'.format(model)
+		projections = "{}"
+		total_to_process = 100
+		skip = 0
+		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
+		for result in results:
+			for key in result:
+				value = result[key]
+				if type(value) != str:
+					result[key] = str(value)
+		results = sorted(results, key = lambda i: i["datetime"])
+		return results
+
+	def direct_read_data_models(self, database, collection):
+		find = "{}"
+		projections = "{}"
+		total_to_process = 100
+		skip = 0
+		results = data_management_engine.get_data(self.p_auth, database, collection, find, total_to_process, projections, skip)
+		for result in results:
+			for key in result:
+				value = result[key]
+				if type(value) != str:
+					result[key] = str(value)
+		return results
+
 	def get_documents_for_key_value_header(self, usecase_name, value):
 		use_case = self.use_cases[usecase_name]
 		database = use_case["database"]

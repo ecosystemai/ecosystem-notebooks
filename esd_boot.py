@@ -1759,6 +1759,119 @@ amcd_component = html.Div([
 	style={"display": "none"}
 )
 
+drift_component = html.Div([
+		html.Div([
+				html.Label("", id="drift_data_buffer", hidden=True),
+				html.Label("", id="drift_data_prebuffer", hidden=True),
+				html.Label("", id="drift_output_div", hidden=True),
+				html.Label("drift_canvas_div", id="drift_div_buffer", hidden=True),
+
+				dbc.Card([
+						dbc.CardHeader(
+							dbc.Button("Options", outline=True, color="link", id="drift_collapse_button", style={"height": "100%", "width": "100%"}),
+						),
+						dbc.Collapse(
+							dbc.CardBody([
+									html.Label("Find"),
+									html.Div([
+											dbc.Row([
+													dbc.Col([
+															html.Label("Database"),
+															html.Div([
+																	html.Div(
+																		dcc.Dropdown(
+																			id="drift_database_dropdown",
+																			clearable=False,
+																		),
+																		style={"width": "90%", "display": "inline-block"}
+																	),
+																	html.Div(
+																		dbc.Button(
+																			html.I(className="fas fa-sync"), 
+																			outline=True, 
+																			color="primary", 
+																			id="drift_database_refresh_button", 
+																			style={"height": "36px"}
+																		),
+																		style={"display": "inline-block", "vertical-align": "top"}
+																	),
+																],
+															)
+														],
+														md=6
+													),
+													dbc.Col([
+															html.Label("Collection"),
+															dcc.Dropdown(
+																id="drift_collection_dropdown",
+																clearable=False,
+															),
+														],
+														md=6
+													),
+												]
+											),
+										]
+									)
+								]
+							),
+							id="drift_collapse",
+							is_open=True
+						)
+					]
+				),
+				dbc.Card(
+					dbc.CardBody([
+							dbc.Tab(
+								html.Div([
+										dbc.Row([
+												dbc.Col([
+														html.Label("Model"),
+														html.Br(),
+														dcc.Dropdown(
+															id="drift_model_dropdown",
+															clearable=False,
+														),
+													],
+													md=3
+												),
+												dbc.Col([
+														html.Label("Date"),
+														html.Br(),
+														dcc.DatePickerRange(
+															id="drift_datepicker",
+															display_format="YYYY-MM-DD",
+														),
+													],
+													md=9
+												),
+											],
+											style={"width": "100%"}
+										),
+										dbc.Row([
+												dbc.Col([
+														dcc.Graph(
+															id="drift_graphing",
+															figure={}
+														)
+													]
+												)
+											]
+										)
+									],
+								),
+							),
+						]
+					),
+					style={"height": "750px", "width": "100%"}
+				),
+			],
+			style={"padding-left": "30px", "padding-right": "30px", "padding-top": "30px", "padding-bottom": "30px"}
+		)
+	],
+	id="drift_component",
+	style={"display": "none"}
+)
 
 footer = dbc.Card(
 	dbc.CardBody([
@@ -1781,6 +1894,7 @@ app.layout = html.Div([
 				dtc.SideBarItem(id="id_4", label="Custom Graphing", icon="fas fa-chart-bar", className="sideBarItem"),
 				dtc.SideBarItem(id="id_5", label="Timeline", icon="fas fa-tasks", className="sideBarItem"),
 				dtc.SideBarItem(id="id_6", label="Timeline Daily", icon="fas fa-tasks", className="sideBarItem"),
+				dtc.SideBarItem(id="id_7", label="Model Drift", icon="fas fa-drafting-compass", className="sideBarItem"),
 			],
 			className="sideBar"
 		),
@@ -1807,7 +1921,7 @@ app.layout = html.Div([
 			],
 			id="toast_div"
 		),
-		html.Div([navbar, login_component, explore_component, scoring_component, custom_graphing_component, amcs_component, amcd_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
+		html.Div([navbar, login_component, explore_component, scoring_component, custom_graphing_component, amcs_component, amcd_component, drift_component, footer], id="page_content", className="page_content", style={"z-index": "-1"}),
 	], 
 	style={"position": "relative"}
 )
@@ -2232,6 +2346,99 @@ def tabs_content_graphing3(graph_dropdown_value, children):
 		layout=dict(
 			title="{} for Customers".format(y_string),
 			xaxes={"type": "category"}
+		)
+	)
+	return figure
+
+
+@app.callback(
+	dash.dependencies.Output("drift_model_dropdown", "options"),
+	[
+		dash.dependencies.Input("drift_collection_dropdown", "value"),
+	],
+	state=[
+		State(component_id="drift_database_dropdown", component_property="value"),
+	],
+	prevent_initial_call=True)
+def drift_graphing_models(collection, database):
+	data_points = sd.direct_read_data_models(database, collection)
+	models = []
+	for entry in data_points:
+		models.append(entry["models"])
+	models = list(set(models))
+	print(models)
+	return convert_list(models)
+
+# @app.callback(
+# 	[
+# 		dash.dependencies.Output("drift_model_dropdown", "start_date"),
+# 		dash.dependencies.Output("drift_model_dropdown", "end_date"),
+# 	],
+# 	[
+# 		dash.dependencies.Input("drift_model_dropdown", "value"),
+# 	],
+# 	state=[
+# 		State(component_id="drift_database_dropdown", component_property="value"),
+# 	],
+# 	prevent_initial_call=True)
+# def drift_graphing_models(collection, database):
+# 	data_points = sd.direct_read_data_models(database, collection)
+# 	models = []
+# 	for entry in data_points:
+# 		models.append(entry["models"])
+# 	models = list(set(models))
+# 	print(models)
+# 	return convert_list(models)
+
+@app.callback(
+	dash.dependencies.Output("drift_graphing", "figure"),
+	[
+		dash.dependencies.Input("drift_model_dropdown", "value")
+		# dash.dependencies.Input("drift_datepicker", "start_data"),
+		# dash.dependencies.Input("drift_datepicker", "end_date")
+	],
+	state=[
+		State(component_id="drift_database_dropdown", component_property="value"),
+		State(component_id="drift_collection_dropdown", component_property="value")
+	],
+	prevent_initial_call=True)
+def drift_graphing(model, database, collection):
+# def drift_graphing(model, start_date, end_date):
+	data_points = sd.direct_read_data(database, collection, model)
+	# data_points = sd.direct_read_data(database, collection, model, start_date, end_date):
+	dd_xs = []
+	dd_ys = []
+	cd_xs = []
+	cd_ys = []
+	
+	for value in data_points:
+		dd_xs.append(value["datetime"])
+		dd_ys.append(value["data_drift"])
+		cd_xs.append(value["datetime"])
+		cd_ys.append(value["concept_drift"])
+
+	figure=dict(
+		data=[
+			dict(
+				x=dd_xs,
+				y=dd_ys,
+				name="Data Drift",
+				marker=dict(
+					color="rgb(26, 118, 255)"
+				)
+			),
+			dict(
+				x=cd_xs,
+				y=cd_ys,
+				name="Concept Drift",
+				marker=dict(
+					color="rgb(255, 118, 26)"
+				)
+			)
+		],
+		layout=dict(
+			title="Drift",
+			xaxes={"type": "date"}
 		)
 	)
 	return figure
@@ -3337,6 +3544,21 @@ def amcd_toggle_collapse(n_clicks, is_open):
 	return True
 
 @app.callback(
+	dash.dependencies.Output("drift_collapse", "is_open"),
+	[
+		dash.dependencies.Input("drift_collapse_button", "n_clicks")
+	],
+	state=[
+		State(component_id="drift_collapse", component_property="is_open"),
+	],
+	prevent_initial_call=True
+)
+def drift_toggle_collapse(n_clicks, is_open):
+	if is_open:
+		return False
+	return True
+
+@app.callback(
 	[
 		dash.dependencies.Output("amcd_analysis_dropdown", "options"),
 		dash.dependencies.Output("amcd_analysis_dropdown", "value"),
@@ -3446,6 +3668,27 @@ def callback_login_amcd(children, n_clicks):
 
 @app.callback(
 	[
+		dash.dependencies.Output("drift_database_dropdown", "options"),
+	],
+	[	
+		dash.dependencies.Input("login_status", "children"),
+		dash.dependencies.Input("drift_database_refresh_button", "n_clicks")
+	],
+	prevent_initial_call=True)
+def callback_login_drift(children, n_clicks):
+	try:
+		databases = sd.get_prediction_databases()
+		new_databases = []
+		for entry in databases["databases"]:
+			new_databases.append(entry["name"])
+		return [convert_list(new_databases)]
+	except Exception as e:
+		print(e)
+		return [[]]
+
+
+@app.callback(
+	[
 		dash.dependencies.Output("amcd_collection_dropdown", "options"),
 	],
 	[	
@@ -3453,6 +3696,27 @@ def callback_login_amcd(children, n_clicks):
 	],
 	prevent_initial_call=True)
 def callback_amcd_database(database):
+	try:
+		if database == "":
+			return [[]]
+		collections = sd.get_prediction_collections(database)
+		new_collections = []
+		for entry in collections["collection"]:
+			new_collections.append(entry["name"])
+		return [convert_list(new_collections)]
+	except Exception as e:
+		print(e)
+		return [[]]
+
+@app.callback(
+	[
+		dash.dependencies.Output("drift_collection_dropdown", "options"),
+	],
+	[	
+		dash.dependencies.Input("drift_database_dropdown", "value")
+	],
+	prevent_initial_call=True)
+def callback_drift_database(database):
 	try:
 		if database == "":
 			return [[]]
@@ -3667,6 +3931,7 @@ def update_navbar_title(pretitle, cg, amcs, amcd):
 		dash.dependencies.Output("custom_graphing_component", "style"),
 		dash.dependencies.Output("amcs_component", "style"),
 		dash.dependencies.Output("amcd_component", "style"),
+		dash.dependencies.Output("drift_component", "style"),
 	],
 	[
 		dash.dependencies.Input("id_1", "n_clicks_timestamp"),
@@ -3675,42 +3940,46 @@ def update_navbar_title(pretitle, cg, amcs, amcd):
 		dash.dependencies.Input("id_4", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_5", "n_clicks_timestamp"),
 		dash.dependencies.Input("id_6", "n_clicks_timestamp"),
+		dash.dependencies.Input("id_7", "n_clicks_timestamp"),
 		dash.dependencies.Input("login_status", "children")
 	],
 )
-def toggle_collapse(input1, input2, input3, input4, input5, input6, login_status):
+def toggle_collapse(input1, input2, input3, input4, input5, input6, input7, login_status):
 	ctx = dash.callback_context
 	y = {"background-color": "#edf1f7", "min-height": "90vh"}
 	n = {"display": "none"}
 	trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 	if trigger_id == "login_status":
 		if login_status[:5] == "Error":			
-			return "Dashboard",y,n,n,n,n,n
+			return "Dashboard",y,n,n,n,n,n,n
 		else:
-			return "Explore",n,y,n,n,n,n
+			return "Explore",n,y,n,n,n,n,n
 	else:
 		if len(login_status) <= 2:
-			return "Dashboard",y,n,n,n,n,n
+			return "Dashboard",y,n,n,n,n,n,n
 		elif login_status[:5] == "Error":
-			return "Dashboard",y,n,n,n,n,n
+			return "Dashboard",y,n,n,n,n,n,n
 		else:
 			if trigger_id == "id_1":
-				return "Dashboard",y,n,n,n,n,n
+				return "Dashboard",y,n,n,n,n,n,n
 
 			if trigger_id == "id_2":
-				return "Explore",n,y,n,n,n,n
+				return "Explore",n,y,n,n,n,n,n
 
 			if trigger_id == "id_3":
-				return "Scoring",n,n,y,n,n,n
+				return "Scoring",n,n,y,n,n,n,n
 
 			if trigger_id == "id_4":
-				return "Custom Graphing",n,n,n,y,n,n
+				return "Custom Graphing",n,n,n,y,n,n,n
 
 			if trigger_id == "id_5":
-				return "Timeline",n,n,n,n,y,n
+				return "Timeline",n,n,n,n,y,n,n
 
 			if trigger_id == "id_6":
-				return "Timeline Daily",n,n,n,n,n,y
+				return "Timeline Daily",n,n,n,n,n,y,n
+
+			if trigger_id == "id_7":
+				return "Model Drift", n,n,n,n,n,n,y
 
 if __name__ == "__main__":
 	app.run_server(debug=True)

@@ -19,4 +19,4 @@ RUN pip3 install -r requirements.txt
 
 COPY . /app
 
-CMD ["gunicorn", "-w 1", "-b 0.0.0.0:5000", "esd_boot:server", "--timeout 600", "--keep-alive 600"]
+CMD ["gunicorn", "-w 1", "-b 0.0.0.0:5000", "esd_boot:server", "--timeout 6000", "--keep-alive 6000"]
